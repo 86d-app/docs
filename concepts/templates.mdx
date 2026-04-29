@@ -1,9 +1,9 @@
 ---
-title: "MDX Templates"
+title: "MDX templates"
 description: "Templates bundle MDX pages, a config.json, and OKLCH color tokens to define your store's look and content. Swap designs without touching business logic."
 ---
 
-A template is a folder that contains everything visual about your store: the MDX files that compose each page, a `config.json` that lists which modules are active and what colors to use, and any global CSS overrides. When you change a template, the store's look changes completely — but the underlying module logic, API routes, and data stay exactly the same.
+A template is a folder that contains everything visual about your store: the MDX files that compose each page, a `config.json` that lists which modules are active and what colors to use, and any global CSS overrides. When you change a template, the store's look changes completely, but the underlying module logic, API routes, and data stay exactly the same.
 
 The default template is **brisa**, located at `templates/brisa/`. It is the starting point for every new store.
 
@@ -30,12 +30,12 @@ templates/brisa/
 │   └── [slug]/layout.mdx
 ├── track/index.mdx      # Order tracking
 ├── search/index.mdx     # Search results
-└── assets/              # Favicon, logos (light + dark variants)
+└── assets/              # Favicon and logos (light + dark variants)
 ```
 
-## config.json
+## `config.json`
 
-`config.json` is the single source of truth for your store's configuration. It controls which modules are active, what the store is named, and how every color is rendered — in both light and dark mode.
+`config.json` is the single source of truth for your store's configuration. It controls which modules are active, what the store is named, and how every color is rendered in both light and dark mode.
 
 ```json config.json
 {
@@ -81,13 +81,15 @@ templates/brisa/
 | `theme` | The template name. Must match the folder name under `templates/`. |
 | `name` | Your store's display name, shown in the navbar and browser tab. |
 | `modules` | `"*"` to enable all installed modules, or an explicit array of package names. |
-| `moduleOptions` | Per-module configuration passed to the module's `init` function at startup. |
+| `moduleOptions` | Per-module configuration passed to each module's `init` function at startup. |
 | `variables.light` | OKLCH color tokens applied as CSS custom properties in light mode. |
 | `variables.dark` | OKLCH color tokens applied as CSS custom properties in dark mode. |
 
+For the full schema, see [`config.json` reference](/configuration/store-config).
+
 ## OKLCH color customization
 
-Colors are defined as [OKLCH](https://oklch.com/) values — a perceptually uniform color space that makes it easy to control lightness and chroma consistently across a palette. Every token in `variables.light` and `variables.dark` maps directly to a CSS custom property used by Tailwind.
+Colors are defined as [OKLCH](https://oklch.com/) values, a perceptually uniform color space that makes it easy to control lightness and chroma consistently across a palette. Every token in `variables.light` and `variables.dark` maps directly to a CSS custom property used by Tailwind.
 
 <CodeGroup>
 
@@ -126,15 +128,15 @@ Colors are defined as [OKLCH](https://oklch.com/) values — a perceptually unif
 </CodeGroup>
 
 <Tip>
-  OKLCH values follow the format `oklch(lightness chroma hue)`. To shift your brand color, adjust the hue value (0–360) on `primary` and keep lightness/chroma consistent across the palette for a harmonious result.
+  OKLCH values follow the format `oklch(lightness chroma hue)`. To shift your brand color, adjust the hue value (0 to 360) on `primary` and keep lightness and chroma consistent across the palette for a harmonious result.
 </Tip>
 
 ## The two-file component pattern
 
 Every visual component in a template follows a strict two-file convention:
 
-- **`.tsx`** — business logic only: state, data fetching, event handlers, and configuration
-- **`.mdx`** — presentation only: pure render template that receives all data as props
+- **`.tsx`**: business logic only. State, data fetching, event handlers, and configuration.
+- **`.mdx`**: presentation only. Pure render template that receives all data as props.
 
 ```tsx navbar/index.tsx
 import One from "./1.mdx";
@@ -153,23 +155,27 @@ export function Navbar() {
 </nav>
 ```
 
-Numbered MDX files (`1.mdx`, `2.mdx`, `3.mdx`) are **design variants** of the same component. Switching themes means swapping which numbered file the `.tsx` imports — the business logic is untouched.
+Numbered MDX files (`1.mdx`, `2.mdx`, `3.mdx`) are **design variants** of the same component. Switching themes means swapping which numbered file the `.tsx` imports. The business logic is untouched.
 
 ## Creating a new template
 
 <Steps>
   <Step title="Scaffold from brisa">
     ```bash
-    bun run 86d template create my-theme
+    86d template create my-theme
     ```
 
-    This copies the brisa template into `templates/my-theme/` as a starting point.
-  </Step>
-  <Step title="Update config.json">
-    Change the `theme` field to your new template name and adjust the `name`, colors, and module list.
+    This copies the brisa template into `templates/my-theme/` as a starting point and updates `theme` and `name` in the new `config.json`.
   </Step>
   <Step title="Edit your MDX pages">
-    Modify `layout.mdx`, `index.mdx`, and any page-level MDX files to match your design. Module components are available by name — no imports needed.
+    Modify `layout.mdx`, `index.mdx`, and any page-level MDX files to match your design. Module components are available by name without any imports.
+  </Step>
+  <Step title="Activate the new template">
+    ```bash
+    86d template activate my-theme
+    ```
+
+    Activation rewires the `template/*` path alias in `apps/store/tsconfig.json` to point at your new template directory.
   </Step>
   <Step title="Restart the dev server">
     ```bash
@@ -180,6 +186,15 @@ Numbered MDX files (`1.mdx`, `2.mdx`, `3.mdx`) are **design variants** of the sa
   </Step>
 </Steps>
 
+You can also pull a template straight from GitHub or npm:
+
+```bash
+86d template add github:owner/repo/templates/custom
+86d template add npm:@acme/store-template
+```
+
+See [`86d template add`](/cli/commands#86d-template-add) for the full specifier grammar.
+
 <Warning>
-  If you rename your template folder, make sure the `theme` field in your `config.json` matches the new folder name exactly, or the build will fail.
+  If you rename your template folder, make sure the `theme` field in your `config.json` matches the new folder name exactly. Otherwise the build will fail.
 </Warning>

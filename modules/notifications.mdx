@@ -1,0 +1,26 @@
+---
+title: "Notifications"
+description: "In-app and email notification system for 86d. Queue, send, retry, and audit transactional messages."
+---
+
+The notifications module is the central queue for outbound messages: order confirmations, password resets, abandoned-cart reminders, return updates, and any custom message your modules emit. It dispatches via Resend (email) and Twilio (SMS) when those provider keys are configured, and falls back to no-op in-memory delivery for local development.
+
+**Source:** [`modules/notifications`](https://github.com/86d-app/86d/tree/main/modules/notifications) · **npm:** [`@86d-app/notifications`](https://www.npmjs.com/package/@86d-app/notifications)
+
+## Installation
+
+```sh
+86d module add notifications
+```
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/notifications` | Sent and queued messages |
+| `POST` | `/admin/notifications/test` | Send a test message |
+| `GET` | `/admin/notifications/templates` | Manage transactional templates |
+
+## Related modules
+
+- [Newsletter](/modules/newsletter) (broadcast vs. transactional), [Automations](/modules/automations).

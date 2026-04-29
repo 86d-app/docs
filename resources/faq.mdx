@@ -1,0 +1,91 @@
+---
+title: "FAQ"
+description: "Frequently asked questions about 86d: licensing, production readiness, hosting, modules, customization, and how it compares to other commerce platforms."
+---
+
+## Is 86d production-ready?
+
+Not yet. 86d is under active development. Several core systems (auth, storage, payments, the module runtime) are stable, but the project is pre-1.0 and APIs may change. Read the warning on [Versioning and stability](/resources/versioning) before you commit a real store to it.
+
+## What is the license?
+
+86d is licensed under [Apache 2.0](https://github.com/86d-app/86d/blob/main/LICENSE). You can fork it, modify it, sell hosting on top of it, build proprietary modules against it, and contribute back, all without asking permission.
+
+## How is 86d different from Shopify?
+
+86d is open source, self-hostable, and modular at the source-code level. Shopify is a closed-source SaaS platform with apps as the unit of extensibility. The big practical differences:
+
+- **Data ownership**: with 86d your store runs on your PostgreSQL database. You can export, migrate, and self-host at any time.
+- **Customization depth**: you can edit any module, any template, and the platform itself. Shopify themes and apps run inside Shopify's sandbox.
+- **Pricing model**: 86d is Apache-licensed software. There is no transaction fee unless you choose 86d's optional hosted services.
+- **Maturity**: Shopify has years of production scale and a vast app ecosystem. 86d is younger and developing fast.
+
+See [Migrate from Shopify](/guides/migrating-from-shopify) for the practical mapping.
+
+## How is 86d different from Medusa, Saleor, or commercetools?
+
+86d's distinguishing choices are:
+
+- **Modules ship as standalone npm packages** rather than as folders inside a monolithic core. You install only what you need.
+- **MDX-driven storefront templates** instead of a separate headless frontend.
+- **Agentic-first design**: the architecture is shaped to be tractable for AI-assisted development. See [Agentic design](/concepts/agentic-design).
+- **Apache 2.0** with no commercial-use restriction.
+
+These tradeoffs are deliberate. If your team prefers a single bundled core or has heavy reliance on the headless model, those alternatives may be a better fit.
+
+## Where do I host an 86d store?
+
+Anywhere that can run a Next.js app and a PostgreSQL database. 86d ships first-class support for:
+
+- **Self-hosted with Docker Compose** (PostgreSQL + MinIO + the store app, one command)
+- **Railway** (managed PostgreSQL, deploy from GitHub)
+- **Vercel + Neon** (serverless PostgreSQL, Vercel Blob storage)
+
+See [Deployment and hosting](/deployment).
+
+## Can I use 86d without the hosted 86d.app service?
+
+Yes. The hosted service is optional. When `STORE_ID` and `86D_API_KEY` are unset, the store runs entirely from your own database and `config.json`. When set, the store fetches its configuration from the 86d hosted API and enables 86d.app SSO.
+
+## Can I write modules in something other than TypeScript?
+
+The module runtime expects TypeScript or compiled JavaScript that follows the `Module` contract. You can write your business logic in any language and call it from a TypeScript shim, but the module entry point must be JS / TS.
+
+## Can I use a database other than PostgreSQL?
+
+Currently no. 86d uses Prisma 7 with the PostgreSQL provider, which the codebase relies on for indexing, JSONB columns, and full-text search. Other Prisma adapters may work for read-heavy paths but are not officially supported.
+
+## How do I add a payment provider that is not built in?
+
+Implement the `PaymentProvider` interface from `@86d-app/payments` and pass an instance to the payments module. See [Payment gateways](/guides/payment-integrations) and [Payments module](/modules/payments).
+
+## How do I sell on a marketplace that is not built in?
+
+Write a custom module that follows the same shape as the existing channel modules (`@86d-app/amazon`, `@86d-app/etsy`, ...). Cross-module data access goes through `requires.read: ["products"]`. See [Build a custom module](/guides/building-a-module).
+
+## Can I run multiple stores from one deployment?
+
+Yes, by setting `STORE_ID` per environment. Each store has its own `config.json` (fetched from the 86d hosted API) and its own data scoped by `storeId` foreign keys. Multiple deployments hitting the same database is the supported pattern; one deployment serving multiple stores at runtime is on the roadmap.
+
+## How do I migrate from a previous 86d version?
+
+Update the workspace, run `bun install`, run `bun run db:migrate` (Prisma migrations), and run `86d generate`. The release notes for each version flag any breaking changes. See [Versioning](/resources/versioning).
+
+## Where do I report a bug?
+
+[github.com/86d-app/86d/issues](https://github.com/86d-app/86d/issues). For security issues, use [GitHub Security Advisories](https://github.com/86d-app/86d/security/advisories) instead of a public issue.
+
+## How do I contribute?
+
+Read [Contributing](/resources/contributing). The TL;DR: fork the repo, branch off `main`, add tests for any code change, run all health gates locally, and open a pull request.
+
+## Is there a hosted version of these docs as an MCP server?
+
+Yes. See [MCP server](/mcp).
+
+## Is there an X / LinkedIn account?
+
+Yes:
+
+- X: [@86d_app](https://x.com/86d_app)
+- LinkedIn: [86d on LinkedIn](https://www.linkedin.com/company/86d)

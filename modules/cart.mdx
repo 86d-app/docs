@@ -1,7 +1,10 @@
 ---
-title: "Carts"
+title: "Cart"
 description: "Add shopping cart functionality to your 86d store. Supports guest and authenticated customers with configurable expiration, item limits, and a cart drawer."
 ---
+
+**Source:** [`modules/cart`](https://github.com/86d-app/86d/tree/main/modules/cart) · **npm:** [`@86d-app/cart`](https://www.npmjs.com/package/@86d-app/cart)
+
 
 The cart module handles the full shopping cart lifecycle for both guest visitors and authenticated customers. It exposes store endpoints for adding, updating, and removing items, ships a ready-to-use cart drawer component, and keeps prices snapshotted at the moment each item is added so totals stay accurate even when catalog prices change later.
 
@@ -72,7 +75,7 @@ All store endpoints return a consistent response shape:
 
 ### Cart
 
-The `Cart` component renders a slide-in drawer from the right side of the screen. It displays the customer's current cart items, subtotal, and a link to proceed to checkout. The component fetches all cart data on its own — no props are required.
+The `Cart` component renders a slide-in drawer from the right side of the screen. It displays the customer's current cart items, subtotal, and a link to proceed to checkout. The component fetches all cart data on its own; no props are required.
 
 ```mdx
 <Cart />
@@ -145,8 +148,8 @@ interface CartItem {
 
 ## Notes
 
-**Guest vs. authenticated carts.** Guest carts are identified by a `guestId` UUID. When a customer signs in, their guest cart can coexist alongside their authenticated cart — both carts reference different IDs. Your checkout flow is responsible for merging them if needed.
+**Guest vs. authenticated carts.** Guest carts are identified by a `guestId` UUID. When a customer signs in, their guest cart can coexist alongside their authenticated cart; both carts reference different IDs. Your checkout flow is responsible for merging them if needed.
 
-**Deterministic item IDs.** Cart item IDs follow the pattern `${cartId}_${productId}[_${variantId}]`. This means adding the same product (or product \+ variant) twice merges the quantity into the existing line item rather than creating a duplicate. Different variants of the same product are always treated as separate line items.
+**Deterministic item IDs.** Cart item IDs follow the pattern `${cartId}_${productId}[_${variantId}]`. This means adding the same product (or product plus variant) twice merges the quantity into the existing line item rather than creating a duplicate. Different variants of the same product are always treated as separate line items.
 
 **Swappable storage.** The module ships with an in-memory adapter by default. You can swap in any persistence layer by replacing the adapter in your module configuration.

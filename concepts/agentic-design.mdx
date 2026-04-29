@@ -1,0 +1,109 @@
+---
+title: "Agentic design"
+description: "86d is shaped to be tractable for AI-assisted code generation, automated reviews, and bulk migrations. Here is what that means in practice."
+---
+
+A guiding principle of 86d is that every commerce feature should be small, isolated, and scoped to a single concern. That makes the platform pleasant for human developers and unusually easy for AI assistants to extend, audit, and refactor.
+
+This page explains the design choices that come out of that principle and how to use them when you build alongside an AI agent.
+
+## Small surface area per module
+
+Every module fits in one folder, depends only on `@86d-app/core`, and ships its own schema, endpoints, components, and tests:
+
+```text
+modules/<name>/src/
+  index.ts              Factory, types, admin navigation
+  schema.ts             Zod schemas
+  controllers.ts        Business logic
+  store/endpoints/      Public API
+  store/components/     Customer-facing MDX components
+  admin/endpoints/      Admin API
+  admin/components/     Admin UI
+  __tests__/            Vitest unit tests
+```
+
+A typical module is a few hundred lines of code. An AI assistant can read the full module into its context window, understand the entire surface, and propose changes that keep the contract intact.
+
+## Strict isolation
+
+Modules cannot import each other. All cross-module reads and writes go through the `requires` / `exports` contract system:
+
+```ts
+exports: {
+  read: ["myFeatureItems"],
+},
+requires: {
+  read: ["cartItems"],
+},
+```
+
+The runtime validates contracts at startup, so a module that drifts out of sync with another module fails fast at boot, not at runtime in production. This keeps refactor blast-radius small. An agent can rewrite an entire module knowing the only public surface is its declared contract.
+
+## Predictable file conventions
+
+Templates follow a strict two-file pattern (`.tsx` for logic, `.mdx` for presentation). Numbered MDX files are design variants, never logical branches. Modules always live under `modules/<name>/src/`. Components always live under `store/components/` or `admin/components/`. Endpoints always live under `store/endpoints/` or `admin/endpoints/`.
+
+These conventions mean an agent can navigate any 86d store, or any community module, with no orientation cost. "Where does X live?" has one answer.
+
+## Schema-first contracts
+
+Every module declares its data shape with Zod schemas in `schema.ts`. Endpoints validate input against the schema before any business logic runs. The same schemas drive TypeScript types, runtime validation, and (when needed) JSON Schema generation.
+
+For an agent, this means:
+
+- Type errors surface immediately. The agent can iterate against `bun run typecheck` rather than waiting for runtime feedback.
+- Generated API clients, OpenAPI specs, and documentation can be derived from the same source of truth.
+- Refactors that change a schema fail loudly at every call site.
+
+## A canonical CLI
+
+The `86d` CLI gives agents a deterministic interface to scaffold, install, enable, and regenerate. Common workflows are one command:
+
+```sh
+86d module create my-feature
+86d module add reviews
+86d module enable my-feature
+86d generate
+86d doctor
+```
+
+`86d doctor` in particular is designed to be agent-friendly: it prints a structured pass / warn / fail report with a `Fix:` line for every issue, so an agent can decide what to do next without parsing prose.
+
+## Registry as a machine-readable manifest
+
+`registry.json` enumerates every first-party module, its category, version, dependency contract, and integrity hash. Agents can plan a deployment ("install these five modules"), audit drift ("which local modules are behind the registry"), and find candidate modules without scraping any human-readable surface.
+
+```json registry.json (excerpt)
+{
+  "modules": {
+    "loyalty": {
+      "name": "@86d-app/loyalty",
+      "version": "0.0.30",
+      "category": "customers",
+      "requires": [],
+      "hasStoreComponents": true,
+      "hasAdminComponents": true,
+      "integrity": "sha256-..."
+    }
+  }
+}
+```
+
+## A documentation MCP server
+
+The 86d docs are exposed over a Model Context Protocol server that AI clients can connect to directly. Two tools cover most needs: a semantic search and a sandboxed read-only filesystem over every page. Agents can `cat /modules/cart.mdx`, `rg "BETTER_AUTH_SECRET" /`, or run `tree / -L 2` against the docs without web scraping or context window pressure.
+
+See [MCP server](/mcp).
+
+## Practical advice for working with agents
+
+- **Scope tasks to a single module.** "Add a `markFavorite` endpoint to `@86d-app/products` and a corresponding component" is a great prompt. "Refactor the catalog" is not.
+- **Lean on the test suite.** Each module ships Vitest tests. Ask the agent to run `bun test` and iterate against the result.
+- **Use `86d doctor` as a precondition check.** If the project is unhealthy, fix that first.
+- **Keep contracts explicit.** When two modules need to talk, prefer adding fields to the `exports` / `requires` contracts over inventing ad-hoc shared utilities.
+- **Pin to a registry version.** When asking an agent to install or upgrade modules, point it at a specific `registry.json` revision so the plan is reproducible.
+
+## What "agentic-first" does not mean
+
+86d is not an LLM wrapper, and it does not require AI to operate. Every workflow is fully usable by hand. Agentic design is a property of the codebase, not a runtime dependency.

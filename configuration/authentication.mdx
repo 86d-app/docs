@@ -3,7 +3,7 @@ title: "Authentication"
 description: "Configure Better Auth session management, social login providers, and admin access for your 86d store, including SSO and the default admin credentials."
 ---
 
-86d uses [Better Auth](https://better-auth.com/) for all authentication — customer sign-in, admin sessions, and social OAuth flows. The auth system handles session cookies, role-based access control, and (when `86D_API_KEY` is set) SSO with the 86d.app platform. Setting up authentication correctly is one of the first things to do before going to production.
+86d uses [Better Auth](https://better-auth.com/) for all authentication: customer sign-in, admin sessions, and social OAuth flows. The auth system handles session cookies, role-based access control, and (when `86D_API_KEY` is set) SSO with the 86d.app platform. Setting up authentication correctly is one of the first things to do before going to production.
 
 ## Required setup
 
@@ -23,7 +23,7 @@ BETTER_AUTH_SECRET=<paste the output here>
   Never use the placeholder value from `.env.example` in production. Any store with a predictable `BETTER_AUTH_SECRET` is trivially exploitable.
 </Warning>
 
-You should also set `BETTER_AUTH_URL` to your store's public URL so that OAuth callbacks resolve correctly:
+You should also set `BETTER_AUTH_URL` to your store's public URL so OAuth callbacks resolve correctly:
 
 ```bash .env
 BETTER_AUTH_URL=https://your-store.com
@@ -31,21 +31,21 @@ BETTER_AUTH_URL=https://your-store.com
 
 ## Auth endpoints
 
-Better Auth handles all requests under `/api/auth/[...all]`. You do not need to configure these routes manually — they are wired up automatically.
+Better Auth handles all requests under `/api/auth/[...all]`. You do not need to configure these routes manually; they are wired up automatically.
 
 | Endpoint | Description |
 | --- | --- |
 | `POST /api/auth/sign-in/email` | Sign in with email and password |
 | `POST /api/auth/sign-up/email` | Register a new customer account |
-| `GET/POST /api/auth/[...all]` | OAuth callbacks, session management, SSO |
+| `GET, POST /api/auth/[...all]` | OAuth callbacks, session management, SSO |
 
 ## Guest shoppers
 
-Guest shoppers do not need an account. Guest carts are tracked using a `guestId` cookie set automatically on first visit. When a guest completes checkout, their order is recorded against the guest ID. If they later create an account, their order history can be associated with their new account.
+Guest shoppers do not need an account. Guest carts are tracked using a `guestId` cookie set automatically on first visit. When a guest completes checkout, their order is recorded against the guest ID. If they later create an account, their order history can be associated with the new account.
 
 ## Social login providers
 
-Enable social login by adding credentials for one or more OAuth providers to your `.env`. Any provider whose variables are absent is automatically disabled — you do not need to remove anything from your config.
+Enable social login by adding credentials for one or more OAuth providers to your `.env`. Any provider whose variables are absent is disabled automatically. You do not need to remove anything from your config.
 
 | Provider | Required variables |
 | --- | --- |
@@ -78,7 +78,7 @@ Enable social login by adding credentials for one or more OAuth providers to you
   </Step>
 </Steps>
 
-Other providers follow the same pattern — create an OAuth app on the provider's developer platform, set the redirect URI to `https://your-store.com/api/auth/callback/<provider>`, and copy the client ID and secret into your `.env`.
+Other providers follow the same pattern: create an OAuth app on the provider's developer platform, set the redirect URI to `https://your-store.com/api/auth/callback/<provider>`, and copy the client ID and secret into your `.env`.
 
 ## Admin access
 
@@ -94,14 +94,14 @@ When you run `86d init` or `docker compose up` (which seeds automatically), a de
 | Password | `password123` |
 
 <Warning>
-  Change the default admin password immediately after setup. In production, use a strong unique password or disable email/password login in favor of SSO.
+  Change the default admin password immediately after setup. In production, use a strong unique password or disable email and password login in favor of SSO.
 </Warning>
 
 You can create additional admin users from the admin dashboard under **System → Users**, or by promoting an existing user to the `admin` role directly in the database.
 
 ### 86d SSO
 
-When `86D_API_KEY` is set, 86d.app SSO is enabled for admin authentication. This allows you to sign in to your store's admin using your 86d.app account credentials — no separate admin password required.
+When `86D_API_KEY` is set, 86d.app SSO is enabled for admin authentication. This lets you sign in to your store's admin using your 86d.app account credentials, with no separate admin password required.
 
 ```bash .env
 86D_API_KEY=your-api-key
@@ -110,7 +110,7 @@ STORE_ID=your-store-uuid
 
 With SSO enabled, admin sessions are issued via the 86d.app identity provider. Team members with access to your store in the 86d.app dashboard can sign in directly without needing a local account.
 
-## Email \+ password auth
+## Email and password auth
 
 Email and password login is enabled by default. Customers and admins can register and sign in using their email address and a password. Passwords are hashed using bcrypt and never stored in plaintext.
 
@@ -120,4 +120,4 @@ To send password-reset and verification emails, set `RESEND_API_KEY`:
 RESEND_API_KEY=re_...
 ```
 
-Without a Resend key, email delivery is disabled and password-reset flows will not work. You may still use social login or SSO for authentication.
+Without a Resend key, email delivery is disabled and password-reset flows do not work. You may still use social login or SSO for authentication.

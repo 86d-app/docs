@@ -1,25 +1,27 @@
 ---
-title: "Module Catalog"
-description: "Browse all 100+ modules available in the 86d commerce platform, organized by category. Each module is an isolated npm package you install independently."
+title: "Module catalog"
+description: "Browse all 99 modules available in the 86d commerce platform, organized by category. Each module is an isolated npm package you install independently."
 ---
 
-86d is built around a modular architecture where every feature ships as a standalone package. You install only the modules your store needs, configure them in `config.json`, and they become available as endpoints and MDX components in your storefront. All modules are published to npm under the `@86d-app` scope and share the same version number.
+86d is built around a modular architecture where every feature ships as a standalone package. You install only the modules your store needs, configure them in `config.json`, and they become available as endpoints and MDX components in your storefront. All first-party modules are published to npm under the `@86d-app` scope and share the same version number.
+
+For the canonical machine-readable list of every module, see the [registry manifest](https://github.com/86d-app/86d/blob/main/registry.json).
 
 ## Installation
 
-Install any module with npm:
+Install any module with the CLI:
 
 ```sh
-npm install @86d-app/<module-name>
+86d module add <module-name>
 ```
 
-Then add it to your store's `config.json` under the `modules` array. Once registered, the module's API endpoints and store components are automatically available.
+The CLI fetches the module from the registry, installs its dependencies, and enables it in the active template. You can also add the module manually to `config.json` and run `npm install`. Once registered, the module's API endpoints and store components are available immediately.
 
 ## Module catalog
 
 <AccordionGroup>
   <Accordion title="Catalog">
-    Core product data — the foundation of every store.
+    Core product data, the foundation of every store.
 
     | Module | Package | Description |
     | --- | --- | --- |
@@ -28,7 +30,7 @@ Then add it to your store's `config.json` under the `modules` array. Once regist
     | brands | `@86d-app/brands` | Organize products by manufacturer or brand |
     | media | `@86d-app/media` | Digital asset management with folder organization and tagging |
     | inventory | `@86d-app/inventory` | Stock tracking, reservations, and low-stock alerts |
-    | product-labels | `@86d-app/product-labels` | Visual badges — "New", "Sale", "Best Seller", etc. |
+    | product-labels | `@86d-app/product-labels` | Visual badges such as "New", "Sale", or "Best Seller" |
     | product-qa | `@86d-app/product-qa` | Product-specific questions and answers |
     | search | `@86d-app/search` | Full-text search with fuzzy matching and faceted filtering |
     | seo | `@86d-app/seo` | Per-page meta tags, Open Graph, Twitter Card, and JSON-LD |
@@ -185,7 +187,7 @@ Then add it to your store's `config.json` under the `modules` array. Once regist
 
 ## Next steps
 
-- [Products module reference](/modules/products) — the core catalog module
-- [Collections module reference](/modules/collections) — curated product groupings
-- [Brands module reference](/modules/brands) — manufacturer and brand pages
-- [Media module reference](/modules/media) — digital asset management
+- [Products](/modules/products): the core catalog module
+- [Collections](/modules/collections): curated product groupings
+- [Brands](/modules/brands): manufacturer and brand pages
+- [Media](/modules/media): digital asset management

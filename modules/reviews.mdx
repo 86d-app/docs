@@ -3,7 +3,9 @@ title: "Reviews"
 description: "Collect and moderate product reviews with star ratings, photo uploads, helpfulness voting, abuse reporting, and merchant responses."
 ---
 
-The reviews module adds a full product review system to your store. Reviews go through a moderation queue before becoming publicly visible — unless you enable `autoApprove`. Customers can submit photo reviews, vote on helpfulness, and report abuse. Merchants can respond to reviews from the admin dashboard.
+The reviews module adds a full product review system to your store. Reviews go through a moderation queue before becoming publicly visible, unless you enable `autoApprove`. Customers can submit photo reviews, vote on helpfulness, and report abuse. Merchants can respond to reviews from the admin dashboard.
+
+**Source:** [`modules/reviews`](https://github.com/86d-app/86d/tree/main/modules/reviews) · **npm:** [`@86d-app/reviews`](https://www.npmjs.com/package/@86d-app/reviews)
 
 ## Installation
 
@@ -193,7 +195,7 @@ Interactive star rating input for use inside a review form.
 
 ### `DistributionBars`
 
-Horizontal bar chart showing the rating distribution (1–5 stars) for a product.
+Horizontal bar chart showing the rating distribution (1 to 5 stars) for a product.
 
 ```mdx
 <DistributionBars />
@@ -217,7 +219,7 @@ interface Review {
   customerId?: string;
   authorName: string;
   authorEmail: string;
-  rating: number;          // 1–5
+  rating: number;          // 1 to 5
   title?: string;
   body: string;
   status: ReviewStatus;
@@ -249,5 +251,5 @@ interface ReviewReport {
 ```
 
 <Note>
-  Only approved reviews appear in product listings and rating summaries. The `isVerifiedPurchase` field can only be set server-side — it is always `false` for reviews submitted through the store endpoint.
+  Only approved reviews appear in product listings and rating summaries. The `isVerifiedPurchase` field can only be set server-side; it is always `false` for reviews submitted through the store endpoint.
 </Note>

@@ -1,0 +1,31 @@
+---
+title: "Flash sales"
+description: "Time-limited promotional events with countdown timers. Drives urgency for short-window discounts in 86d."
+---
+
+The flash-sales module configures sale events that auto-activate and auto-expire. Each event applies a discount across selected products or collections, surfaces a countdown timer on the storefront, and emits `flash-sale.started` and `flash-sale.ended` events for downstream automation.
+
+**Source:** [`modules/flash-sales`](https://github.com/86d-app/86d/tree/main/modules/flash-sales) · **npm:** [`@86d-app/flash-sales`](https://www.npmjs.com/package/@86d-app/flash-sales)
+
+## Installation
+
+```sh
+86d module add flash-sales
+```
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/flash-sales` | List events |
+| `POST` | `/admin/flash-sales` | Create an event |
+| `PUT` | `/admin/flash-sales/:id` | Update |
+| `POST` | `/admin/flash-sales/:id/end` | Force-end early |
+
+## Components
+
+- `<FlashSaleBanner />`, `<FlashSaleCountdown saleId={id} />`.
+
+## Related modules
+
+- [Discounts](/modules/discounts), [Product labels](/modules/product-labels), [Announcements](/modules/announcements).

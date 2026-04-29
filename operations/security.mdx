@@ -1,0 +1,94 @@
+---
+title: "Security model"
+description: "How 86d secures sessions, API requests, file uploads, webhooks, and multi-tenant data. The defaults you get and the tradeoffs you control."
+---
+
+86d ships with strict defaults across every layer that touches the network or user data. This page is a reference for what those defaults are, where each protection lives, and what knobs you have.
+
+## Authentication
+
+- **Better Auth.** Sessions are signed with `BETTER_AUTH_SECRET`. The placeholder in `.env.example` is rejected by the boot validator; you must replace it with a 32-byte random string. Generate with `openssl rand -base64 32`.
+- **Bcrypt for passwords.** Passwords are hashed with bcrypt and never stored in plaintext.
+- **Cookies are HTTP-only and SameSite-Lax.** Session tokens cannot be read by JavaScript.
+- **OAuth callbacks** use `BETTER_AUTH_URL`. Misconfigured callback URLs fail closed at the provider.
+- **86d.app SSO.** When `86D_API_KEY` is set, admin authentication delegates to 86d.app's identity provider.
+
+See [Authentication](/configuration/authentication).
+
+## Admin access
+
+- The admin app at `/admin` is gated by an `admin` role check.
+- Unauthenticated requests redirect to `/auth/signin`.
+- The default seeded admin (`admin@example.com` / `password123`) **must** be replaced before any internet-facing deploy.
+
+## API rate limits
+
+Rate limits are enforced per route class:
+
+| Surface | Limit | Identifier |
+| --- | --- | --- |
+| Public storefront API | 120 req / minute | IP address |
+| Sensitive public endpoints (newsletter subscribe, payment intent create) | 10 req / 10 minutes | IP address |
+| Admin API (`/api/admin/...`) | 300 req / minute | `userId` |
+
+When a client exceeds a limit, the API returns `HTTP 429` with `Retry-After` and `X-RateLimit-Reset` headers.
+
+## File uploads
+
+`POST /api/upload` is admin-only. Every uploaded file is validated against:
+
+- Magic-byte detection (the actual file format), not the `Content-Type` header.
+- A size cap per format (4.5 MB for images, 10 MB for PDFs).
+- An SVG sanitizer that rejects embedded scripts, event handlers, and `javascript:` URIs.
+
+Files are stored at `stores/{storeId}/{uuid}` so cross-store reads, writes, and deletes are not possible even with a forged path. SVG responses use a strict CSP (`default-src 'none'; style-src 'unsafe-inline'`); PDFs are served as attachments.
+
+`DELETE /api/upload` includes a store-isolation check so admins of one store cannot delete files owned by another.
+
+See [Storage configuration](/configuration/storage).
+
+## Webhook verification
+
+Every payment provider module implements HMAC signature verification before any handler runs:
+
+- **Raw body capture.** The signature is computed against the raw request body, not the JSON-parsed value.
+- **HMAC-SHA256** with a constant-time comparator. No external crypto library; verification runs on the Web Crypto API.
+- **Replay protection.** Webhook timestamps older than 5 minutes are rejected with `401`.
+
+See [Payment gateways](/guides/payment-integrations) for per-provider signing schemes.
+
+## Multi-tenancy
+
+Every database row that is store-scoped includes a `storeId` foreign key. Every admin endpoint resolves `storeId` from the session, never from the request body. Every storage path is prefixed with `stores/{storeId}/`. Stores cannot read or write each other's data.
+
+When you set `STORE_ID` and `86D_API_KEY`, the store fetches its config from the hosted 86d API. The hosted API authenticates using the API key, scopes responses to the store, and refuses to return any other store's configuration.
+
+## Database
+
+- **Prisma 7** with parameterized queries. SQL injection is structurally impossible from app code.
+- **Migrations** run with `DATABASE_URL_UNPOOLED` to avoid PgBouncer issues.
+- Module data access is funneled through `ModuleDataService`, which scopes every query to the calling module's schema. A module cannot read another module's tables directly.
+
+## Identity at the request boundary
+
+The storefront never accepts a customer's identity from a request body. On every authenticated request, the customer is taken from the session cookie. Admin endpoints likewise do not trust client-supplied user IDs.
+
+## Secrets
+
+- `BETTER_AUTH_SECRET`, payment provider keys, and webhook secrets are read from environment variables.
+- They are never logged or returned in API responses.
+- `redactUrl()` is used when printing `DATABASE_URL` to console (`init`, `dev`, `doctor`); only host:port is shown.
+
+## What you should do before going live
+
+1. Replace `BETTER_AUTH_SECRET` with a fresh `openssl rand -base64 32`.
+2. Change the default admin password.
+3. Set `BETTER_AUTH_URL` and `APP_URL` to your real domain.
+4. Configure a payment provider with the appropriate webhook secret.
+5. Run `86d doctor` and resolve every fail.
+6. Enable Sentry by setting `SENTRY_DSN` so production errors are captured.
+7. Enable `@86d-app/audit-log` if you want a tamper-evident record of admin actions.
+
+## Reporting a vulnerability
+
+Please report security issues privately. Open a GitHub Security Advisory at [github.com/86d-app/86d/security/advisories](https://github.com/86d-app/86d/security/advisories) rather than a public issue.

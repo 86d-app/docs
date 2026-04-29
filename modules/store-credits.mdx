@@ -1,0 +1,34 @@
+---
+title: "Store credits"
+description: "Customer credit balances in 86d. Issue store credit, debit at checkout, and audit every credit change with the audit-log module."
+---
+
+The store-credits module manages a credit balance per customer. Admins issue or revoke credit; customers can apply available credit at checkout in lieu of payment. Every credit change is recorded with reason and source, and the running balance never goes negative.
+
+**Source:** [`modules/store-credits`](https://github.com/86d-app/86d/tree/main/modules/store-credits) · **npm:** [`@86d-app/store-credits`](https://www.npmjs.com/package/@86d-app/store-credits)
+
+## Installation
+
+```sh
+86d module add store-credits
+```
+
+## Store endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/store-credits/me/balance` | Current balance |
+| `GET` | `/store-credits/me/transactions` | Credit history |
+| `POST` | `/store-credits/me/apply` | Apply credit at checkout |
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/admin/store-credits/:customerId/issue` | Add credit |
+| `POST` | `/admin/store-credits/:customerId/revoke` | Subtract credit |
+| `GET` | `/admin/store-credits/:customerId` | Detail with history |
+
+## Related modules
+
+- [Customers](/modules/customers), [Checkout](/modules/checkout), [Returns](/modules/returns) (for refunds as credit), [Audit log](/modules/audit-log).

@@ -1,7 +1,10 @@
 ---
-title: "Stripe module"
-description: "Accept payments with Stripe using PaymentIntents, webhook signature verification, and full or partial refund support — no Stripe SDK required."
+title: "Stripe"
+description: "Accept payments with Stripe using PaymentIntents, webhook signature verification, and full or partial refund support. No Stripe SDK required."
 ---
+
+**Source:** [`modules/stripe`](https://github.com/86d-app/86d/tree/main/modules/stripe) · **npm:** [`@86d-app/stripe`](https://www.npmjs.com/package/@86d-app/stripe)
+
 
 The Stripe module implements the `PaymentProvider` interface from `@86d-app/payments` using raw `fetch()` calls to the Stripe REST API. There is no Stripe SDK dependency. It includes a webhook endpoint with HMAC-SHA256 signature verification and timestamp replay protection.
 
@@ -50,7 +53,7 @@ You can also configure both modules via `config.json`:
 </ParamField>
 
 <ParamField path="webhookSecret" type="string">
-  Webhook signing secret from the Stripe dashboard (`whsec_...`). When provided, every incoming webhook request is verified using HMAC-SHA256 with a 5-minute timestamp tolerance. Without this value, all webhook requests are accepted — useful for local development but not suitable for production.
+  Webhook signing secret from the Stripe dashboard (`whsec_...`). When provided, every incoming webhook request is verified using HMAC-SHA256 with a 5-minute timestamp tolerance. Without this value, all webhook requests are accepted, which is useful for local development but not suitable for production.
 </ParamField>
 
 ## PaymentProvider API
@@ -155,7 +158,7 @@ expected_sig   = HMAC-SHA256(webhookSecret, signed_payload)
 
 The `v1` signature from the header is compared using constant-time comparison to prevent timing attacks. Requests with invalid or expired signatures (older than 5 minutes) return `401`.
 
-Verification uses the Web Crypto API — no external dependencies.
+Verification uses the Web Crypto API. No external dependencies.
 
 ## Types
 

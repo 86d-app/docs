@@ -1,0 +1,26 @@
+---
+title: "Automations"
+description: "Rule-based workflow automation for 86d. Trigger actions on events: send an email when an order ships, tag a customer when they hit a spend threshold."
+---
+
+The automations module is a rule engine: when **trigger** happens and **conditions** match, perform **actions**. Triggers are domain events emitted by other modules (`order.placed`, `customer.created`, ...). Actions can send emails, add tags, issue store credits, or call external webhooks.
+
+**Source:** [`modules/automations`](https://github.com/86d-app/86d/tree/main/modules/automations) · **npm:** [`@86d-app/automations`](https://www.npmjs.com/package/@86d-app/automations)
+
+## Installation
+
+```sh
+86d module add automations
+```
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/automations` | List rules |
+| `POST` | `/admin/automations` | Create a rule |
+| `GET` | `/admin/automations/:id/runs` | Execution history |
+
+## Related modules
+
+- [Notifications](/modules/notifications), [Audit log](/modules/audit-log).

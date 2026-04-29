@@ -1,0 +1,35 @@
+---
+title: "Returns"
+description: "Customer return requests and approval workflow for 86d. Refund, exchange, or store credit; admin approves and refunds via the payments module."
+---
+
+The returns module handles RMA workflows. Customers request a return from their order detail page; the request flows through `requested -> approved -> shipped_back -> received -> refunded -> completed`, with `rejected` as a terminal alternate path. Refunds dispatch through `@86d-app/payments`, and exchanges create a new order automatically.
+
+**Source:** [`modules/returns`](https://github.com/86d-app/86d/tree/main/modules/returns) · **npm:** [`@86d-app/returns`](https://www.npmjs.com/package/@86d-app/returns)
+
+## Installation
+
+```sh
+86d module add returns
+```
+
+## Store endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/orders/me/:id/returns/create` | Submit a return request |
+| `GET` | `/orders/me/returns` | List the customer's returns |
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/returns` | Pending and processed returns |
+| `POST` | `/admin/returns/:id/approve` | Approve |
+| `POST` | `/admin/returns/:id/reject` | Reject with reason |
+| `POST` | `/admin/returns/:id/receive` | Mark items received |
+| `POST` | `/admin/returns/:id/refund` | Issue refund (full or partial) |
+
+## Related modules
+
+- [Orders](/modules/orders), [Payments](/modules/payments), [Store credits](/modules/store-credits).

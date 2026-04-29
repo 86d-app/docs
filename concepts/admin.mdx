@@ -1,9 +1,9 @@
 ---
-title: "Admin Dashboard"
-description: "The admin dashboard at /admin gives you full control over your store. Modules register their own pages automatically into a 2-level sidebar."
+title: "Admin dashboard"
+description: "The admin dashboard at /admin gives you full control over your store. Modules register their own pages automatically into a two-level sidebar."
 ---
 
-The 86d admin is your store's management interface, available at `/admin`. It is auth-protected — any unauthenticated request redirects to `/auth/signin` automatically. Once you sign in, every module that is enabled in your store registers its management pages into the sidebar without any manual configuration.
+The 86d admin is your store's management interface, available at `/admin`. It is auth-protected; any unauthenticated request redirects to `/auth/signin` automatically. Once you sign in, every module that is enabled in your store registers its management pages into the sidebar without any manual configuration.
 
 ## Signing in
 
@@ -20,7 +20,7 @@ If you started your store with the default seed data, use these credentials to a
 
 ## Sidebar navigation
 
-The sidebar uses a 2-level collapsible structure. The top level has 9 fixed groups; each group contains subgroups that modules populate automatically.
+The sidebar uses a two-level collapsible structure. The top level has nine fixed groups; each group contains subgroups that modules populate automatically.
 
 ### Top-level groups
 
@@ -28,15 +28,15 @@ The sidebar uses a 2-level collapsible structure. The top level has 9 fixed grou
 | --- | --- |
 | **Catalog** | Products, Categories, Collections, Brands |
 | **Sales** | Orders, Cart, Billing, Scheduling, Promotions, Add-ons |
-| **Customers** | Customer list, Groups, Saved Addresses |
-| **Fulfillment** | Shipping, Returns, Delivery Slots, Pickups |
+| **Customers** | Customer list, Groups, Saved addresses |
+| **Fulfillment** | Shipping, Returns, Delivery slots, Pickups |
 | **Marketing** | Newsletter, Blog, Affiliates, Loyalty, Referrals |
 | **Content** | Publishing, Knowledge, Site |
 | **Finance** | Gateways, Configuration |
 | **Support** | Helpdesk, Messaging |
 | **System** | Monitoring, Tools |
 
-When you enable a module, it declares which group and subgroup it belongs to. The admin sidebar reflects this automatically — you never need to touch a navigation config file.
+When you enable a module, it declares which group and subgroup it belongs to. The admin sidebar reflects this automatically; you never need to touch a navigation config file.
 
 <Note>
   Both the group and subgroup collapse states persist in `localStorage` under the key `86d-admin-sidebar-collapsed`. Your sidebar state survives page reloads and browser restarts.
@@ -46,7 +46,7 @@ When you enable a module, it declares which group and subgroup it belongs to. Th
 
 Each module declares a `group` and optionally a `subgroup` in its admin page definition. The sidebar registry reads these declarations and places the page in the right section. Active pages auto-expand their parent group and subgroup so you always know where you are.
 
-For example, the `@86d-app/orders` module registers under **Sales → Orders**, and `@86d-app/blog` registers under **Marketing → Publishing** — without any configuration on your end.
+For example, the `@86d-app/orders` module registers under **Sales → Orders**, and `@86d-app/blog` registers under **Marketing → Publishing**, with no configuration on your end.
 
 ## File uploads
 
@@ -84,13 +84,13 @@ POST /api/upload
 
 Admin API endpoints allow a higher request rate than public endpoints, since they are used by authenticated users performing intentional actions:
 
-- **300 requests/min per userId** for all `/api/admin/...` endpoints
+- **300 requests per minute per `userId`** for all `/api/admin/...` endpoints
 
 If you exceed this limit, the API returns HTTP `429` with `Retry-After` and `X-RateLimit-Reset` headers.
 
 ## Dashboard overview
 
-The admin dashboard (`/admin`) shows a summary of your store's current state, pulling live data from your enabled modules:
+The admin dashboard at `/admin` shows a summary of your store's current state, pulling live data from your enabled modules:
 
 <Steps>
   <Step title="Sign in">
@@ -100,7 +100,7 @@ The admin dashboard (`/admin`) shows a summary of your store's current state, pu
     Stat cards on the main page give you a snapshot of products, categories, and recent activity pulled from `/api/admin/products` and `/api/admin/categories`.
   </Step>
   <Step title="Navigate using the sidebar">
-    Use the 2-level sidebar to reach any module's management pages. Click a group to expand it, then click a subgroup or page link.
+    Use the two-level sidebar to reach any module's management pages. Click a group to expand it, then click a subgroup or page link.
   </Step>
   <Step title="Manage products">
     Under **Catalog**, the Products section lets you search, filter by status, paginate, create, edit, and delete products. Slug generation is automatic.
@@ -108,5 +108,5 @@ The admin dashboard (`/admin`) shows a summary of your store's current state, pu
 </Steps>
 
 <Tip>
-  On mobile, the admin sidebar collapses into a hamburger menu. The same 2-level navigation structure is available in the mobile drawer.
+  On mobile, the admin sidebar collapses into a hamburger menu. The same two-level navigation structure is available in the mobile drawer.
 </Tip>

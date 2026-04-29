@@ -1,9 +1,9 @@
 ---
 title: "Storage"
-description: "Configure where 86d stores uploaded files — local filesystem, Vercel Blob, or any S3-compatible provider including MinIO, AWS S3, and Cloudflare R2."
+description: "Configure where 86d stores uploaded files: local filesystem, Vercel Blob, or any S3-compatible provider including MinIO, AWS S3, and Cloudflare R2."
 ---
 
-86d includes a storage abstraction layer that handles file uploads for product images, PDFs, and other media. You choose a storage backend by setting the `STORAGE_PROVIDER` environment variable. The three supported providers are `local` (the default when running Docker), `vercel` (for Vercel deployments with Vercel Blob), and `s3` (for any S3-compatible object storage). Uploaded files are stored under the path `stores/{storeId}/{uuid}` and are automatically isolated per store.
+86d includes a storage abstraction layer that handles file uploads for product images, PDFs, and other media. You choose a storage backend by setting the `STORAGE_PROVIDER` environment variable. The three supported providers are `local` (the default when running Docker), `vercel` (for Vercel deployments with Vercel Blob), and `s3` (for any S3-compatible object storage). Uploaded files are stored under the path `stores/{storeId}/{uuid}` and are isolated per store automatically.
 
 ## Choosing a provider
 
@@ -20,10 +20,10 @@ Local storage writes files to a directory on the same filesystem as the running 
 ```bash .env
 STORAGE_PROVIDER=local
 
-# Optional — defaults to ./uploads
+# Optional: defaults to ./uploads
 STORAGE_LOCAL_DIR=./uploads
 
-# Optional — controls how upload URLs are returned (see below)
+# Optional: controls how upload URLs are returned (see below)
 STORAGE_PUBLIC_URL_MODE=proxy
 ```
 
@@ -31,12 +31,12 @@ Files are served by the store app at `GET /uploads/[...path]` with immutable cac
 
 ## Vercel Blob
 
-When deploying to Vercel, use Vercel Blob for durable object storage. Add a Blob store to your Vercel project and Vercel will inject `BLOB_READ_WRITE_TOKEN` automatically.
+When deploying to Vercel, use Vercel Blob for durable object storage. Add a Blob store to your Vercel project and Vercel injects `BLOB_READ_WRITE_TOKEN` automatically.
 
 ```bash .env
 STORAGE_PROVIDER=vercel
 
-# Set automatically by Vercel — do not set manually
+# Set automatically by Vercel: do not set manually
 BLOB_READ_WRITE_TOKEN=vercel_blob_rw_...
 ```
 
@@ -46,7 +46,7 @@ BLOB_READ_WRITE_TOKEN=vercel_blob_rw_...
 
 ## S3-compatible storage
 
-Use the `s3` provider for AWS S3, Cloudflare R2, MinIO, or Railway object storage. All S3-compatible APIs are supported.
+Use the `s3` provider for AWS S3, Cloudflare R2, MinIO, or Railway object storage. Every S3-compatible API is supported.
 
 ```bash .env
 STORAGE_PROVIDER=s3
@@ -72,7 +72,7 @@ S3_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
     STORAGE_PUBLIC_URL_MODE=proxy
     ```
 
-    Set `STORAGE_PUBLIC_URL_MODE=proxy` so that upload URLs are served through the store app (`/uploads/...`) rather than pointing directly to the MinIO container, which is not reachable from the browser.
+    Set `STORAGE_PUBLIC_URL_MODE=proxy` so upload URLs are served through the store app at `/uploads/...` rather than pointing directly to the MinIO container, which is not reachable from the browser.
   </Accordion>
 
   <Accordion title="Cloudflare R2">
@@ -109,8 +109,8 @@ S3_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 | Value | Behavior |
 | --- | --- |
-| `direct` | Upload responses return the raw bucket or filesystem URL (e.g. `http://minio:9000/86d/stores/...`). This is the default. |
-| `proxy` | Upload responses return a same-origin URL (e.g. `/uploads/stores/...`). The store app fetches the file from the backend and re-serves it to the browser. |
+| `direct` | Upload responses return the raw bucket or filesystem URL (for example `http://minio:9000/86d/stores/...`). This is the default. |
+| `proxy` | Upload responses return a same-origin URL (for example `/uploads/stores/...`). The store app fetches the file from the backend and re-serves it to the browser. |
 
 Use `proxy` mode when:
 
@@ -125,7 +125,7 @@ STORAGE_PUBLIC_URL_MODE=proxy
 
 ## Upload limits and accepted types
 
-All uploads go through `POST /api/upload` (admin only). The endpoint validates file contents using magic-byte detection — setting a fake `Content-Type` header does not bypass validation.
+All uploads go through `POST /api/upload` (admin only). The endpoint validates file contents using magic-byte detection. Setting a fake `Content-Type` header does not bypass validation.
 
 | File type | Max size | Accepted formats |
 | --- | --- | --- |

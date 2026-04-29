@@ -1,0 +1,33 @@
+---
+title: "Saved addresses"
+description: "Customer address book for 86d. Each customer keeps multiple shipping and billing addresses with a default for fast checkout."
+---
+
+The saved-addresses module stores multiple shipping and billing addresses per customer, with a default for each. The checkout module reads these via the addresses contract to pre-fill checkout forms.
+
+**Source:** [`modules/saved-addresses`](https://github.com/86d-app/86d/tree/main/modules/saved-addresses) · **npm:** [`@86d-app/saved-addresses`](https://www.npmjs.com/package/@86d-app/saved-addresses)
+
+## Installation
+
+```sh
+86d module add saved-addresses
+```
+
+## Store endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/addresses/me` | List addresses |
+| `POST` | `/addresses/me` | Add an address |
+| `PUT` | `/addresses/me/:id` | Update |
+| `DELETE` | `/addresses/me/:id` | Delete |
+| `POST` | `/addresses/me/:id/set-default` | Mark as default |
+
+## Components
+
+- `<AddressBook />`: full self-service address book.
+- `<AddressPicker />`: dropdown for choosing a saved address at checkout.
+
+## Related modules
+
+- [Customers](/modules/customers), [Checkout](/modules/checkout).

@@ -3,7 +3,9 @@ title: "Discounts"
 description: "Create and manage promo codes with percentage, fixed-amount, and free-shipping types. Supports product and category scoping, usage limits, and date ranges."
 ---
 
-The discounts module handles promo code creation, validation, and application. It is standalone — it has no dependencies on other modules and requires no configuration at initialization time. Discount rules and promo codes are managed entirely at runtime through the admin endpoints or the controller API. The checkout module integrates with discounts automatically via structural typing, so promo codes entered in `CheckoutSummary` flow through without any additional wiring on your part.
+The discounts module handles promo code creation, validation, and application. It is standalone: no dependencies on other modules, and no configuration at initialization time. Discount rules and promo codes are managed at runtime through the admin endpoints or the controller API. The checkout module integrates with discounts automatically via structural typing, so promo codes entered in `CheckoutSummary` flow through without any additional wiring.
+
+**Source:** [`modules/discounts`](https://github.com/86d-app/86d/tree/main/modules/discounts) · **npm:** [`@86d-app/discounts`](https://www.npmjs.com/package/@86d-app/discounts)
 
 ## Installation
 
@@ -26,8 +28,8 @@ const client = createModuleClient([discounts()]);
 
 | `type` | `value` field | Calculation |
 | --- | --- | --- |
-| `percentage` | `0` – `100` | `subtotal × value / 100` |
-| `fixed_amount` | cents | `min(value, subtotal)` — never exceeds cart total |
+| `percentage` | `0` to `100` | `subtotal * value / 100` |
+| `fixed_amount` | cents | `min(value, subtotal)`. Never exceeds cart total. |
 | `free_shipping` | `0` | Sets `freeShipping: true` in the result; no amount deducted |
 
 ## Store endpoints
@@ -97,10 +99,10 @@ With props:
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `subtotal` | `number` | `0` | Cart subtotal in cents, used for minimum amount validation |
-| `productIds` | `string[]` | — | Product IDs for product-scoped discount filtering |
-| `categoryIds` | `string[]` | — | Category IDs for category-scoped discount filtering |
-| `onApplied` | `(result: ApplyResult) => void` | — | Called when a valid code is applied |
-| `onRemoved` | `() => void` | — | Called when the applied code is removed |
+| `productIds` | `string[]` |  | Product IDs for product-scoped discount filtering |
+| `categoryIds` | `string[]` |  | Category IDs for category-scoped discount filtering |
+| `onApplied` | `(result: ApplyResult) => void` |  | Called when a valid code is applied |
+| `onRemoved` | `() => void` |  | Called when the applied code is removed |
 | `compact` | `boolean` | `false` | Compact inline layout |
 
 ### CartDiscounts
@@ -142,7 +144,7 @@ interface Discount {
   name: string;
   description?: string;
   type: DiscountType;
-  value: number;                // percentage 0–100, cents, or 0 for free_shipping
+  value: number;                // percentage 0 to 100, cents, or 0 for free_shipping
   minimumAmount?: number;       // minimum cart subtotal in cents
   maximumUses?: number;         // null = unlimited
   usedCount: number;
@@ -182,6 +184,6 @@ interface ApplyResult {
 
 **Case-insensitive codes.** Promo codes are stored and matched as uppercase. `SAVE10`, `save10`, and `Save10` all resolve to the same code.
 
-**`validateCode` vs. `applyCode`.** Use `validateCode` for previews and cart-page feedback — it never mutates state. Call `applyCode` exactly once per order at confirmation time; it increments both the code's `usedCount` and the parent discount's `usedCount`.
+**`validateCode` vs. `applyCode`.** Use `validateCode` for previews and cart-page feedback; it never mutates state. Call `applyCode` exactly once per order at confirmation time; it increments both the code's `usedCount` and the parent discount's `usedCount`.
 
-**Checkout integration.** The checkout module accesses `DiscountController` through the runtime context via structural typing — no direct import is needed. The `CheckoutSummary` component handles the promo code form automatically; you do not need to wire up `DiscountCodeInput` separately on the checkout page.
+**Checkout integration.** The checkout module accesses `DiscountController` through the runtime context via structural typing; no direct import is needed. The `CheckoutSummary` component handles the promo code form automatically; you do not need to wire up `DiscountCodeInput` separately on the checkout page.

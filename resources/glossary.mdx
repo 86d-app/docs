@@ -1,0 +1,105 @@
+---
+title: "Glossary"
+description: "Plain-language definitions for every term used across the 86d documentation, from 'admin' to 'webhook'."
+---
+
+If a term in the docs is unfamiliar, this is the page to check.
+
+## Admin
+The auth-protected management interface at `/admin`. Auto-redirects unauthenticated requests to `/auth/signin`. See [Admin dashboard](/concepts/admin).
+
+## Brisa
+The default storefront template, located at `templates/brisa/`. Every new 86d store starts from Brisa.
+
+## CLI (the `86d` CLI)
+The command-line tool that scaffolds modules, manages templates, runs codegen, and diagnoses health. See [CLI overview](/cli/overview).
+
+## Codegen
+The set of generators that produce static module imports, the API router, and the registry manifest. Run with `86d generate`.
+
+## `config.json`
+The single source of truth for a template's identity, color tokens, enabled modules, and per-module options. Lives at `templates/<theme>/config.json`. See the [reference](/configuration/store-config).
+
+## Contract (`requires` / `exports`)
+A declared dependency between modules. Modules cannot import each other; instead they declare what data or operations they expose (`exports`) and what they need (`requires`). The runtime validates contracts at startup.
+
+## Controller
+The business-logic layer of a module, called from endpoint handlers. Lives in `controllers.ts`.
+
+## Endpoint
+An API route mounted by a module under `/api/...` (storefront) or `/api/admin/...` (admin). Each module ships its own endpoints.
+
+## Event (domain event)
+A named signal emitted by a module when something happens in its domain (`order.placed`, `payment.completed`, `newsletter.subscribed`). Other modules and webhooks can subscribe.
+
+## Factory (module factory)
+The default export of a module's `src/index.ts`. A function `(options) => Module`. The runtime calls it once at boot.
+
+## Featured
+A boolean flag on entities like products, collections, and brands that surfaces them in "featured" listings. The corresponding `Featured*` components query the featured-only endpoints.
+
+## Guest cart
+A cart that belongs to an unauthenticated visitor, identified by a `guestId` cookie. Persists for `guestCartExpiration` milliseconds (default 7 days).
+
+## Idempotency
+An operation that returns the same result whether you call it once or many times. Used in cart item adds (deterministic IDs), discount validation, and webhook handling.
+
+## Init function
+The lifecycle hook a module exposes to receive its runtime context. The runtime calls `init(ctx)` once at boot. `ctx.data` is the `ModuleDataService`, `ctx.contracts` is the read view of every other module's exports, `ctx.events` is the event bus.
+
+## Intent (payment intent)
+A record of a payment in flight. Created at checkout, transitioned through `pending` -> `processing` -> `succeeded`, and finalized by a provider webhook.
+
+## Magic-byte detection
+Validating a file by inspecting its actual binary header rather than trusting the `Content-Type` header. Used by `POST /api/upload` to prevent MIME-type spoofing.
+
+## Manifest (registry manifest)
+`registry.json` at the repo root. Enumerates every official module with its name, version, category, dependency contract, and integrity hash.
+
+## MDX
+Markdown plus JSX. The format every storefront template page is written in. Module components are auto-registered into the MDX component registry.
+
+## Module
+An isolated npm package that contributes API endpoints, admin UI, and storefront components. The unit of feature delivery in 86d. See [Modules](/concepts/modules).
+
+## `ModuleDataService`
+The only sanctioned way for a module to touch the database. Provided as `ctx.data` in the module's `init` function. Scoped to the module's schema so cross-module reads are not possible.
+
+## OKLCH
+A perceptually uniform color space used for every color token in `config.json`. Format is `oklch(lightness chroma hue)` with lightness 0 to 1, chroma 0+ , hue 0 to 360.
+
+## Provider (payment provider)
+An implementation of the `PaymentProvider` interface from `@86d-app/payments` (Stripe, PayPal, Square, Braintree, or a custom provider). Pass an instance to the payments module to enable real processing.
+
+## Registry
+The central index of official 86d modules. The CLI uses it to install, search, and update modules. Hosted at `https://github.com/86d-app/86d/blob/main/registry.json` (`registry.json` at the repo root).
+
+## Schema (Zod schema)
+The Zod definition of a module's data shape, in `src/schema.ts`. Drives runtime validation and TypeScript types.
+
+## Specifier (module/template specifier)
+A string passed to `86d module add` or `86d template add` that identifies what to install: a registry name (`reviews`), a GitHub path (`github:owner/repo/modules/loyalty`), or an npm package (`npm:@scope/pkg`).
+
+## SSO (86d SSO)
+Single sign-on for the admin via 86d.app. Activated when both `STORE_ID` and `86D_API_KEY` are set.
+
+## Storage adapter
+The pluggable backend for file uploads. Three providers ship: `local`, `vercel`, and `s3`. Selected by `STORAGE_PROVIDER`. See [Storage configuration](/configuration/storage).
+
+## Storefront
+The customer-facing Next.js app, driven by MDX templates and module components. See [Storefront](/concepts/storefront).
+
+## `STORE_ID`
+A UUID that identifies a tenant. Storage paths are prefixed with it (`stores/{storeId}/{uuid}`). When set, the store fetches its config from the 86d hosted API instead of `config.json`.
+
+## Template
+A folder of MDX, color tokens, and assets that controls every visible aspect of the storefront. Swap templates without changing modules. See [MDX templates](/concepts/templates).
+
+## Theme
+The `theme` field in `config.json`. Must match the template's directory name under `templates/`.
+
+## Two-file pattern
+The convention every visual component follows: `.tsx` for logic and `.mdx` for presentation. Numbered MDX files (`1.mdx`, `2.mdx`) are design variants.
+
+## Webhook
+An HTTP request sent from an external service to `/api/<provider>/webhook` (Stripe, PayPal, Square, Braintree, channel modules). Verified with HMAC signatures before any handler runs.

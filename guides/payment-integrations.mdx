@@ -1,9 +1,9 @@
 ---
-title: "Payment Gateways"
-description: "Connect a payment gateway to your 86d store — install the payment module, set your API keys, and configure webhooks for real-time order status updates."
+title: "Payment gateways"
+description: "Connect a payment gateway to your 86d store. Install the payment module, set your API keys, and configure webhooks for real-time order status updates."
 ---
 
-86d separates payment logic into two layers: the `@86d-app/payments` module manages the intent lifecycle (create, confirm, cancel, refund), and a provider module (Stripe, PayPal, Square, or Braintree) handles the actual API communication. This lets you swap payment providers without touching your checkout flow. All provider modules implement HMAC webhook verification using the Web Crypto API directly — no extra crypto dependencies required. Webhooks return `401` on invalid or expired signatures.
+86d separates payment logic into two layers: the `@86d-app/payments` module manages the intent lifecycle (create, confirm, cancel, refund), and a provider module (Stripe, PayPal, Square, or Braintree) handles the actual API communication. This split lets you swap payment providers without touching your checkout flow. All provider modules implement HMAC webhook verification using the Web Crypto API directly, so no extra crypto dependencies are required. Webhooks return `401` on invalid or expired signatures.
 
 <Tabs>
   <Tab title="Stripe">
@@ -13,20 +13,20 @@ description: "Connect a payment gateway to your 86d store — install the paymen
     npm install @86d-app/stripe @86d-app/payments
     ```
 
-    ## Add to config.json
+    ## Add to `config.json`
 
     ```json
     {
-        "modules": [
-            "@86d-app/payments",
-            "@86d-app/stripe"
-        ],
-        "moduleOptions": {
-            "@86d-app/stripe": {
-                "apiKey": "sk_live_...",
-                "webhookSecret": "whsec_..."
-            }
+      "modules": [
+        "@86d-app/payments",
+        "@86d-app/stripe"
+      ],
+      "moduleOptions": {
+        "@86d-app/stripe": {
+          "apiKey": "sk_live_...",
+          "webhookSecret": "whsec_..."
         }
+      }
     }
     ```
 
@@ -38,12 +38,12 @@ description: "Connect a payment gateway to your 86d store — install the paymen
 
     ## Set environment variables
 
-    Set these in your deployment environment (`.env.local` for local dev):
+    Set these in your deployment environment (`.env.local` for local development):
 
     | Variable | Description |
     | --- | --- |
-    | `STRIPE_SECRET_KEY` | Your Stripe secret key — `sk_live_...` for production, `sk_test_...` for testing |
-    | `STRIPE_WEBHOOK_SECRET` | Signing secret from your Stripe webhook endpoint — `whsec_...` |
+    | `STRIPE_SECRET_KEY` | Your Stripe secret key. `sk_live_...` for production, `sk_test_...` for testing. |
+    | `STRIPE_WEBHOOK_SECRET` | Signing secret from your Stripe webhook endpoint (`whsec_...`). |
 
     ## Configure a Stripe webhook
 
@@ -53,7 +53,7 @@ description: "Connect a payment gateway to your 86d store — install the paymen
     POST https://your-store.com/api/stripe/webhook
     ```
 
-    Select at minimum these events:
+    Select these events at minimum:
 
     - `payment_intent.succeeded`
     - `payment_intent.payment_failed`
@@ -64,9 +64,9 @@ description: "Connect a payment gateway to your 86d store — install the paymen
 
     ## How the payment flow works
 
-    1. **Create intent** — At checkout, the server calls `provider.createIntent({ amount, currency })` against the Stripe API. This returns a `clientSecret` in `providerMetadata`.
-    2. **Confirm on the client** — Your checkout UI uses Stripe.js to call `confirmCardPayment(clientSecret)` with the customer's card details. No raw card data ever touches your server.
-    3. **Webhook confirms** — Stripe sends a `payment_intent.succeeded` event to `/api/stripe/webhook`. The module verifies the HMAC-SHA256 signature using a timing-safe comparison, then emits a `payment.completed` domain event that the `payments` module uses to finalize the order.
+    1. **Create intent.** At checkout, the server calls `provider.createIntent({ amount, currency })` against the Stripe API. This returns a `clientSecret` in `providerMetadata`.
+    2. **Confirm on the client.** Your checkout UI uses Stripe.js to call `confirmCardPayment(clientSecret)` with the customer's card details. No raw card data ever touches your server.
+    3. **Webhook confirms.** Stripe sends a `payment_intent.succeeded` event to `/api/stripe/webhook`. The module verifies the HMAC-SHA256 signature using a timing-safe comparison, then emits a `payment.completed` domain event that the `payments` module uses to finalize the order.
 
     ## Webhook security
 
@@ -77,7 +77,7 @@ description: "Connect a payment gateway to your 86d store — install the paymen
     expected_sig   = HMAC-SHA256(webhook_secret, signed_payload)
     ```
 
-    Signatures are compared with constant-time comparison to prevent timing attacks. Webhooks with timestamps older than 5 minutes are rejected with `401` to protect against replay attacks. Without `webhookSecret` set, all requests are accepted — useful for local development with the Stripe CLI.
+    Signatures are compared with constant-time comparison to prevent timing attacks. Webhooks with timestamps older than 5 minutes are rejected with `401` to protect against replay attacks. Without `webhookSecret` set, all requests are accepted, which is useful for local development with the Stripe CLI.
 
     ## Status mapping
 
@@ -95,20 +95,20 @@ description: "Connect a payment gateway to your 86d store — install the paymen
     npm install @86d-app/paypal @86d-app/payments
     ```
 
-    ## Add to config.json
+    ## Add to `config.json`
 
     ```json
     {
-        "modules": [
-            "@86d-app/payments",
-            "@86d-app/paypal"
-        ],
-        "moduleOptions": {
-            "@86d-app/paypal": {
-                "clientId": "...",
-                "clientSecret": "..."
-            }
+      "modules": [
+        "@86d-app/payments",
+        "@86d-app/paypal"
+      ],
+      "moduleOptions": {
+        "@86d-app/paypal": {
+          "clientId": "...",
+          "clientSecret": "..."
         }
+      }
     }
     ```
 
@@ -124,6 +124,8 @@ description: "Connect a payment gateway to your 86d store — install the paymen
     | --- | --- |
     | `PAYPAL_CLIENT_ID` | Your PayPal REST API client ID |
     | `PAYPAL_CLIENT_SECRET` | Your PayPal REST API client secret |
+    | `PAYPAL_WEBHOOK_ID` | Webhook ID from your PayPal app configuration |
+    | `PAYPAL_SANDBOX` | Set to `"true"` to use the PayPal sandbox environment |
 
     ## Configure a PayPal webhook
 
@@ -149,20 +151,20 @@ description: "Connect a payment gateway to your 86d store — install the paymen
     npm install @86d-app/square @86d-app/payments
     ```
 
-    ## Add to config.json
+    ## Add to `config.json`
 
     ```json
     {
-        "modules": [
-            "@86d-app/payments",
-            "@86d-app/square"
-        ],
-        "moduleOptions": {
-            "@86d-app/square": {
-                "accessToken": "...",
-                "webhookSignatureKey": "..."
-            }
+      "modules": [
+        "@86d-app/payments",
+        "@86d-app/square"
+      ],
+      "moduleOptions": {
+        "@86d-app/square": {
+          "accessToken": "...",
+          "webhookSignatureKey": "..."
         }
+      }
     }
     ```
 
@@ -177,7 +179,10 @@ description: "Connect a payment gateway to your 86d store — install the paymen
     | Variable | Description |
     | --- | --- |
     | `SQUARE_ACCESS_TOKEN` | Your Square access token (sandbox or production) |
-    | `SQUARE_WEBHOOK_SIGNATURE_KEY` | The signature key from your Square webhook subscription |
+    | `NEXT_PUBLIC_SQUARE_APPLICATION_ID` | Square application ID (client-side) |
+    | `NEXT_PUBLIC_SQUARE_LOCATION_ID` | Square location ID (client-side) |
+    | `SQUARE_WEBHOOK_SIGNATURE_KEY` | Signature key from your Square webhook subscription |
+    | `SQUARE_WEBHOOK_NOTIFICATION_URL` | Public URL Square sends webhook events to |
 
     ## Configure a Square webhook
 
@@ -191,7 +196,7 @@ description: "Connect a payment gateway to your 86d store — install the paymen
 
     ## How the payment flow works
 
-    1. The server creates a Square payment using the Payments API with a nonce generated by Square Web Payments SDK on the client.
+    1. The server creates a Square payment using the Payments API with a nonce generated by the Square Web Payments SDK on the client.
     2. On success, Square sends a `payment.created` webhook to confirm capture.
     3. The module verifies the HMAC-SHA256 signature and emits `payment.completed`.
   </Tab>
@@ -202,21 +207,21 @@ description: "Connect a payment gateway to your 86d store — install the paymen
     npm install @86d-app/braintree @86d-app/payments
     ```
 
-    ## Add to config.json
+    ## Add to `config.json`
 
     ```json
     {
-        "modules": [
-            "@86d-app/payments",
-            "@86d-app/braintree"
-        ],
-        "moduleOptions": {
-            "@86d-app/braintree": {
-                "merchantId": "...",
-                "publicKey": "...",
-                "privateKey": "..."
-            }
+      "modules": [
+        "@86d-app/payments",
+        "@86d-app/braintree"
+      ],
+      "moduleOptions": {
+        "@86d-app/braintree": {
+          "merchantId": "...",
+          "publicKey": "...",
+          "privateKey": "..."
         }
+      }
     }
     ```
 
@@ -233,6 +238,7 @@ description: "Connect a payment gateway to your 86d store — install the paymen
     | `BRAINTREE_MERCHANT_ID` | Your Braintree merchant ID |
     | `BRAINTREE_PUBLIC_KEY` | Your Braintree public key |
     | `BRAINTREE_PRIVATE_KEY` | Your Braintree private key |
+    | `BRAINTREE_SANDBOX` | Set to `"true"` to use the Braintree sandbox environment |
 
     ## Configure a Braintree webhook
 
@@ -255,4 +261,4 @@ description: "Connect a payment gateway to your 86d store — install the paymen
 
 ## Webhook security across all providers
 
-All four payment modules implement the same security model: webhook secrets are captured in a closure at module init time; each incoming request reads the raw body before any JSON parsing (required for HMAC integrity); signatures are verified with timing-safe comparison; and replay attacks are blocked by timestamp tolerance. No external crypto library is used — verification runs on the Web Crypto API built into the runtime, keeping every payment module publishable as a standalone npm package.
+All four payment modules implement the same security model: webhook secrets are captured in a closure at module init time; each incoming request reads the raw body before any JSON parsing (required for HMAC integrity); signatures are verified with timing-safe comparison; and replay attacks are blocked by timestamp tolerance. No external crypto library is used. Verification runs on the Web Crypto API built into the runtime, keeping every payment module publishable as a standalone npm package.

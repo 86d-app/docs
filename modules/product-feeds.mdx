@@ -1,0 +1,31 @@
+---
+title: "Product feeds"
+description: "Generate product feeds for external channels in 86d: Google Shopping, Meta, Pinterest, and custom destinations."
+---
+
+The product-feeds module produces XML and CSV feeds in the formats expected by major channels. Feeds are generated on demand or on a schedule and served from `/feeds/<name>.xml` for the channel to fetch.
+
+**Source:** [`modules/product-feeds`](https://github.com/86d-app/86d/tree/main/modules/product-feeds) · **npm:** [`@86d-app/product-feeds`](https://www.npmjs.com/package/@86d-app/product-feeds)
+
+## Installation
+
+```sh
+86d module add product-feeds
+```
+
+## Store endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/feeds/:name.xml` | Fetch a generated feed |
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/admin/product-feeds` | Configure a feed (format, schedule, filters) |
+| `POST` | `/admin/product-feeds/:id/regenerate` | Force regeneration |
+
+## Related modules
+
+- [Google Shopping](/modules/google-shopping), [Facebook Shop](/modules/facebook-shop), [Pinterest Shop](/modules/pinterest-shop).

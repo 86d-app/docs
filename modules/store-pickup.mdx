@@ -1,0 +1,31 @@
+---
+title: "Store pickup (BOPIS)"
+description: "Buy online, pick up in store. Customers select a pickup location at checkout; admins fulfill against a per-location queue."
+---
+
+The store-pickup module enables BOPIS (buy online, pick up in store). Locations are defined by `@86d-app/store-locator`; this module wires those locations into the checkout flow as a fulfillment option and exposes a per-location pickup queue in the admin.
+
+**Source:** [`modules/store-pickup`](https://github.com/86d-app/86d/tree/main/modules/store-pickup) · **npm:** [`@86d-app/store-pickup`](https://www.npmjs.com/package/@86d-app/store-pickup)
+
+## Installation
+
+```sh
+86d module add store-pickup
+```
+
+## Store endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/store-pickup/locations?postalCode=` | Pickup-eligible locations for a postal code |
+| `POST` | `/store-pickup/orders/:id/ready` | Notify the customer their order is ready |
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/store-pickup/queue` | Per-location pickup queue |
+
+## Related modules
+
+- [Store locator](/modules/store-locator), [Fulfillment](/modules/fulfillment), [Notifications](/modules/notifications).

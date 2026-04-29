@@ -1,26 +1,26 @@
 ---
 title: "Modules"
-description: "Modules are isolated npm packages that add API endpoints, admin UI, and storefront components to your store. Compose exactly the features you need."
+description: "Modules are isolated npm packages that contribute API endpoints, admin UI, and storefront components. Compose exactly the features your store needs."
 ---
 
-Modules are the building blocks of an 86d store. Each module is a self-contained npm package under the `@86d-app` scope that ships three things together: API endpoints your storefront calls, admin UI pages that appear in the dashboard, and React components you can drop directly into your MDX templates. You add or remove features by editing a single list in `config.json` — there are no plugins to configure, no monolithic bundles to untangle.
+Modules are the building blocks of an 86d store. Each module is a self-contained npm package under the `@86d-app` scope that ships three things together: API endpoints your storefront calls, admin UI pages that appear in the dashboard, and React components you can drop directly into your MDX templates. You add or remove features by editing a single list in `config.json`. There are no plugins to register and no monolithic bundles to untangle.
 
 ## What a module provides
 
 Every module in the `@86d-app` scope is structured the same way:
 
-- **Store endpoints** — public API routes mounted at `/api/[module-path]/...`
-- **Admin endpoints** — protected routes accessible only to authenticated admin users
-- **Store components** — React components (e.g. `<Cart />`, `<ProductGrid />`) registered automatically in the MDX component registry
-- **Admin components** — management UI pages that appear in the relevant group in the sidebar
+- **Store endpoints**: public API routes mounted at `/api/[module-path]/...`
+- **Admin endpoints**: protected routes accessible only to authenticated admin users
+- **Store components**: React components (for example `<Cart />`, `<ProductGrid />`) registered automatically in the MDX component registry
+- **Admin components**: management UI pages that appear in the relevant group of the admin sidebar
 
 Modules depend only on `@86d-app/core` and communicate with each other through declared contracts, not direct imports. This keeps every module independently replaceable.
 
-## Enabling modules in config.json
+## Enabling modules in `config.json`
 
-The `modules` field in `templates/brisa/config.json` controls which modules are active. After editing it, run `bun run generate:modules` to wire everything in.
+The `modules` field in `templates/brisa/config.json` controls which modules are active. After editing it, run `86d generate` to wire everything in.
 
-```json config.json
+```json templates/brisa/config.json
 {
   "modules": [
     "@86d-app/cart",
@@ -37,18 +37,18 @@ The `modules` field in `templates/brisa/config.json` controls which modules are 
   </Step>
   <Step title="Regenerate module imports">
     ```bash
-    bun run generate:modules
+    86d generate
     ```
 
     This installs any missing packages, updates `package.json`, and regenerates `modules.ts` with static imports from every enabled module.
   </Step>
   <Step title="Use the components in MDX">
-    Components from newly enabled modules are immediately available in any MDX template file — no import statements needed.
+    Components from newly enabled modules are immediately available in any MDX template file. No import statements are required.
   </Step>
 </Steps>
 
 <Note>
-  Setting `"modules": "*"` in `config.json` enables all installed modules. This is the default for the brisa starter template.
+  Setting `"modules": "*"` in `config.json` enables every module installed in the workspace. This is the default for the brisa starter template.
 </Note>
 
 ## Using module components in MDX
@@ -65,11 +65,11 @@ Once a module is enabled, its components are auto-registered in the MDX componen
 <Cart />
 ```
 
-No import statements are required — the code generator handles that automatically.
+No import statements are required. The code generator handles them for you.
 
 ## Module categories
 
-86d ships more than 99 modules. Here is a breakdown by category:
+86d ships 99 modules. Here is a breakdown by category. For the full list with descriptions, see the [Module catalog](/modules/overview).
 
 <AccordionGroup>
   <Accordion title="Catalog">
@@ -86,22 +86,22 @@ No import statements are required — the code generator handles that automatica
     | Product Q&A | `@86d-app/product-qa` |
     | Reviews | `@86d-app/reviews` |
     | Comparisons | `@86d-app/comparisons` |
-    | Recently Viewed | `@86d-app/recently-viewed` |
+    | Recently viewed | `@86d-app/recently-viewed` |
     | Recommendations | `@86d-app/recommendations` |
   </Accordion>
 
   <Accordion title="Shopping">
-    Cart, checkout, and purchase flow.
+    Cart, checkout, and the purchase flow.
 
     | Module | Package |
     | --- | --- |
     | Cart | `@86d-app/cart` |
     | Checkout | `@86d-app/checkout` |
     | Discounts | `@86d-app/discounts` |
-    | Giftcards | `@86d-app/giftcards` |
+    | Gift cards | `@86d-app/giftcards` |
     | Wishlist | `@86d-app/wishlist` |
-    | Bulk Pricing | `@86d-app/bulk-pricing` |
-    | Flash Sales | `@86d-app/flash-sales` |
+    | Bulk pricing | `@86d-app/bulk-pricing` |
+    | Flash sales | `@86d-app/flash-sales` |
     | Auctions | `@86d-app/auctions` |
     | Subscriptions | `@86d-app/subscriptions` |
     | Preorders | `@86d-app/preorders` |
@@ -120,7 +120,7 @@ No import statements are required — the code generator handles that automatica
     | Referrals | `@86d-app/referrals` |
     | Gamification | `@86d-app/gamification` |
     | Announcements | `@86d-app/announcements` |
-    | Social Proof | `@86d-app/social-proof` |
+    | Social proof | `@86d-app/social-proof` |
     | SEO | `@86d-app/seo` |
   </Accordion>
 
@@ -133,9 +133,9 @@ No import statements are required — the code generator handles that automatica
     | Fulfillment | `@86d-app/fulfillment` |
     | Shipping | `@86d-app/shipping` |
     | Returns | `@86d-app/returns` |
-    | Digital Downloads | `@86d-app/digital-downloads` |
-    | Store Pickup | `@86d-app/store-pickup` |
-    | Delivery Slots | `@86d-app/delivery-slots` |
+    | Digital downloads | `@86d-app/digital-downloads` |
+    | Store pickup | `@86d-app/store-pickup` |
+    | Delivery slots | `@86d-app/delivery-slots` |
     | DoorDash | `@86d-app/doordash` |
     | Uber Direct | `@86d-app/uber-direct` |
   </Accordion>
@@ -158,7 +158,7 @@ No import statements are required — the code generator handles that automatica
 
 ## Installing community modules from npm
 
-Modules do not have to come from the `@86d-app` scope. Any npm package that follows the 86d module contract works the same way. Add the package name to `config.json` and run `bun run generate:modules` — the generator detects that it is not a workspace package and installs it from npm automatically.
+Modules do not have to come from the `@86d-app` scope. Any npm package that follows the 86d module contract works the same way. Add the package name to `config.json` and run `86d generate`. The generator detects that it is not a workspace package and installs it from npm automatically.
 
 ```json config.json
 {
@@ -170,6 +170,15 @@ Modules do not have to come from the `@86d-app` scope. Any npm package that foll
 }
 ```
 
+You can also pull a module straight from a GitHub repository or any npm registry with the CLI:
+
+```bash
+86d module add github:owner/repo/modules/loyalty
+86d module add npm:@acme/commerce-module
+```
+
+See [`86d module add`](/cli/commands#86d-module-add) for the full specifier grammar.
+
 <Tip>
-  You can enable and disable modules between environments by keeping separate `config.json` files — for example, including a `@86d-app/debug-tools` module in development but omitting it from production.
+  You can keep separate `config.json` files per environment. Include a `@86d-app/debug-tools` module in development, for example, but omit it from production.
 </Tip>

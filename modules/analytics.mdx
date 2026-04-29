@@ -1,0 +1,27 @@
+---
+title: "Analytics"
+description: "Storefront and conversion analytics for 86d, recorded in your own database. Vendor-neutral funnel and cohort views."
+---
+
+The analytics module records storefront events (page views, product views, add-to-cart, begin-checkout, purchase) directly to your own database. It complements third-party tag-based analytics (Google Analytics, Meta CAPI) with a vendor-neutral, queryable record you control.
+
+**Source:** [`modules/analytics`](https://github.com/86d-app/86d/tree/main/modules/analytics) · **npm:** [`@86d-app/analytics`](https://www.npmjs.com/package/@86d-app/analytics)
+
+## Installation
+
+```sh
+86d module add analytics
+```
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/analytics/funnel` | Funnel for a date range |
+| `GET` | `/admin/analytics/cohorts` | Cohort retention |
+| `GET` | `/admin/analytics/products` | Top products |
+
+## Related modules
+
+- [Observability](/operations/observability) covers the bigger picture (Sentry, GTM).
+- [Audit log](/modules/audit-log) for admin-side actions.

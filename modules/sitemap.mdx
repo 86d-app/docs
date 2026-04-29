@@ -1,0 +1,25 @@
+---
+title: "Sitemap"
+description: "Automated sitemap.xml and robots.txt generation for an 86d storefront. Updates on every catalog change."
+---
+
+The sitemap module generates `sitemap.xml` from the active catalog (products, collections, pages, blog posts) and exposes it at `/sitemap.xml`. `robots.txt` is generated alongside with sensible defaults (allow public pages, disallow admin and API, point search engines at the sitemap).
+
+**Source:** [`modules/sitemap`](https://github.com/86d-app/86d/tree/main/modules/sitemap) · **npm:** [`@86d-app/sitemap`](https://www.npmjs.com/package/@86d-app/sitemap)
+
+## Installation
+
+```sh
+86d module add sitemap
+```
+
+## Store endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/sitemap.xml` | Sitemap index |
+| `GET` | `/robots.txt` | Robots policy |
+
+## Related modules
+
+- [SEO](/modules/seo), [Redirects](/modules/redirects).

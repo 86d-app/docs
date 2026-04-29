@@ -1,0 +1,37 @@
+---
+title: "Tax"
+description: "Jurisdiction-based tax calculation for 86d with nexus management. Pluggable backends including TaxJar and Avalara."
+---
+
+The tax module computes taxes at checkout based on the shipping address, the cart contents, and your nexus configuration. It ships with a built-in jurisdiction backend that handles common cases and adapters for TaxJar and Avalara when you need authoritative real-time rates.
+
+**Source:** [`modules/tax`](https://github.com/86d-app/86d/tree/main/modules/tax) · **npm:** [`@86d-app/tax`](https://www.npmjs.com/package/@86d-app/tax)
+
+## Installation
+
+```sh
+86d module add tax
+```
+
+## Configuration
+
+```ts
+tax({
+  backend: "builtin",        // "builtin" | "taxjar" | "avalara"
+  taxjarApiKey: "...",
+  avalaraAccountId: "...",
+  avalaraLicenseKey: "...",
+});
+```
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/tax/nexus` | List jurisdictions where you collect tax |
+| `POST` | `/admin/tax/nexus` | Add a nexus |
+| `POST` | `/admin/tax/calculate` | Test calculation for an address |
+
+## Related modules
+
+- [Checkout](/modules/checkout), [Multi-currency](/modules/multi-currency), [Shipping](/modules/shipping).

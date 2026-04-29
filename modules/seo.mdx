@@ -1,0 +1,43 @@
+---
+title: "SEO"
+description: "Per-page meta tags, Open Graph, Twitter Card, and JSON-LD for an 86d storefront. Drives social previews and structured data for search engines."
+---
+
+The SEO module manages page-level meta tags and structured data. It generates Open Graph and Twitter Card tags for social previews, and JSON-LD `Product`, `BreadcrumbList`, and `Organization` schemas for search engines. The module reads catalog data through the products contract, so product pages get accurate meta tags with no per-page work.
+
+**Source:** [`modules/seo`](https://github.com/86d-app/86d/tree/main/modules/seo) · **npm:** [`@86d-app/seo`](https://www.npmjs.com/package/@86d-app/seo)
+
+## Installation
+
+```sh
+86d module add seo
+```
+
+## Configuration
+
+```ts
+seo({
+  defaultTitle: "My Store",
+  defaultDescription: "Curated goods.",
+  twitterHandle: "@mystore",
+  defaultOgImage: "/assets/og-default.png",
+});
+```
+
+## Components
+
+- `<SEOMeta title=... description=... image=... canonical=... />`: drop into MDX page heads.
+- `<ProductSEO product={product} />`: emits product-specific meta and JSON-LD.
+- `<CollectionSEO collection={collection} />`: collection meta and breadcrumbs.
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/seo/audit` | Pages with missing or weak meta |
+| `PUT` | `/admin/seo/page/:slug` | Override per-page meta |
+
+## Related modules
+
+- [Sitemap](/modules/sitemap): generates `/sitemap.xml`.
+- [Redirects](/modules/redirects): preserves SEO during URL changes.

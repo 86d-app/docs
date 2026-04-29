@@ -1,34 +1,75 @@
-> **Customize this file**: Tailor this template to your project by noting specific contribution types you're looking for, adding a Code of Conduct, or adjusting the writing guidelines to match your style.
+# Contribute to the 86d documentation
 
-# Contribute to the documentation
-
-Thank you for your interest in contributing to our documentation! This guide will help you get started.
+Thank you for your interest in improving the 86d docs. The full contribution guide for the project (framework, modules, and docs) lives at [86d.app/docs/resources/contributing](https://86d.app/docs/resources/contributing). This file covers the docs site specifically.
 
 ## How to contribute
 
-### Option 1: Edit directly on GitHub
+### Option 1: edit on GitHub
 
-1. Navigate to the page you want to edit
-2. Click the "Edit this file" button (the pencil icon)
-3. Make your changes and submit a pull request
+1. Open the page you want to edit on [86d.app/docs](https://86d.app/docs).
+2. Click the **Edit on GitHub** link.
+3. Make your changes and submit a pull request.
 
-### Option 2: Local development
+### Option 2: local development
 
-1. Fork and clone this repository
-2. Install the Mintlify CLI: `npm i -g mint`
-3. Create a branch for your changes
-4. Make changes
-5. Navigate to the docs directory and run `mint dev`
-6. Preview your changes at `http://localhost:3000`
-7. Commit your changes and submit a pull request
+```bash
+git clone https://github.com/86d-app/86d
+cd 86d/docs
+npm i -g mint
+mint dev
+```
 
-For more details on local development, see our [development guide](development.mdx).
+The dev server runs at `http://localhost:3000` and hot-reloads on file changes.
+
+### Checking links
+
+```bash
+mint broken-links
+```
+
+Run this before opening a PR. We treat broken internal links as a blocker.
 
 ## Writing guidelines
 
-- **Use active voice**: "Run the command" not "The command should be run"
-- **Address the reader directly**: Use "you" instead of "the user"
-- **Keep sentences concise**: Aim for one idea per sentence
-- **Lead with the goal**: Start instructions with what the user wants to accomplish
-- **Use consistent terminology**: Don't alternate between synonyms for the same concept
-- **Include examples**: Show, don't just tell
+- **Active voice.** "Run the command" not "the command should be run."
+- **Address the reader.** Use "you" instead of "the user" or "one."
+- **One idea per sentence.** Aim for 15 to 20 words per sentence.
+- **Lead with the goal.** The first paragraph of every page should answer "what is this and why do I care."
+- **Sentence case for headings.** "Module configuration" not "Module Configuration."
+- **No em dashes.** Use a comma, a colon, a semicolon, parentheses, or a sentence break instead. We grep for them in CI.
+- **Code formatting** for file paths, command names, environment variables, and code identifiers. Not for prose emphasis.
+- **Show, do not just tell.** Include working examples next to every API or CLI reference.
+
+## What goes in this repo
+
+- Documentation pages under `docs/<section>/<page>.mdx`.
+- Mintlify configuration (`docs.json`).
+- Static assets that are unique to the docs site.
+
+The framework source, the CLI, and module source code live in the parent repo (`/`). Do not edit those from a docs-only PR.
+
+## Page templates
+
+Each content type has a consistent shape:
+
+- **Concept pages** (`concepts/`): start with a one-paragraph "what is this and why does it exist", then the conceptual model, then a short list of practical references.
+- **How-to guides** (`guides/`): start with the goal, then numbered steps, then troubleshooting.
+- **Reference pages** (`configuration/`, `cli/`, `modules/`): start with a one-paragraph summary, then a structured reference (tables, `<ParamField />`, code blocks).
+- **Tutorial pages**: start with prerequisites, then numbered steps that build on each other, then a "what next" section.
+
+If your edit straddles types, pick the closest fit and stick to its shape.
+
+## Frontmatter
+
+Every page must have YAML frontmatter with at least `title` and `description`. Both fields are used by Mintlify for navigation and search.
+
+```yaml
+---
+title: "Sentence-case page title"
+description: "One- or two-sentence summary that completes the thought 'this page is about ...'."
+---
+```
+
+## Reporting documentation bugs
+
+Open an issue at [github.com/86d-app/86d/issues](https://github.com/86d-app/86d/issues) with the `docs` label. Include the page URL and the specific section that is wrong.

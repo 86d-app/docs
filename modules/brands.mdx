@@ -1,9 +1,11 @@
 ---
 title: "Brands"
-description: "Complete reference for @86d-app/brands: organize products by manufacturer or brand with dedicated pages, featured listings, and full SEO support."
+description: "Reference for @86d-app/brands: organize products by manufacturer or brand with dedicated pages, featured listings, and full SEO support."
 ---
 
-The brands module lets you organize products by manufacturer or brand. You create brand records with logos, banner images, and SEO metadata, then associate products with a brand. On the storefront, you get dedicated brand pages and featured brand listings. Because a product belongs to exactly one brand, the module also makes it easy to filter catalog queries by brand.
+The brands module organizes products by manufacturer or brand. You create brand records with logos, banner images, and SEO metadata, then associate products with a brand. On the storefront, you get dedicated brand pages and featured brand listings. Because a product belongs to exactly one brand, the module also makes it easy to filter catalog queries by brand.
+
+**Source:** [`modules/brands`](https://github.com/86d-app/86d/tree/main/modules/brands) · **npm:** [`@86d-app/brands`](https://www.npmjs.com/package/@86d-app/brands)
 
 ## Installation
 
@@ -23,7 +25,7 @@ Then register the module in your store's `config.json`:
 
 ```json
 {
-  "modules": ["brands"]
+  "modules": ["@86d-app/brands"]
 }
 ```
 
@@ -144,4 +146,4 @@ interface BrandStats {
 - A product can belong to only one brand. Assigning a product to a new brand automatically removes it from its previous brand.
 - Store endpoints return only active brands. `getBrandForProduct` returns `null` for inactive brands.
 - Deleting a brand cascades and removes all associated `BrandProduct` records.
-- Bulk assign and unassign operations are idempotent — already-assigned products are skipped, and the return value is the count of new assignments only.
+- Bulk assign and unassign operations are idempotent. Already-assigned products are skipped, and the return value is the count of new assignments only.

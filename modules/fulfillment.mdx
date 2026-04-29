@@ -1,0 +1,36 @@
+---
+title: "Fulfillment"
+description: "Shipment lifecycle for 86d orders. Five-state machine from pending to delivered with tracking, partial shipments, and per-line-item status."
+---
+
+The fulfillment module manages the post-payment shipment lifecycle. An order can have one or many fulfillments (partial shipments are first-class). Each fulfillment moves through `pending -> ready -> shipped -> in_transit -> delivered`, and tracking numbers from major carriers (UPS, USPS, FedEx, DHL) auto-generate carrier tracking URLs.
+
+**Source:** [`modules/fulfillment`](https://github.com/86d-app/86d/tree/main/modules/fulfillment) · **npm:** [`@86d-app/fulfillment`](https://www.npmjs.com/package/@86d-app/fulfillment)
+
+## Installation
+
+```sh
+86d module add fulfillment
+```
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/fulfillments` | List fulfillments (filter by `status`, `orderId`) |
+| `POST` | `/admin/fulfillments` | Create a fulfillment for selected line items |
+| `POST` | `/admin/fulfillments/:id/ship` | Mark shipped with carrier and tracking |
+| `POST` | `/admin/fulfillments/:id/deliver` | Mark delivered |
+| `POST` | `/admin/fulfillments/:id/cancel` | Cancel |
+
+## Events
+
+| Event | When |
+| --- | --- |
+| `fulfillment.created` | Fulfillment opened |
+| `fulfillment.shipped` | Tracking added |
+| `fulfillment.delivered` | Delivery confirmed |
+
+## Related modules
+
+- [Orders](/modules/orders), [Shipping](/modules/shipping), [Returns](/modules/returns).

@@ -1,0 +1,32 @@
+---
+title: "Delivery slots"
+description: "Scheduled delivery time windows for 86d. Restrict capacity per slot and let shoppers pick a slot at checkout."
+---
+
+The delivery-slots module exposes scheduled delivery windows at checkout. Each slot has a date, a time range, and a capacity; once capacity fills, the slot becomes unavailable. Useful for grocery, florist, and any local-delivery store.
+
+**Source:** [`modules/delivery-slots`](https://github.com/86d-app/86d/tree/main/modules/delivery-slots) · **npm:** [`@86d-app/delivery-slots`](https://www.npmjs.com/package/@86d-app/delivery-slots)
+
+## Installation
+
+```sh
+86d module add delivery-slots
+```
+
+## Store endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/delivery-slots?date=` | Available slots for a given date |
+| `POST` | `/delivery-slots/:id/reserve` | Reserve a slot during checkout |
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/admin/delivery-slots/templates` | Define recurring slot templates |
+| `GET` | `/admin/delivery-slots` | View capacity and reservations |
+
+## Related modules
+
+- [Shipping](/modules/shipping), [Store pickup](/modules/store-pickup), [Checkout](/modules/checkout).

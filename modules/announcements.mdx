@@ -1,0 +1,29 @@
+---
+title: "Announcements"
+description: "Site-wide announcement bars and popup notices for 86d. Schedule, target, and dismiss."
+---
+
+The announcements module shows banners and popups across the storefront. Each announcement has a schedule (start, end), targeting rules (geo, customer group), and a dismissal policy.
+
+**Source:** [`modules/announcements`](https://github.com/86d-app/86d/tree/main/modules/announcements) · **npm:** [`@86d-app/announcements`](https://www.npmjs.com/package/@86d-app/announcements)
+
+## Installation
+
+```sh
+86d module add announcements
+```
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/admin/announcements` | Create an announcement |
+| `PUT` | `/admin/announcements/:id` | Update |
+
+## Components
+
+- `<AnnouncementBar />`, `<AnnouncementModal />`.
+
+## Related modules
+
+- [Customer groups](/modules/customer-groups) for targeting.

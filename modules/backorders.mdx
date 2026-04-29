@@ -1,0 +1,31 @@
+---
+title: "Backorders"
+description: "Accept orders for out-of-stock items in 86d. Customer is informed of the wait and the item ships when stock arrives."
+---
+
+The backorders module lets shoppers buy items that are temporarily out of stock. Each line item is tagged as backordered with an estimated ship date. The module fires `backorder.fulfillable` when stock is replenished and the order can ship.
+
+**Source:** [`modules/backorders`](https://github.com/86d-app/86d/tree/main/modules/backorders) · **npm:** [`@86d-app/backorders`](https://www.npmjs.com/package/@86d-app/backorders)
+
+## Installation
+
+```sh
+86d module add backorders
+```
+
+## Configuration
+
+```ts
+backorders({
+  defaultLeadTimeDays: "21",
+  notifyCustomerOnFulfillable: "true",
+});
+```
+
+## Components
+
+- `<BackorderBadge productId={id} />`: storefront badge with expected ship date.
+
+## Related modules
+
+- [Preorders](/modules/preorders), [Inventory](/modules/inventory), [Notifications](/modules/notifications).

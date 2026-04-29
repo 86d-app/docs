@@ -3,7 +3,9 @@ title: "Newsletters"
 description: "Manage an email subscriber list with subscribe, unsubscribe, and resubscribe flows, subscriber tagging support, and idempotent double-opt-in."
 ---
 
-The newsletter module manages your email subscriber database — it handles the full subscriber lifecycle (subscribe, unsubscribe, resubscribe) with tagging and source attribution. The module does not send emails itself; connect it to an email provider like [Resend](https://resend.com) by listening to the `newsletter.subscribed` event and using `RESEND_API_KEY` in your integration.
+The newsletter module manages your email subscriber database. It handles the full subscriber lifecycle (subscribe, unsubscribe, resubscribe) with tagging and source attribution. The module does not send emails itself; connect it to an email provider like [Resend](https://resend.com) by listening to the `newsletter.subscribed` event and using `RESEND_API_KEY` in your integration.
+
+**Source:** [`modules/newsletter`](https://github.com/86d-app/86d/tree/main/modules/newsletter) · **npm:** [`@86d-app/newsletter`](https://www.npmjs.com/package/@86d-app/newsletter)
 
 ## Installation
 
@@ -27,7 +29,7 @@ const client = createModuleClient([
 ## Configuration
 
 <ParamField path="allowResubscribe" default='"true"' type="string">
-  When `"true"`, previously unsubscribed (or bounced) addresses can resubscribe. Set to `"false"` to prevent resubscription — calls to `POST /newsletter/subscribe` for an unsubscribed address will return the subscriber unchanged.
+  When `"true"`, previously unsubscribed (or bounced) addresses can resubscribe. Set to `"false"` to prevent resubscription; calls to `POST /newsletter/subscribe` for an unsubscribed address return the subscriber unchanged.
 </ParamField>
 
 ## Subscriber lifecycle
@@ -82,8 +84,8 @@ Sets the subscriber's status to `unsubscribed` and records an `unsubscribedAt` t
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| `status` | `string` | — | Filter by `active`, `unsubscribed`, or `bounced` |
-| `tag` | `string` | — | Filter by a specific tag |
+| `status` | `string` |  | Filter by `active`, `unsubscribed`, or `bounced` |
+| `tag` | `string` |  | Filter by a specific tag |
 | `page` | `number` | `1` | Page number (1-indexed) |
 | `limit` | `number` | `50` | Results per page (max 100) |
 

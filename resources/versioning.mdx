@@ -1,0 +1,107 @@
+---
+title: "Versioning and stability"
+description: "What is stable, what is experimental, and what is changing. The compatibility commitments 86d makes during the pre-1.0 period."
+---
+
+86d is pre-1.0. APIs and module contracts can change between minor versions, and we will do so when the change makes the platform meaningfully better. This page sets expectations.
+
+## Versioning model
+
+Every published package in 86d shares a single version, bumped together with [Changesets](https://github.com/changesets/changesets). At the time of writing, that version is `0.0.x`.
+
+- The store app, the CLI, and every `@86d-app/*` module advance in lockstep.
+- A release that introduces a breaking change in any one of them bumps the shared version's minor (until 1.0) or major (after 1.0).
+- Patch bumps fix bugs without touching public APIs.
+
+Once we ship 1.0, the project will follow strict [Semantic Versioning](https://semver.org/).
+
+## Stability tiers
+
+Three labels describe how much code can move underneath you.
+
+### Stable
+
+Stable surfaces will not break without a major version bump.
+
+- The `Module` contract from `@86d-app/core` (factory shape, `id`, `version`, `endpoints`, `components`).
+- The Better Auth integration shape and `BETTER_AUTH_SECRET` semantics.
+- The storage adapter contract (`local`, `vercel`, `s3`).
+- The shape of `config.json` (top-level fields).
+- The CLI's top-level commands: `dev`, `init`, `status`, `doctor`, `module`, `template`, `generate`.
+- The HMAC webhook verification model.
+
+### Evolving
+
+Evolving surfaces are useful and shipped, but their shape is still being tuned. We try to deprecate before we remove, but a minor pre-1.0 release may break them.
+
+- Per-module API endpoint paths and field names.
+- Module-level options passed via `moduleOptions` in `config.json`.
+- The MDX component prop shapes (we add props more often than we remove them).
+- The `requires` / `exports` contract grammar.
+- The admin sidebar group taxonomy.
+- The registry specifier grammar (`github:`, `npm:`, plain name).
+
+### Experimental
+
+Experimental surfaces are explicitly marked as "may change at any time". Treat them as previews, not as stable APIs.
+
+- Anything explicitly tagged `@experimental` in source comments.
+- The hosted 86d API endpoints (`86D_API_URL`).
+- New modules that have not yet appeared in a release announcement.
+- Internal `ModuleDataService` methods not exported through `@86d-app/core`.
+
+## Deprecation policy
+
+When we remove or rename a stable surface:
+
+1. The new surface is added in version N.
+2. The old surface is marked deprecated in version N (TypeScript `@deprecated`, runtime warning when feasible).
+3. The old surface is removed in version N+1 minor (pre-1.0) or N+1 major (post-1.0).
+
+Evolving surfaces may skip step 2 in pre-1.0 releases.
+
+## Migration notes
+
+Each release includes migration notes in its [changelog entry](/resources/changelog). The notes describe:
+
+- Schema changes (new migrations to run)
+- Renamed environment variables
+- Renamed `config.json` fields
+- Renamed module options
+- Removed APIs and their replacements
+
+Always run `bun run db:migrate` after pulling a new release.
+
+## Module updates
+
+When a module bumps its version, the registry's `integrity` hash changes. Run `86d module update` to see what is outdated locally:
+
+```bash
+86d module update
+```
+
+To upgrade a specific module:
+
+```bash
+86d module add <name>
+```
+
+## What "production use" looks like today
+
+We do not recommend running 86d as the primary commerce system for a high-revenue store yet. Reasonable uses today:
+
+- Internal tools (B2B portals, employee shops).
+- Niche stores with tolerant traffic patterns where you can iterate alongside us.
+- Greenfield projects where you can move with the platform rather than against it.
+
+If you want to use 86d in production, talk to us first. Open a discussion at [github.com/86d-app/86d/discussions](https://github.com/86d-app/86d/discussions) and we can help you scope the risk.
+
+## Long-term stability commitments
+
+After 1.0:
+
+- Strict SemVer.
+- A 12-month deprecation window before any breaking change to a stable surface.
+- An LTS release line with security fixes for at least 18 months.
+
+Until then, treat every minor as potentially breaking and read the changelog before upgrading.

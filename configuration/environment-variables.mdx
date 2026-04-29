@@ -1,9 +1,9 @@
 ---
-title: "Environment Variables"
-description: "Reference for all environment variables that configure your 86d store, including required database and auth settings and optional provider integrations."
+title: "Environment variables"
+description: "Reference for every environment variable that configures your 86d store, including required database and auth settings and optional provider integrations."
 ---
 
-86d reads configuration from environment variables at startup. To get started, copy `.env.example` to `.env` in the repository root and fill in the required values. Variables that are commented out in `.env.example` are optional — uncomment and set only the ones you need for the integrations you want to enable.
+86d reads configuration from environment variables at startup. To get started, copy `.env.example` to `.env` in the repository root and fill in the required values. Variables that are commented out in `.env.example` are optional. Uncomment and set only the ones you need for the integrations you want to enable.
 
 ```bash
 cp .env.example .env
@@ -11,12 +11,12 @@ cp .env.example .env
 
 ## Required variables
 
-These three variables must be set before your store will start. The application will fail validation on boot if any are missing.
+These three variables must be set before your store will start. The application fails validation on boot if any are missing.
 
 | Variable | Description |
 | --- | --- |
 | `DATABASE_URL` | PostgreSQL connection string used for all runtime queries. Example: `postgresql://postgres:postgres@localhost:5432/86d` |
-| `DATABASE_URL_UNPOOLED` | The same connection string, but without connection pooling. Used for database migrations. Set this to the same value as `DATABASE_URL` unless you are using a pooler such as PgBouncer. |
+| `DATABASE_URL_UNPOOLED` | The same connection string, without connection pooling. Used for database migrations. Set to the same value as `DATABASE_URL` unless you are using a pooler such as PgBouncer. |
 | `BETTER_AUTH_SECRET` | Secret key used to sign session tokens and auth cookies. Generate a secure value with `openssl rand -base64 32` and never commit it to source control. |
 
 <Warning>
@@ -43,11 +43,11 @@ These three variables must be set before your store will start. The application 
 
 | Variable | Description |
 | --- | --- |
-| `RESEND_API_KEY` | API key for [Resend](https://resend.com). When set, the store sends transactional emails (order confirmations, password resets, etc.) using Resend. If not set, email sending is disabled. |
+| `RESEND_API_KEY` | API key for [Resend](https://resend.com). When set, the store sends transactional emails (order confirmations, password resets, and so on) using Resend. If not set, email sending is disabled. |
 
 ## Auth providers
 
-Enable social login by setting the corresponding variables. Any provider whose credentials are absent is automatically disabled. See [Authentication](/configuration/authentication) for setup details.
+Enable social login by setting the corresponding variables. Any provider whose credentials are absent is disabled automatically. See [Authentication](/configuration/authentication) for setup details.
 
 | Provider | Variables |
 | --- | --- |
@@ -60,7 +60,7 @@ Enable social login by setting the corresponding variables. Any provider whose c
 
 ## Payment providers
 
-The first configured payment provider is automatically wired to the payments module. Priority order when multiple providers are configured: **Stripe → PayPal → Square → Braintree**.
+The first configured payment provider is wired to the payments module automatically. Priority order when multiple providers are configured: **Stripe, PayPal, Square, Braintree**.
 
 <AccordionGroup>
   <Accordion title="Stripe">
@@ -110,13 +110,37 @@ Control where uploaded files are stored. See [Storage configuration](/configurat
 | `STORAGE_PROVIDER` | Storage backend: `local` (default), `vercel`, or `s3`. |
 | `STORAGE_PUBLIC_URL_MODE` | How upload URLs are returned: `direct` (raw bucket URL) or `proxy` (same-origin `/uploads/...` path). |
 | `STORAGE_LOCAL_DIR` | Directory for local file storage. Defaults to `./uploads`. |
+| `STORAGE_LOCAL_BASE_URL` | Public base URL for files served from `STORAGE_LOCAL_DIR`. Defaults to `/uploads`. |
 | `S3_ENDPOINT` | S3-compatible endpoint URL (MinIO, Cloudflare R2, Railway Bucket, AWS S3). |
 | `S3_BUCKET` | S3 bucket name. |
 | `S3_REGION` | S3 region. Defaults to `us-east-1`. |
 | `S3_ACCESS_KEY` | S3 access key ID. |
 | `S3_SECRET_KEY` | S3 secret access key. |
 | `S3_VIRTUAL_HOSTED_STYLE` | Set to `"true"` when using Railway object storage or any provider that requires virtual-hosted-style URLs. |
-| `BLOB_READ_WRITE_TOKEN` | Vercel Blob read/write token. Set automatically by Vercel when you add a Blob store to your project. |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob read and write token. Set automatically by Vercel when you add a Blob store to your project. |
+| `VERCEL_BLOB_STORAGE_HOSTNAME` | Public hostname of your Vercel Blob store. |
+
+## Docker Compose MinIO
+
+When you run `docker compose up`, the MinIO container is configured with these defaults. Override them in `.env` for production:
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `MINIO_ROOT_USER` | `minioadmin` | MinIO root username. |
+| `MINIO_ROOT_PASSWORD` | `minioadmin` | MinIO root password. |
+| `MINIO_API_PUBLISH_PORT` | `9000` | Host port for the MinIO S3 API. |
+| `MINIO_CONSOLE_PUBLISH_PORT` | `9001` | Host port for the MinIO web console. |
+
+## Railway
+
+These variables are populated by Railway at runtime. Reference them when constructing absolute URLs.
+
+| Variable | Description |
+| --- | --- |
+| `RAILWAY_PUBLIC_DOMAIN` | Hostname assigned by Railway. Use it as `APP_URL=https://$RAILWAY_PUBLIC_DOMAIN`. |
+| `RAILWAY_PROJECT_ID` | Project ID. |
+| `RAILWAY_SERVICE_ID` | Service ID. |
+| `RAILWAY_ENVIRONMENT_ID` | Environment ID. |
 
 ## SMS
 
@@ -131,7 +155,7 @@ Control where uploaded files are stored. See [Storage configuration](/configurat
 
 | Variable | Description |
 | --- | --- |
-| `OPENAI_API_KEY` | OpenAI API key for AI-powered features (product descriptions, search, etc.). |
+| `OPENAI_API_KEY` | OpenAI API key for AI-powered features (product descriptions, search, recommendations). |
 | `GEMINI_API_KEY` | Google Gemini API key. |
 | `OPENROUTER_API_KEY` | OpenRouter API key for routing to multiple LLM providers. |
 
@@ -145,7 +169,7 @@ Control where uploaded files are stored. See [Storage configuration](/configurat
 
 | Variable | Description |
 | --- | --- |
-| `NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID` | Google Tag Manager container ID (e.g. `GTM-XXXXXXX`). |
+| `NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID` | Google Tag Manager container ID (for example `GTM-XXXXXXX`). |
 | `SENTRY_DSN` | Sentry DSN for error tracking and performance monitoring. |
 
 ## Point of sale

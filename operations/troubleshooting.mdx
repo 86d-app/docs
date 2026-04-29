@@ -1,0 +1,138 @@
+---
+title: "Troubleshooting"
+description: "Diagnose common 86d issues. Database errors, codegen failures, missing components, broken webhooks, and what each one points at."
+---
+
+When something goes wrong, run `86d doctor` first. It reports on Node, Bun, dependencies, the active template, module integrity, environment variables, database connectivity, codegen scripts, and TypeScript config, with a `Fix:` line for every issue.
+
+```bash
+86d doctor
+```
+
+If `doctor` is green and you still have a problem, the rest of this page covers the symptoms we see most often.
+
+## "DATABASE_URL is not set"
+
+The store boots without a database, but every endpoint that needs data fails. Set `DATABASE_URL` in `.env`:
+
+```bash .env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/86d
+DATABASE_URL_UNPOOLED=postgresql://postgres:postgres@localhost:5432/86d
+```
+
+For Neon, set both (`DATABASE_URL` to the pooled connection string, `DATABASE_URL_UNPOOLED` to the direct one). For Docker Compose, both can point at `postgres:5432`.
+
+## "Database is not reachable"
+
+The TCP connectivity check in `86d dev` and `86d init` failed. Either the database is down, or `DATABASE_URL` points at the wrong host.
+
+- **Local Postgres**: `pg_isready -h localhost -p 5432`
+- **Docker Compose**: `docker compose ps postgres` should show "healthy"
+- **Neon or Railway**: confirm the project is awake and the connection string is current
+
+## Module components are missing
+
+Symptom: `<ProductGrid />` or `<Cart />` renders as plain text in MDX, or the page errors with "component not found".
+
+Run codegen and restart the dev server:
+
+```bash
+86d generate
+bun run dev
+```
+
+Confirm the module is enabled in your active template's `config.json`. If `modules` is `"*"`, every module under `modules/` is enabled. If it is an explicit array, the package name (`@86d-app/<name>`) must be in the list.
+
+## "Module 'X' is enabled in template but not found"
+
+`86d doctor` flags this when `config.json` references a module that has no folder under `modules/`. Either install the module:
+
+```bash
+86d module add X
+```
+
+or remove it from `config.json` and run `86d generate`.
+
+## Codegen fails
+
+`86d generate` errors usually point at one of:
+
+- A module whose `src/index.ts` does not export a default factory.
+- A module whose `package.json` has the wrong `name` (must be `@86d-app/<dir>` for first-party modules).
+- A circular `requires` between modules.
+
+Read the generator's error output; it tells you which module is at fault.
+
+## Webhooks return 401
+
+Most often the webhook secret is wrong or the body is being mutated before signature verification.
+
+- For Stripe, set `STRIPE_WEBHOOK_SECRET` to the value from the Stripe dashboard webhook endpoint detail. The same secret must match the deployment receiving the webhook (test secret for test events, live secret for live events).
+- Confirm your reverse proxy is not stripping or modifying the request body. The webhook handler reads the raw body before any JSON parsing.
+- Webhooks older than 5 minutes are rejected as replays. If you are replaying old events for testing, do so via the Stripe CLI which re-signs with a current timestamp.
+
+See [Payment gateways](/guides/payment-integrations).
+
+## "Could not find active template config.json"
+
+The CLI's template helpers look for the `template/*` path alias in `apps/store/tsconfig.json` to figure out which template is active. If you edited the alias by hand and it does not match `../../templates/<name>/`, the helpers fail.
+
+Re-run:
+
+```bash
+86d template activate brisa
+```
+
+This rewrites the alias to a known-good value.
+
+## "BETTER_AUTH_SECRET" placeholder warning
+
+The store boot validator rejects the placeholder `change-me-to-a-random-string`. Generate a real value:
+
+```bash
+openssl rand -base64 32
+```
+
+and put it in `.env`. The CLI's `86d init` does this automatically on first run.
+
+## OAuth callbacks fail
+
+Symptom: customer signs in with Google (or another provider), is redirected, and lands on an error.
+
+- `BETTER_AUTH_URL` must be set to the public URL of your store. On Vercel, this is `https://<deployment>.vercel.app` or your custom domain. On Railway, set `APP_URL=https://$RAILWAY_PUBLIC_DOMAIN`.
+- The redirect URI registered with the OAuth provider must match `https://<your-store>/api/auth/callback/<provider>` exactly. Trailing slashes count.
+- For Google, both server-side credentials and `NEXT_PUBLIC_AUTH_GOOGLE_ID` must be set.
+
+## Storage uploads fail in production
+
+- Local storage on Vercel does not persist. Files written to disk in a serverless deployment are lost on the next request. Switch `STORAGE_PROVIDER` to `vercel` (and connect a Blob store) or `s3`.
+- For MinIO inside Docker, set `STORAGE_PUBLIC_URL_MODE=proxy` so URLs return as `/uploads/...` paths from the store app rather than raw container hostnames the browser cannot reach.
+
+See [Storage configuration](/configuration/storage).
+
+## TypeScript errors after upgrading
+
+Run a clean install:
+
+```bash
+bun install
+86d generate
+bun run typecheck
+```
+
+If TypeScript still complains about generated files, delete them and regenerate:
+
+```bash
+rm -rf apps/store/lib/generated
+86d generate
+```
+
+## Asking for help
+
+If none of the above resolves your problem:
+
+1. Run `86d doctor` and copy the full output.
+2. Capture the error message verbatim, the command that produced it, and the page or endpoint involved.
+3. Open an issue at [github.com/86d-app/86d/issues](https://github.com/86d-app/86d/issues) with that information.
+
+We collect repeated reports back into this page.

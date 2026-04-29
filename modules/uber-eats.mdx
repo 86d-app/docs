@@ -1,0 +1,26 @@
+---
+title: "Uber Eats"
+description: "Sell on Uber Eats for restaurant and food merchants. Menu sync and order ingestion via the Uber Eats Marketplace API."
+---
+
+The Uber Eats module connects an 86d store to the Uber Eats marketplace. It syncs your catalog as a menu and ingests Uber Eats orders into the same `@86d-app/orders` queue you use for direct-store orders, with a `channel` field indicating origin.
+
+**Source:** [`modules/uber-eats`](https://github.com/86d-app/86d/tree/main/modules/uber-eats) · **npm:** [`@86d-app/uber-eats`](https://www.npmjs.com/package/@86d-app/uber-eats)
+
+## Installation
+
+```sh
+86d module add uber-eats
+```
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/admin/uber-eats/menu/sync` | Push catalog as a menu |
+| `GET` | `/admin/uber-eats/orders` | Uber Eats orders |
+
+## Related modules
+
+- [Toast](/modules/toast) for POS integration in the same physical location.
+- [Channels](/modules/channels) (overview).

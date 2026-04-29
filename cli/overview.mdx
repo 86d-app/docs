@@ -1,9 +1,9 @@
 ---
 title: "Installation"
-description: "The 86d CLI lets you scaffold modules and templates, manage your dev server, run code generation, and configure your store from the terminal."
+description: "The 86d CLI lets you scaffold modules and templates, manage your dev server, run code generation, diagnose issues, and configure your store from the terminal."
 ---
 
-The `86d` CLI is the primary tool for working with your store locally. You use it to start the development server, configure a new store, create and manage modules and templates, and keep generated code in sync after you make changes to `config.json`.
+The `86d` CLI is the primary tool for working with your store locally. You use it to start the development server, configure a new store, create and manage modules and templates, run code generation, and diagnose project issues.
 
 ## Installation
 
@@ -21,42 +21,53 @@ bun run 86d <command>
 
 ## What the CLI does
 
-The CLI covers four main areas:
+The CLI covers six main areas:
 
-- **Scaffolding** — generate a new module or copy a template as a starting point for a custom design
-- **Development server** — start the Next.js storefront on your local machine
-- **Code generation** — regenerate module imports, the API router, and component documentation after you edit `config.json`
-- **Module management** — enable or disable modules in your active template without manually editing config files
+- **Project setup**: configure a new store, install dependencies, run migrations, and seed data with a single command.
+- **Development server**: start the Next.js storefront on your local machine with database connectivity checks.
+- **Module management**: scaffold custom modules, install community modules from the registry / GitHub / npm, enable or disable modules, and check for updates.
+- **Template management**: create new themes, install third-party templates, and switch the active template.
+- **Code generation**: regenerate module imports, the API router, the registry, and component documentation after you edit `config.json`.
+- **Diagnostics**: run `86d doctor` for a full health check with fix suggestions.
 
 ## Command reference
 
-| Command | Description |  |
-| --- | --- | --- |
-| `86d dev` | Start the store development server |  |
-| \`86d init \[--yes | -y\]\` | Configure a local store |
-| `86d status` | Show project health and configuration |  |
-| `86d module create <name>` | Scaffold a new module |  |
-| `86d module list` | List all modules |  |
-| `86d module info <name>` | Show module details |  |
-| `86d module enable <name>` | Enable a module |  |
-| `86d module disable <name>` | Disable a module |  |
-| `86d template create <name>` | Scaffold a new template |  |
-| `86d template list` | List all templates |  |
-| `86d template activate <name>` | Switch to a template |  |
-| `86d generate` | Run all code generation |  |
-| `86d generate modules` | Generate module imports |  |
-| `86d generate components` | Generate component docs |  |
+| Command | Description |
+| --- | --- |
+| `86d dev` | Start the store development server |
+| `86d init [--yes]` | Configure a local store (env, deps, migrate, seed) |
+| `86d status` | Show project health and configuration |
+| `86d doctor` | Diagnose project issues with fix suggestions |
+| `86d module create <name>` | Scaffold a new module |
+| `86d module add <specifier>` | Add a module from the registry, GitHub, or npm |
+| `86d module update [name]` | Check for and apply module updates |
+| `86d module list` | List all local modules |
+| `86d module search [query]` | Search the registry for modules |
+| `86d module info <name>` | Show module details |
+| `86d module enable <name>` | Enable a module in the active template |
+| `86d module disable <name>` | Disable a module in the active template |
+| `86d template create <name>` | Scaffold a new template from `brisa` |
+| `86d template add <specifier>` | Add a template from GitHub or npm |
+| `86d template remove <name>` | Remove an installed template |
+| `86d template activate <name>` | Switch the store to use a template |
+| `86d template list` | List all templates |
+| `86d generate` | Run all code generation |
+| `86d generate modules` | Generate module imports and the API router |
+| `86d generate registry` | Generate `registry.json` |
+| `86d generate components` | Generate component documentation |
+
+See [Flags and usage reference](/cli/commands) for full details on every command.
 
 ## Typical development workflow
 
 This sequence covers the common setup-and-develop loop:
 
 ```sh
-# 1. Configure the store — sets up .env, installs deps, runs migrations, seeds demo data
+# 1. Configure the store: sets up .env, installs deps, runs migrations, seeds demo data
 86d init
 
 # 2. Check that everything is healthy before you start
-86d status
+86d doctor
 
 # 3. Start the development server
 86d dev
@@ -71,4 +82,15 @@ This sequence covers the common setup-and-develop loop:
 86d generate
 ```
 
-See [CLI command reference](/cli/commands) for full details on every command, including flags and examples.
+## Adding a community module
+
+To install a published community or first-party module from the registry:
+
+```sh
+86d module add reviews
+86d module add @86d-app/reviews
+86d module add github:owner/repo/modules/loyalty
+86d module add npm:@acme/commerce-module
+```
+
+The CLI fetches the module, installs its dependencies, enables it in the active template, and prompts you to run `86d generate`. See [Add a module](/guides/adding-modules) for the full workflow.

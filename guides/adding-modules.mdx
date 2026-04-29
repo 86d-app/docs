@@ -1,57 +1,119 @@
 ---
-title: "Add and Configure Modules"
-description: "Install, configure, and use npm modules in your 86d store — add functionality like carts, reviews, and analytics in minutes by editing a single config file."
+title: "Add a module"
+description: "Install, configure, and use modules in your 86d store. Add functionality like carts, reviews, and analytics in minutes by editing one config file."
 ---
 
-Modules are the building blocks of a 86d store. Every feature — cart, reviews, blog, newsletter, checkout — ships as an independent module that you opt into by listing it in your store's `config.json`. When you add a module, its components become immediately available in your MDX templates. No manual imports, no boilerplate.
+Modules are the building blocks of an 86d store. Every feature (cart, reviews, blog, newsletter, checkout) ships as an independent module that you opt into by listing it in your store's `config.json`. When you add a module, its components become available immediately in your MDX templates. No manual imports, no boilerplate.
 
 ## Find a module
 
-Browse available modules at [npmjs.com](https://www.npmjs.com/search?q=%4086d-app) or list all locally installed modules with the CLI:
+Browse first-party modules at [npmjs.com](https://www.npmjs.com/search?q=%4086d-app), explore the [Module catalog](/modules/overview), or list everything in your local registry from the CLI:
 
 ```bash
-86d module list
+86d module search             # list every registry module
+86d module search payment     # filter by name, description, or category
+86d module list               # show locally installed modules
 ```
 
-Official 86d modules follow the `@86d-app/<name>` naming convention (e.g. `@86d-app/reviews`, `@86d-app/blog`). You can also use any npm package that exports MDX components.
+Official 86d modules follow the `@86d-app/<name>` naming convention (for example `@86d-app/reviews`, `@86d-app/blog`). You can also use any npm package or GitHub repository that follows the 86d module contract.
 
-## Add and configure a module
+## Add a registered module
+
+The fastest way to add a module is `86d module add`. The CLI downloads the module, fetches its required dependencies, runs `bun install`, and enables it in the active template.
 
 <Steps>
+  <Step title="Run module add">
+    ```bash
+    86d module add reviews
+    ```
+
+    The command accepts the short name (`reviews`), the fully scoped name (`@86d-app/reviews`), a GitHub specifier (`github:owner/repo/modules/loyalty`), or an npm specifier (`npm:@acme/commerce-module`). See [`86d module add`](/cli/commands#86d-module-add) for the full grammar.
+  </Step>
+  <Step title="Regenerate module bindings">
+    ```bash
+    86d generate
+    ```
+
+    This rewires module imports, the API router, and the MDX component registry so the new module is available in your store.
+  </Step>
+  <Step title="Use the components in MDX">
+    The module's components are now registered. Drop them into any MDX template:
+
+    ```mdx products/[slug]/layout.mdx
+    <ProductDetail slug={props.slug} />
+    <ProductReviews productId={props.slug} />
+    ```
+  </Step>
+</Steps>
+
+## Add a module by editing `config.json`
+
+You can also add modules manually by listing them in the active template's `config.json`. This is useful when you are scripting deployments or want to audit changes through a pull request.
+
+<Steps>
+  <Step title="Edit config.json">
+    Open `templates/brisa/config.json` and append the package name to the `modules` array:
+
+    ```json templates/brisa/config.json
+    {
+      "modules": [
+        "@86d-app/cart",
+        "@86d-app/products",
+        "@86d-app/reviews"
+      ]
+    }
+    ```
+  </Step>
+  <Step title="Install the package (if it is not a workspace module)">
+    If the module is a published npm package that is not in your workspace, install it:
+
+    ```bash
+    npm install @86d-app/reviews
+    ```
+
+    Workspace modules under `modules/` are already on disk, so this step is unnecessary for first-party modules.
+  </Step>
+  <Step title="Run codegen">
+    ```bash
+    86d generate
+    ```
+
+    The generator detects which packages are workspace-local and which are public npm packages, installs the public ones if needed, and writes static imports into `modules.ts`.
+  </Step>
 </Steps>
 
 ## Set per-module options
 
-Many modules accept configuration options that control their behaviour. Pass these via the `moduleOptions` key in `config.json`:
+Many modules accept configuration options that control their behavior. Pass these via the `moduleOptions` key in `config.json`:
 
 ```json
 {
-    "modules": [
-        "@86d-app/cart",
-        "@86d-app/reviews"
-    ],
-    "moduleOptions": {
-        "@86d-app/cart": {
-            "guestCartExpiration": 604800000,
-            "maxItemsPerCart": 100
-        }
+  "modules": [
+    "@86d-app/cart",
+    "@86d-app/reviews"
+  ],
+  "moduleOptions": {
+    "@86d-app/cart": {
+      "guestCartExpiration": 604800000,
+      "maxItemsPerCart": 100
     }
+  }
 }
 ```
 
-Each module documents its accepted options in its README on npm. The keys inside `moduleOptions` must match the exact npm package name.
+Each module documents its accepted options in its README on npm and on its dedicated docs page (for example, [Carts](/modules/cart)). The keys inside `moduleOptions` must match the exact npm package name.
 
 ## Use external npm packages
 
-You are not limited to `@86d-app/*` modules. Any npm package that exports React or MDX components can be listed:
+You are not limited to `@86d-app/*` modules. Any npm package that exports React or MDX components and follows the 86d module contract can be listed:
 
 ```json
 {
-    "modules": [
-        "@86d-app/cart",
-        "@some-company/analytics-widget",
-        "react-product-carousel"
-    ]
+  "modules": [
+    "@86d-app/cart",
+    "@some-company/analytics-widget",
+    "react-product-carousel"
+  ]
 }
 ```
 
@@ -60,4 +122,31 @@ You are not limited to `@86d-app/*` modules. Any npm package that exports React 
 ## Remove a module
 
 <Steps>
+  <Step title="Disable the module">
+    ```bash
+    86d module disable reviews
+    ```
+
+    This removes the module from `config.json`. If `config.json` had `"modules": "*"`, the CLI converts it to an explicit list with `reviews` excluded.
+  </Step>
+  <Step title="Regenerate">
+    ```bash
+    86d generate
+    ```
+
+    The codegen run drops the module from `modules.ts`, the API router, and the MDX component registry.
+  </Step>
+  <Step title="Optionally uninstall the package">
+    If the module is a workspace package, leave it in `modules/`; you may want to enable it again later. If it is a published npm package and you no longer need it, uninstall it:
+
+    ```bash
+    npm uninstall @86d-app/reviews
+    ```
+  </Step>
 </Steps>
+
+## Next steps
+
+- [Build a custom module](/guides/building-a-module) to add bespoke functionality.
+- [Module catalog](/modules/overview) for the full list of 99 modules.
+- [`config.json` reference](/configuration/store-config) for every supported field.

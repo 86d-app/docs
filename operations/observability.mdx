@@ -1,0 +1,107 @@
+---
+title: "Observability"
+description: "Wire 86d up to Sentry, Google Tag Manager, and your own logs. What gets captured, where it goes, and how to extend it."
+---
+
+The store and admin app emit structured logs by default. 86d also ships first-class hooks for Sentry (server and client error tracking) and Google Tag Manager (storefront analytics). Both are opt-in.
+
+## Logs
+
+The store app uses Next.js's built-in logger plus `console` for ad-hoc logging. Logs go to stdout, which means:
+
+- In Docker Compose, run `docker compose logs -f store` to tail them.
+- On Vercel, logs are available in the Vercel dashboard and via `vercel logs`.
+- On Railway, logs appear in the service log view.
+
+There is no separate log shipper inside the app. If you want centralized logging, point your platform's log forwarder at the container's stdout.
+
+## Sentry
+
+Set `SENTRY_DSN` to enable Sentry error tracking and performance monitoring:
+
+```bash .env
+SENTRY_DSN=https://<key>@<org>.ingest.sentry.io/<project>
+```
+
+What gets captured automatically:
+
+- **Server errors.** Unhandled exceptions in Next.js route handlers, server components, and API routes.
+- **Client errors.** Unhandled exceptions and `console.error` calls in the browser.
+- **Performance traces.** Page navigations, slow API calls, and database queries (sampled).
+
+Sentry is wired into the store, the admin, and every module's endpoint handlers. You can capture errors from your own code with the standard Sentry SDK:
+
+```ts
+import * as Sentry from "@sentry/nextjs";
+
+Sentry.captureException(err, { tags: { module: "my-feature" } });
+```
+
+<Tip>
+  Add a `module` tag whenever you call `captureException` from a module. Sentry's "Issues by tag" view becomes a per-module incident dashboard.
+</Tip>
+
+### Source maps
+
+For readable stack traces in production, source maps are uploaded to Sentry during the build. The default Next.js Sentry integration handles this; on Vercel and Railway it works out of the box.
+
+## Google Tag Manager
+
+Set `NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID` to your container ID:
+
+```bash .env
+NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID=GTM-XXXXXXX
+```
+
+The store app injects the GTM container in `<head>` and pushes structured commerce events to the data layer:
+
+| Event | When it fires | Payload highlights |
+| --- | --- | --- |
+| `view_item` | Product detail page render | `item_id`, `item_name`, `price` |
+| `view_item_list` | Listing or collection page | `item_list_name`, items |
+| `add_to_cart` | Item added to cart | `item_id`, `quantity`, `value` |
+| `remove_from_cart` | Item removed | same shape |
+| `begin_checkout` | Customer enters checkout | `value`, items |
+| `purchase` | Checkout completes | `transaction_id`, `value`, items |
+| `sign_up` | Account created | `method` |
+| `login` | Sign-in | `method` |
+
+Map these to your GA4, Meta CAPI, or other destinations from inside GTM.
+
+## Per-module analytics
+
+The `@86d-app/analytics` module records storefront and conversion analytics in your own database, independent of any third-party tag. Enable it for a vendor-neutral funnel view:
+
+```bash
+86d module add analytics
+```
+
+See [Analytics module](/modules/analytics).
+
+## Audit log
+
+The `@86d-app/audit-log` module captures a tamper-evident record of every admin action: who did what, when, against which entity. Useful for compliance, security review, and post-incident forensics.
+
+```bash
+86d module add audit-log
+```
+
+See [Audit log module](/modules/audit-log).
+
+## Health endpoint
+
+Every store exposes:
+
+```text
+GET /api/health
+```
+
+The endpoint returns `200` with `{"status":"ok"}` when the app is healthy, and `503` with details when a dependency (the database, primarily) is unreachable. Wire it up to your platform's health check (Vercel's "Status" check, Railway's deploy health check, an external uptime monitor).
+
+## Diagnostics from the CLI
+
+For ad-hoc diagnostics, `86d doctor` prints a structured pass / warn / fail report covering Node version, Bun, project root, dependencies, active template, module integrity, environment variables, database connectivity, code-generation scripts, and TypeScript configs. It is the first thing to run when something feels off.
+
+```bash
+86d doctor
+```

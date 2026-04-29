@@ -1,0 +1,39 @@
+---
+title: "Braintree"
+description: "Accept payments with Braintree in 86d. Braintree GraphQL plus REST, webhook verification, and full or partial refund support."
+---
+
+The Braintree module implements the `PaymentProvider` interface from `@86d-app/payments` against Braintree's GraphQL and REST APIs. The webhook endpoint verifies signatures and emits `payment.completed` on `transaction_settled`.
+
+**Source:** [`modules/braintree`](https://github.com/86d-app/86d/tree/main/modules/braintree) · **npm:** [`@86d-app/braintree`](https://www.npmjs.com/package/@86d-app/braintree)
+
+## Installation
+
+```sh
+86d module add braintree payments
+```
+
+## Configuration
+
+```ts
+braintree({
+  merchantId: "...",
+  publicKey: "...",
+  privateKey: "...",
+  sandbox: "true"
+});
+```
+
+See [Environment variables](/configuration/environment-variables) for the `BRAINTREE_*` variables.
+
+## Webhook setup
+
+In the [Braintree Control Panel](https://www.braintreegateway.com/login), go to **Settings -> Webhooks** and create a webhook for `transaction_settled` and `transaction_settlement_declined` pointing at:
+
+```text
+POST https://your-store.com/api/braintree/webhook
+```
+
+## Related modules
+
+- [Payments](/modules/payments), [Payment gateways guide](/guides/payment-integrations).

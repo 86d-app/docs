@@ -1,0 +1,41 @@
+---
+title: "Uber Direct"
+description: "On-demand local delivery via Uber Direct for 86d. Real-time quotes, dispatch, and status webhooks."
+---
+
+The Uber Direct module integrates with the Uber Direct API for last-mile delivery. The store quotes rates at checkout, creates a delivery on order placement, and receives webhook updates as the courier picks up and drops off.
+
+**Source:** [`modules/uber-direct`](https://github.com/86d-app/86d/tree/main/modules/uber-direct) · **npm:** [`@86d-app/uber-direct`](https://www.npmjs.com/package/@86d-app/uber-direct)
+
+## Installation
+
+```sh
+86d module add uber-direct
+```
+
+## Configuration
+
+```ts
+uberDirect({
+  customerId: "...",
+  clientId: "...",
+  clientSecret: "...",
+});
+```
+
+## Store endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/uber-direct/quote` | Quote a delivery |
+| `POST` | `/uber-direct/webhooks` | Status webhooks |
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/uber-direct/deliveries` | Active and completed deliveries |
+
+## Related modules
+
+- [DoorDash](/modules/doordash), [Favor](/modules/favor), [Uber Eats](/modules/uber-eats).

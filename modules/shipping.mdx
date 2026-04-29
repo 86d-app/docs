@@ -1,0 +1,36 @@
+---
+title: "Shipping"
+description: "Shipping zones, rates, and carrier definitions for 86d. Configure zones by country and region, and rates by weight, price, or flat fee."
+---
+
+The shipping module configures how shipping is priced at checkout. You define **zones** (one or more countries, optionally narrowed to states or postal codes) and attach **rates** to each zone (flat, weight-based, price-based, or live carrier). The checkout module reads available rates via the shipping contract and presents them to the customer.
+
+**Source:** [`modules/shipping`](https://github.com/86d-app/86d/tree/main/modules/shipping) · **npm:** [`@86d-app/shipping`](https://www.npmjs.com/package/@86d-app/shipping)
+
+## Installation
+
+```sh
+86d module add shipping
+```
+
+## Store endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/shipping/rates` | Quote available rates for an address and cart |
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/shipping/zones` | List zones |
+| `POST` | `/admin/shipping/zones` | Create a zone |
+| `POST` | `/admin/shipping/zones/:id/rates` | Add a rate to a zone |
+
+## Live carrier rates
+
+For real-time rates from EasyPost or Shippo, configure `EASYPOST_API_KEY` or `SHIPPO_API_KEY`. The shipping module dispatches to the live provider when the rate type is `live`.
+
+## Related modules
+
+- [Fulfillment](/modules/fulfillment), [Tax](/modules/tax), [Checkout](/modules/checkout).

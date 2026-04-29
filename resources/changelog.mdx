@@ -1,0 +1,51 @@
+---
+title: "Changelog"
+description: "Find release notes for the 86d framework, the CLI, and every official module. The canonical changelog lives on GitHub Releases."
+---
+
+The canonical changelog for 86d lives in the repository, generated from [Changesets](https://github.com/changesets/changesets) entries.
+
+- **GitHub Releases**: [github.com/86d-app/86d/releases](https://github.com/86d-app/86d/releases)
+- **CHANGELOG files**: every published package has its own `CHANGELOG.md`, for example [`packages/cli/CHANGELOG.md`](https://github.com/86d-app/86d/blob/main/packages/cli/CHANGELOG.md).
+
+Every release entry covers:
+
+- A summary of changes (features, fixes, internal work).
+- Migration notes for breaking changes (database migrations, renamed environment variables, removed APIs).
+- The list of packages bumped in that release. All packages move together; see [Versioning](/resources/versioning).
+
+## Following releases
+
+- **Watch the GitHub repo** for release notifications: open [github.com/86d-app/86d](https://github.com/86d-app/86d), click **Watch**, and choose **Custom -> Releases**.
+- **Subscribe to the npm RSS feeds** for individual packages on the package page (`https://www.npmjs.com/package/@86d-app/<name>`).
+- Follow [@86d_app on X](https://x.com/86d_app) for shipped-feature posts.
+
+## Upgrading
+
+After pulling a new release into your store:
+
+```bash
+bun install
+bun run db:migrate
+86d generate
+86d doctor
+```
+
+Read the release notes for that version before you deploy. They flag any required `.env` changes, removed module options, or schema-affecting migrations.
+
+For module upgrades specifically:
+
+```bash
+86d module update
+86d module add <name>   # for each outdated module
+```
+
+## Reporting regressions
+
+If a release breaks something for you:
+
+1. Note the version you upgraded from and to.
+2. Capture the error and the smallest possible reproduction.
+3. Open an issue at [github.com/86d-app/86d/issues](https://github.com/86d-app/86d/issues) tagged with `regression`.
+
+We treat regressions as the highest priority and aim to ship a patch within a few days.

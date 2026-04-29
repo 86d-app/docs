@@ -1,9 +1,9 @@
 ---
-title: "Marketplaces and Channels"
-description: "Sync your 86d product catalog to Amazon, eBay, TikTok Shop, Google Shopping, Instagram, and more — each channel is a drop-in module you enable in config.json."
+title: "Sales channels"
+description: "Sync your 86d product catalog to Amazon, eBay, TikTok Shop, Google Shopping, Instagram, and more. Each channel is a drop-in module you enable in config.json."
 ---
 
-86d includes a dedicated module for every major sales channel. Each module handles credential management, catalog sync, order ingestion, and channel-specific data mapping — all accessible from the admin sidebar once enabled. You use the same product catalog you already manage in 86d; the channel module handles translation to each marketplace's API format.
+86d includes a dedicated module for every major sales channel. Each module handles credential management, catalog sync, order ingestion, and channel-specific data mapping. All of it is accessible from the admin sidebar once enabled. You use the same product catalog you already manage in 86d; the channel module handles translation to each marketplace's API format.
 
 ## Available channel modules
 
@@ -35,7 +35,7 @@ description: "Sync your 86d product catalog to Amazon, eBay, TikTok Shop, Google
   <Card title="Instagram Shop" icon="instagram" href="https://www.npmjs.com/package/@86d-app/instagram-shop">
     `@86d-app/instagram-shop`
 
-    Tag products in Instagram posts and stories; sync your catalog to your Instagram Shop.
+    Tag products in Instagram posts and stories, and sync your catalog to your Instagram Shop.
   </Card>
 
   <Card title="Facebook Shop" icon="facebook" href="https://www.npmjs.com/package/@86d-app/facebook-shop">
@@ -65,7 +65,7 @@ description: "Sync your 86d product catalog to Amazon, eBay, TikTok Shop, Google
   <Card title="X Shop" icon="x-twitter" href="https://www.npmjs.com/package/@86d-app/x-shop">
     `@86d-app/x-shop`
 
-    Connect X (formerly Twitter) Shopping to surface products in posts and your storefront profile.
+    Connect X Shopping to surface products in posts and on your storefront profile.
   </Card>
 
   <Card title="Wish" icon="sparkles" href="https://www.npmjs.com/package/@86d-app/wish">
@@ -77,9 +77,31 @@ description: "Sync your 86d product catalog to Amazon, eBay, TikTok Shop, Google
 
 ## General setup pattern
 
-Every channel module follows the same four steps:
+Every channel module follows the same four-step setup.
 
 <Steps>
+  <Step title="Install the package">
+    ```bash
+    npm install @86d-app/<channel-name>
+    ```
+  </Step>
+  <Step title="Add to config.json">
+    Add the package to the `modules` array in your active template's `config.json`:
+
+    ```json
+    {
+      "modules": ["@86d-app/<channel-name>"]
+    }
+    ```
+  </Step>
+  <Step title="Regenerate module bindings">
+    ```bash
+    86d generate
+    ```
+  </Step>
+  <Step title="Enter credentials in the admin">
+    Open **Admin → Settings → \[Channel name\]** in the dashboard and enter the API credentials for that channel. Each module documents the required credentials in its README on npm.
+  </Step>
 </Steps>
 
 ## Module-specific setup
@@ -91,10 +113,10 @@ Each channel has its own authentication method, required scopes, and webhook con
 npm info @86d-app/amazon readme
 ```
 
-Or visit the module's page on npm — all READMEs are linked in the cards above.
+You can also visit the module's page on npm. Every README is linked from the cards above.
 
 ## Notes on catalog sync
 
-- Channel modules read your product catalog through the module contract system — they do not import the products module directly. You must have `@86d-app/products` enabled for catalog sync to work.
-- Inventory levels, prices, and product status changes made in your 86d admin are pushed to connected channels on a configurable schedule or can be triggered manually from the admin.
+- Channel modules read your product catalog through the module contract system; they do not import the products module directly. You must have `@86d-app/products` enabled for catalog sync to work.
+- Inventory levels, prices, and product status changes made in your 86d admin are pushed to connected channels on a configurable schedule, or can be triggered manually from the admin.
 - Orders imported from channels appear in your 86d orders queue alongside direct-store orders, with a `channel` field indicating their origin.

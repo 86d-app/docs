@@ -1,9 +1,11 @@
 ---
-title: "Collections "
-description: "Complete reference for @86d-app/collections: curate manual and automatic product groupings with SEO, featured flags, and drag-and-drop ordering."
+title: "Collections"
+description: "Reference for @86d-app/collections: curate manual and automatic product groupings with SEO, featured flags, and drag-and-drop ordering."
 ---
 
-The collections module lets you group products into curated sets — think "Summer Sale", "New Arrivals", or "Staff Picks". You can build collections by hand-picking products (**manual**) or by writing rule-based conditions that automatically include matching products (**automatic**). Collections support featured flags, SEO metadata, and drag-and-drop product ordering.
+The collections module groups products into curated sets, such as "Summer Sale", "New Arrivals", or "Staff Picks". You can build collections by hand-picking products (**manual**) or by writing rule-based conditions that automatically include matching products (**automatic**). Collections support featured flags, SEO metadata, and drag-and-drop product ordering.
+
+**Source:** [`modules/collections`](https://github.com/86d-app/86d/tree/main/modules/collections) · **npm:** [`@86d-app/collections`](https://www.npmjs.com/package/@86d-app/collections)
 
 ## Installation
 
@@ -23,7 +25,7 @@ Then register the module in your store's `config.json`:
 
 ```json
 {
-  "modules": ["collections"]
+  "modules": ["@86d-app/collections"]
 }
 ```
 
@@ -75,23 +77,19 @@ Add these components to your MDX template files. The `collections` module must b
 
 ### `CollectionList`
 
-Renders a grid of all active collections. Fetches its own data — no props required.
+Renders a grid of all active collections. Fetches its own data; no props required.
 
 ```mdx
 <CollectionList />
 ```
 
----
-
 ### `FeaturedCollections`
 
-Renders featured collection cards. Fetches its own data — no props required.
+Renders featured collection cards. Fetches its own data; no props required.
 
 ```mdx
 <FeaturedCollections />
 ```
-
----
 
 ## Types
 
@@ -168,7 +166,7 @@ interface CollectionStats {
 ## Notes
 
 - Slugs must be unique. The create and update endpoints validate for conflicts.
-- Adding a product that already exists in a collection is idempotent — the operation returns the existing entry rather than creating a duplicate.
+- Adding a product that already exists in a collection is idempotent. The operation returns the existing entry rather than creating a duplicate.
 - Deleting a collection cascades and removes all associated `CollectionProduct` records.
 - Automatic collections store `conditions` as JSON. The runtime evaluates these conditions at query time.
 - Store endpoints return only active collections. Admin endpoints return all collections regardless of status.

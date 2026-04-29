@@ -3,7 +3,9 @@ title: "Checkouts"
 description: "Manage checkout sessions and the cart-to-order conversion flow. Covers session creation, address collection, discount application, and checkout components."
 ---
 
-The checkout module manages the session-based flow that converts a shopping cart into a confirmed order. Each checkout session tracks the customer's email, shipping and billing addresses, applied discounts, and totals through a well-defined status lifecycle. The module is customer-facing only — there are no admin endpoints. To process real payments you pair it with a payment gateway module such as `@86d-app/stripe`.
+The checkout module manages the session-based flow that converts a shopping cart into a confirmed order. Each checkout session tracks the customer's email, shipping and billing addresses, applied discounts, and totals through a well-defined status lifecycle. The module is customer-facing only; there are no admin endpoints. To process real payments you pair it with a payment gateway module such as `@86d-app/stripe`.
+
+**Source:** [`modules/checkout`](https://github.com/86d-app/86d/tree/main/modules/checkout) · **npm:** [`@86d-app/checkout`](https://www.npmjs.com/package/@86d-app/checkout)
 
 ## Installation
 
@@ -68,7 +70,7 @@ Call `controller.expireStale()` periodically (for example from a cron job) to tr
 
 ### CheckoutForm
 
-`CheckoutForm` is the multi-step checkout orchestrator. It renders the active step — information, shipping, payment, or review — alongside the `CheckoutSummary` sidebar. A step indicator shows customers how far along they are. If no session ID is set in `checkoutState`, the component falls back to a "Return to cart" message.
+`CheckoutForm` is the multi-step checkout orchestrator. It renders the active step (information, shipping, payment, or review) alongside the `CheckoutSummary` sidebar. A step indicator shows customers how far along they are. If no session ID is set in `checkoutState`, the component falls back to a "Return to cart" message.
 
 ```mdx
 <CheckoutForm />
@@ -101,7 +103,7 @@ Step 2. Collects the shipping address: first and last name, address lines, city,
 
 ### CheckoutPayment
 
-Step 3. Confirms the checkout session — validating collected fields and reserving inventory — then creates a payment intent. In offline mode (no payments module configured) this step auto-succeeds. With a payment provider such as Stripe, it renders the provider's payment UI (for example the Stripe `PaymentElement`).
+Step 3. Confirms the checkout session (validating collected fields and reserving inventory), then creates a payment intent. In offline mode (no payments module configured) this step auto-succeeds. With a payment provider such as Stripe, it renders the provider's payment UI (for example the Stripe `PaymentElement`).
 
 ```mdx
 <CheckoutPayment />
@@ -193,6 +195,6 @@ This transitions the session from `pending` to `completed` and stores the `order
 
 ## Discount integration
 
-The checkout module integrates with the discounts module automatically when both are enabled. When a customer applies a promo code at checkout, the checkout module validates and applies it via the discounts module — no additional configuration required.
+The checkout module integrates with the discounts module automatically when both are enabled. When a customer applies a promo code at checkout, the checkout module validates and applies it via the discounts module. No additional configuration is required.
 
 See the [Discounts module reference](/modules/discounts) for the promo code API and the `DiscountController` interface.

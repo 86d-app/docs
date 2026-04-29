@@ -1,21 +1,21 @@
 ---
-title: "Getting Started"
-description: "Set up a local 86d store using the CLI and Bun, or skip all configuration with a single Docker Compose command that starts the full stack."
+title: "Quickstart"
+description: "Set up a local 86d store with the CLI and Bun, or skip configuration entirely with one Docker Compose command that starts the full stack."
 ---
 
-The fastest way to get an 86d store running is `docker compose up` — it starts PostgreSQL, MinIO object storage, and the store app with zero configuration. If you prefer a local development setup with hot reloading and direct access to the codebase, use the CLI path below.
+The fastest way to get an 86d store running is `docker compose up`. It starts PostgreSQL, MinIO object storage, and the store app with zero configuration. If you prefer a local dev setup with hot reload and direct access to the codebase, follow the CLI path below.
 
 <Steps>
   <Step title="Check prerequisites">
-    Before you start, make sure you have the following installed:
+    Before you start, install the following:
 
     | Tool | Minimum version |
     | --- | --- |
-    | [Bun](https://bun.sh) | v1.3.6\+ |
-    | [Node.js](https://nodejs.org) | v23\+ |
-    | [PostgreSQL](https://www.postgresql.org) | v15\+ |
+    | [Bun](https://bun.sh) | v1.3.6 or newer |
+    | [Node.js](https://nodejs.org) | v23 or newer |
+    | [PostgreSQL](https://www.postgresql.org) | v15 or newer |
 
-    If you'd rather not install PostgreSQL locally, use the Docker Compose path at the bottom of this page — it handles the database for you.
+    You can skip the PostgreSQL install by using the [Docker Compose path](#docker-compose-alternative) below; it provisions the database for you.
   </Step>
   <Step title="Clone the repository and install dependencies">
     Clone the 86d monorepo and install all workspace dependencies with Bun:
@@ -37,10 +37,12 @@ The fastest way to get an 86d store running is `docker compose up` — it starts
 
     The `init` command:
 
-    - Creates a `.env` file from `.env.example` if one doesn't exist
+    - Creates a `.env` file from `.env.example` if one does not exist
+    - Generates a random `BETTER_AUTH_SECRET` if the placeholder is still in place
+    - Installs dependencies with `bun install`
+    - Runs code generation to wire up module imports
     - Prompts you to run database migrations against your `DATABASE_URL`
     - Optionally seeds the database with demo products, categories, and an admin user
-    - Runs code generation to wire up module imports
 
     <Tip>
       To skip all interactive prompts (useful in scripts or CI), run `bun run 86d init --yes`.
@@ -55,11 +57,11 @@ The fastest way to get an 86d store running is `docker compose up` — it starts
     ```
 
     <Warning>
-      Change the admin password immediately in any environment that is accessible from the internet.
+      Change the admin password immediately in any environment that is reachable from the internet.
     </Warning>
   </Step>
   <Step title="Start the development server">
-    Start the store with hot reloading:
+    Start the store with hot reload:
 
     ```bash
     bun run dev
@@ -67,8 +69,8 @@ The fastest way to get an 86d store running is `docker compose up` — it starts
 
     Once running, open:
 
-    - **Storefront** — [http://localhost:3000](http://localhost:3000)
-    - **Admin dashboard** — [http://localhost:3000/admin](http://localhost:3000/admin)
+    - **Storefront**: [http://localhost:3000](http://localhost:3000)
+    - **Admin dashboard**: [http://localhost:3000/admin](http://localhost:3000/admin)
 
     Sign in with `admin@example.com` / `password123`.
   </Step>
@@ -101,13 +103,13 @@ The fastest way to get an 86d store running is `docker compose up` — it starts
     bun run 86d module create my-feature
     ```
 
-    This creates `modules/my-feature/` with the full module structure — entry point, schema, store and admin endpoints, and component stubs.
+    This creates `modules/my-feature/` with the full module structure: entry point, schema, store and admin endpoints, and component stubs. See [Build a custom module](/guides/building-a-module) for the full workflow.
   </Step>
 </Steps>
 
 ## Docker Compose alternative
 
-If you want a zero-configuration setup — no local PostgreSQL, no manual `.env` — use Docker Compose. A single command starts PostgreSQL, MinIO object storage, and the store app, and automatically runs migrations and seeds demo data on first boot:
+If you want zero-configuration setup (no local PostgreSQL, no manual `.env`), use Docker Compose. A single command starts PostgreSQL, MinIO object storage, and the store app, and runs migrations and seeds demo data on first boot:
 
 ```bash
 docker compose up
@@ -125,7 +127,7 @@ Once the containers are healthy, the following services are available:
 Default admin credentials are `admin@example.com` / `password123`.
 
 <Note>
-  In the Docker Compose setup, file uploads are stored in MinIO and served at same-origin `/uploads/...` URLs. You do not need to expose the raw MinIO bucket URL to your users.
+  In the Docker Compose setup, file uploads are stored in MinIO and served at same-origin `/uploads/...` URLs. You do not need to expose the raw MinIO bucket URL to your shoppers.
 </Note>
 
 If any default ports conflict with services already running on your machine, override them:
@@ -142,6 +144,6 @@ POSTGRES_PUBLISH_PORT=5433 STORE_PUBLISH_PORT=3001 docker compose up
   </Card>
 
   <Card title="Browse the module catalog" icon="grid" href="/modules/overview">
-    Explore the 99\+ modules you can enable in your store.
+    Explore the 99 modules you can enable in your store.
   </Card>
 </CardGroup>

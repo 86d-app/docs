@@ -1,63 +1,68 @@
 ---
-title: "86d: Open-source modular commerce platform"
-description: "86d is an open-source commerce platform built from isolated, interchangeable modules. Compose the exact stack you need and deploy anywhere."
+title: "86d"
+description: "86d is an open-source dynamic commerce platform. Compose your store from 99 isolated modules, own every byte of data, and deploy anywhere."
+sidebarTitle: "Home"
 ---
 
-86d gives you a modular commerce platform where every feature — products, cart, checkout, loyalty, subscriptions, and 90+ more — ships as an independent npm package. Add exactly what you need, customize every component, and deploy to your own infrastructure with full data ownership.
+86d is an open-source dynamic commerce platform built from isolated, interchangeable modules. Every feature ships as its own npm package: products, cart, checkout, loyalty, subscriptions, multi-channel selling, and 90 more. You compose the exact stack you need, customize every component, and deploy on infrastructure you control.
 
 <CardGroup cols={2}>
-  <Card title="Quick Start" icon="bolt" href="/quickstart">
-    Get your store running locally in minutes using the CLI and Docker.
+  <Card title="Quickstart" icon="bolt" href="/quickstart">
+    Get a store running locally in minutes with the CLI or Docker Compose.
   </Card>
   <Card title="Deploy" icon="rocket" href="/deployment">
-    Deploy to Railway, Vercel, or self-host with Docker Compose.
+    Ship to Railway, Vercel + Neon, or self-host with Docker.
   </Card>
-  <Card title="Module Catalog" icon="grid" href="/modules/overview">
-    Browse 99+ commerce modules ready to install from npm.
+  <Card title="Module catalog" icon="grid" href="/modules/overview">
+    Browse all 99 modules and pick what your store needs.
   </Card>
-  <Card title="CLI Reference" icon="terminal" href="/cli/overview">
-    Use the `86d` CLI to scaffold modules, manage templates, and run codegen.
+  <Card title="CLI reference" icon="terminal" href="/cli/overview">
+    Scaffold modules, switch templates, and run codegen with the `86d` CLI.
   </Card>
 </CardGroup>
 
 ## How 86d works
 
-86d is organized as a monorepo of composable modules. Each module is an isolated npm package that contributes API endpoints, admin UI, and storefront components. You enable only the modules your store needs — in `config.json` — and they are automatically wired into your storefront and admin dashboard.
+A store is a Bun + Next.js monorepo of composable modules. Each module is an isolated npm package that contributes API endpoints, admin UI, and storefront components. You enable the modules your store needs in `templates/<theme>/config.json`, run codegen, and the components are wired into your MDX templates and admin sidebar automatically.
 
 <Steps>
   <Step title="Install and initialize">
-    Install the CLI, run `86d init` to configure your environment, database, and seed data.
+    Install the `86d` CLI, then run `86d init` to set up your environment, run database migrations, and seed demo data.
   </Step>
   <Step title="Choose your modules">
-    Add modules to `templates/brisa/config.json`. Every `@86d-app/*` module on npm is available.
+    Edit `templates/brisa/config.json`. Every `@86d-app/*` module on npm is available, and so is any third-party module that follows the same contract.
   </Step>
   <Step title="Run codegen">
-    Run `86d generate` to regenerate module imports and the API router. Components are now available in your MDX templates.
+    `86d generate` regenerates module imports and the API router. Module components become available immediately in MDX templates.
   </Step>
   <Step title="Customize and deploy">
-    Edit your MDX templates to control layout and content. Deploy to Railway, Vercel, or any Docker host.
+    Edit MDX templates to control layout and content. Push to Railway, Vercel, or any Docker host.
   </Step>
 </Steps>
 
-## Key features
+## Why 86d
 
 <CardGroup cols={2}>
-  <Card title="99+ Commerce Modules" icon="boxes-stacked" href="/modules/overview">
-    Products, cart, checkout, subscriptions, loyalty, multi-currency, and more — each as an independent package.
+  <Card title="99 commerce modules" icon="boxes-stacked" href="/modules/overview">
+    Products, cart, checkout, subscriptions, loyalty, multi-currency, and more. Each one is an independent package.
   </Card>
-  <Card title="MDX Storefront Templates" icon="palette" href="/concepts/templates">
-    Control your store's layout and content with MDX. Module components drop directly into your templates.
+  <Card title="MDX storefront templates" icon="palette" href="/concepts/templates">
+    Control layout and content with MDX. Module components drop into templates with no imports.
   </Card>
-  <Card title="Multi-Channel Selling" icon="share-nodes" href="/modules/channels">
-    Sync listings to Amazon, eBay, TikTok Shop, Google Shopping, Instagram, and more.
+  <Card title="Multi-channel selling" icon="share-nodes" href="/modules/channels">
+    Sync your catalog to Amazon, eBay, TikTok Shop, Google Shopping, Instagram, and more.
   </Card>
-  <Card title="Payment Integrations" icon="credit-card" href="/guides/payment-integrations">
-    Accept payments via Stripe, PayPal, Square, or Braintree with webhook verification built in.
+  <Card title="Payment integrations" icon="credit-card" href="/guides/payment-integrations">
+    Accept payments via Stripe, PayPal, Square, or Braintree. HMAC webhook verification is built in.
   </Card>
-  <Card title="Full Data Ownership" icon="database" href="/deployment">
+  <Card title="Full data ownership" icon="database" href="/deployment">
     Self-host on your own PostgreSQL database. No vendor lock-in, no usage-based pricing surprises.
   </Card>
-  <Card title="Open Source" icon="code" href="https://github.com/86d-app/86d">
-    Apache-2.0 licensed. Fork it, extend it, or contribute back.
+  <Card title="Open source" icon="code" href="https://github.com/86d-app/86d">
+    Apache 2.0 licensed. Fork it, extend it, or contribute back.
   </Card>
 </CardGroup>
+
+<Note>
+  86d is under active development and is not yet recommended for production use. Proceed with caution.
+</Note>

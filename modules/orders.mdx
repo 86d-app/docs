@@ -3,7 +3,9 @@ title: "Orders"
 description: "Manage the full order lifecycle in your 86d store. Covers status transitions, fulfillment tracking, returns, invoices, and customer-facing components."
 ---
 
-The orders module handles every stage of an order's life — from the moment it is created through fulfillment, returns, and invoicing. Customers can view their order history, cancel eligible orders, track shipments, and submit return requests directly from your storefront. All store endpoints require an authenticated session, and each endpoint verifies that the order belongs to the requesting customer before returning any data.
+The orders module handles every stage of an order's life, from the moment it is created through fulfillment, returns, and invoicing. Customers can view their order history, cancel eligible orders, track shipments, and submit return requests directly from your storefront. All store endpoints require an authenticated session, and each endpoint verifies that the order belongs to the requesting customer before returning any data.
+
+**Source:** [`modules/orders`](https://github.com/86d-app/86d/tree/main/modules/orders) · **npm:** [`@86d-app/orders`](https://www.npmjs.com/package/@86d-app/orders)
 
 ## Installation
 
@@ -30,7 +32,7 @@ const client = createModuleClient([
 
 ## Store endpoints
 
-All store endpoints require an authenticated session. Requests for orders that do not belong to the authenticated customer return `404` — not `403` — to avoid leaking the existence of other customers' orders.
+All store endpoints require an authenticated session. Requests for orders that do not belong to the authenticated customer return `404` (not `403`), to avoid leaking the existence of other customers' orders.
 
 | Method | Path | Description |
 | --- | --- | --- |
@@ -103,7 +105,7 @@ Paginated list of a customer's orders. Requires authentication. Clicking a row t
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `onSelectOrder` | `(id: string) => void` | — | Callback when a row is clicked |
+| `onSelectOrder` | `(id: string) => void` |  | Callback when a row is clicked |
 | `pageSize` | `number` | `10` | Number of orders per page |
 
 ### OrderDetail
@@ -139,7 +141,7 @@ Return requests section for a specific order. Displays existing return requests 
 
 ### OrderTracker
 
-Public order tracking form — no authentication required. Customers enter their order number and the email address used at checkout to retrieve order status.
+Public order tracking form. No authentication required. Customers enter their order number and the email address used at checkout to retrieve order status.
 
 ```mdx
 <OrderTracker />

@@ -1,9 +1,11 @@
 ---
 title: "Products"
-description: "Complete reference for @86d-app/products: install, configure, store endpoints, admin endpoints, MDX components, and TypeScript types."
+description: "Reference for @86d-app/products: install, configure, store endpoints, admin endpoints, MDX components, and TypeScript types."
 ---
 
-The products module is the foundation of every 86d store. It manages your full product catalog — including variants, hierarchical categories, and collections — with read-only storefront browsing and full admin CRUD. You get paginated listing, full-text search, featured products, related product scoring, and CSV import out of the box.
+The products module is the foundation of every 86d store. It manages your full product catalog (including variants, hierarchical categories, and collections) with read-only storefront browsing and full admin CRUD. You get paginated listing, full-text search, featured products, related-product scoring, and CSV import out of the box.
+
+**Source:** [`modules/products`](https://github.com/86d-app/86d/tree/main/modules/products) · **npm:** [`@86d-app/products`](https://www.npmjs.com/package/@86d-app/products)
 
 ## Installation
 
@@ -75,7 +77,7 @@ Store endpoints are public and return only `active` products. Use these in your 
 | `page` | `number` | Page number (default `1`) |
 | `limit` | `number` | Items per page, capped at `maxPageSize` |
 | `category` | `string` | Filter by category slug |
-| `status` | `string` | Product status — storefront always filters to `active` |
+| `status` | `string` | Product status. The storefront always filters to `active`. |
 | `featured` | `boolean` | Filter to featured products only |
 
 ### Categories
@@ -162,7 +164,7 @@ Displays a single product card with image, name, price, discount badge, and an o
 
 ### `FeaturedProducts`
 
-Responsive grid of featured products. Fetches its own data — no props required.
+Responsive grid of featured products. Fetches its own data; no props required.
 
 <ParamField body="limit" type="number">
   Maximum number of featured products to display.
@@ -213,7 +215,7 @@ Full product detail page including image gallery, variant selector, pricing, inv
 </ParamField>
 
 <ParamField body="params" type="Record<string, string>" required>
-  Route params object (e.g. `params.slug`).
+  Route params object (for example `params.slug`).
 </ParamField>
 
 ---
@@ -428,8 +430,8 @@ interface ProductWithVariants extends Product {
 ## Notes
 
 - Store endpoints always filter to `status: "active"`. Admin endpoints return all statuses.
-- Deleting a category orphans its child categories and products rather than cascading — `categoryId` and `parentId` are set to `undefined`.
+- Deleting a category orphans its child categories and products rather than cascading; `categoryId` and `parentId` are set to `undefined`.
 - Deleting a product cascades to all its variants. Deleting a collection cascades to collection-product links.
-- `addProductToCollection` is idempotent — adding a product already in a collection returns the existing link.
+- `addProductToCollection` is idempotent. Adding a product already in a collection returns the existing link.
 - Inventory decrement has no floor and can go negative. Products with `trackInventory: false` skip all inventory operations.
-- Related products are scored by shared category (\+10 points) and shared tags (\+1 point each).
+- Related products are scored by shared category (+10 points) and shared tags (+1 point each).

@@ -1,9 +1,9 @@
 ---
-title: "Deployment and Hosting"
-description: "Deploy 86d to Railway, Vercel, or a self-hosted Docker server. Each option takes minutes to set up and requires only a few environment variables."
+title: "Deployment and hosting"
+description: "Deploy 86d to Railway, Vercel + Neon, or a self-hosted Docker server. Each option takes minutes to set up and needs only a few environment variables."
 ---
 
-86d ships a production-ready `Dockerfile` and `docker-compose.yml`, and supports one-click deploys to Railway and Vercel. Choose the path that matches your infrastructure preferences — all three run the same codebase.
+86d ships with a production-ready `Dockerfile` and `docker-compose.yml`, and supports one-click deploys to Railway and Vercel. Pick the path that matches your infrastructure preferences. All three run the same codebase.
 
 <Tabs>
   <Tab title="Docker Compose (self-hosted)">
@@ -37,20 +37,25 @@ description: "Deploy 86d to Railway, Vercel, or a self-hosted Docker server. Eac
     BETTER_AUTH_SECRET="$(openssl rand -base64 32)"
     ```
 
-    Set this in a `.env` file alongside your `docker-compose.yml` before running. The default value in the Compose file is for development only.
+    Set this in a `.env` file alongside your `docker-compose.yml` before you run the stack. The default value baked into the Compose file is for development only.
 
-    **Storage:** Docker Compose uses MinIO (an S3-compatible object store) by default. File uploads are stored in the `86d-uploads` bucket and served at same-origin `/uploads/...` URLs.
+    **Storage:** Docker Compose uses MinIO (an S3-compatible object store) by default. Uploads land in the `86d-uploads` bucket and are served at same-origin `/uploads/...` URLs.
 
     To override default ports if they conflict with existing services:
 
     ```bash
-    POSTGRES_PUBLISH_PORT=5433 STORE_PUBLISH_PORT=3001 MINIO_API_PUBLISH_PORT=9002 MINIO_CONSOLE_PUBLISH_PORT=9003 docker compose up
+    POSTGRES_PUBLISH_PORT=5433 \
+    STORE_PUBLISH_PORT=3001 \
+    MINIO_API_PUBLISH_PORT=9002 \
+    MINIO_CONSOLE_PUBLISH_PORT=9003 \
+    docker compose up
     ```
   </Tab>
-  <Tab title="Railway">
-    Railway provides managed PostgreSQL and runs the store as a containerized service. Click the button below to deploy directly from the 86d GitHub repository:
 
-    **Required environment variables on Railway:**
+  <Tab title="Railway">
+    Railway provides managed PostgreSQL and runs the store as a containerized service. Click the **Deploy on Railway** button on the [GitHub repository](https://github.com/86d-app/86d) to deploy directly.
+
+    **Required environment variables:**
 
     | Variable | Description |
     | --- | --- |
@@ -61,7 +66,7 @@ description: "Deploy 86d to Railway, Vercel, or a self-hosted Docker server. Eac
 
     Railway populates `DATABASE_URL` automatically when you attach a PostgreSQL service. Set `BETTER_AUTH_SECRET` in the Railway dashboard under **Variables** before your first deploy.
 
-    **Storage on Railway:** Use a Railway Object Storage bucket (S3-compatible). Set these additional variables:
+    **Storage on Railway:** use a Railway Object Storage bucket (S3-compatible). Add these variables:
 
     ```bash
     STORAGE_PROVIDER=s3
@@ -73,13 +78,14 @@ description: "Deploy 86d to Railway, Vercel, or a self-hosted Docker server. Eac
     ```
 
     <Tip>
-      Railway automatically sets `RAILWAY_PUBLIC_DOMAIN` at runtime. Use `APP_URL=https://$RAILWAY_PUBLIC_DOMAIN` to configure the store's public URL.
+      Railway sets `RAILWAY_PUBLIC_DOMAIN` at runtime. Configure your store's public URL with `APP_URL=https://$RAILWAY_PUBLIC_DOMAIN`.
     </Tip>
   </Tab>
-  <Tab title="Vercel + Neon">
-    Vercel hosts the Next.js store app and Neon provides a serverless PostgreSQL database. Click the button below to clone the repository and deploy:
 
-    **Required environment variables on Vercel:**
+  <Tab title="Vercel + Neon">
+    Vercel hosts the Next.js store app and Neon provides serverless PostgreSQL. Click the **Deploy on Vercel** button on the [GitHub repository](https://github.com/86d-app/86d) to clone the repo and deploy.
+
+    **Required environment variables:**
 
     | Variable | Description |
     | --- | --- |
@@ -91,7 +97,7 @@ description: "Deploy 86d to Railway, Vercel, or a self-hosted Docker server. Eac
     | `STORAGE_PROVIDER` | Set to `vercel` |
     | `BLOB_READ_WRITE_TOKEN` | From your Vercel Blob store |
 
-    **Storage on Vercel:** Set `STORAGE_PROVIDER=vercel` and connect a Vercel Blob store in the Vercel dashboard. The store uses Vercel Blob for all file uploads. Set `VERCEL_BLOB_STORAGE_HOSTNAME` to your blob store's public hostname.
+    **Storage on Vercel:** set `STORAGE_PROVIDER=vercel` and connect a Vercel Blob store in the Vercel dashboard. The store uses Vercel Blob for all file uploads. Set `VERCEL_BLOB_STORAGE_HOSTNAME` to your blob store's public hostname.
 
     <Note>
       Neon provides both a pooled connection string (for the app) and a direct connection string (for migrations). Set both `DATABASE_URL` and `DATABASE_URL_UNPOOLED` to the appropriate Neon URLs from your project dashboard.
@@ -101,38 +107,41 @@ description: "Deploy 86d to Railway, Vercel, or a self-hosted Docker server. Eac
 
 ## Environment variables reference
 
-The table below covers the variables you are most likely to configure. For the full list, see `.env.example` in the repository.
+The table below lists the variables you are most likely to configure. For the full list, see [Environment variables](/configuration/environment-variables) or `.env.example` in the repository.
 
 | Variable | Required | Description |
 | --- | --- | --- |
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
 | `DATABASE_URL_UNPOOLED` | Yes | Same connection string, used for migrations |
-| `BETTER_AUTH_SECRET` | Yes | Auth signing key — generate with `openssl rand -base64 32` |
+| `BETTER_AUTH_SECRET` | Yes | Auth signing key. Generate with `openssl rand -base64 32` |
 | `STORE_ID` | Recommended | UUID identifying this store. Required for 86d API integration |
 | `STORAGE_PROVIDER` | No | Storage backend: `local`, `vercel`, or `s3` (default: `local`) |
 | `86D_API_KEY` | No | Enables 86d platform API and admin SSO |
-| `APP_URL` | No | Public URL of your store (e.g. `https://mystore.com`) |
+| `APP_URL` | No | Public URL of your store, for example `https://mystore.com` |
 
 ## Storage providers
 
-Set `STORAGE_PROVIDER` to choose where uploaded files (product images, PDFs, etc.) are stored.
+Set `STORAGE_PROVIDER` to choose where uploaded files (product images, PDFs, and other assets) are stored.
 
 | Value | Use case | Additional variables required |
 | --- | --- | --- |
-| `local` | Local development or Docker self-hosted | `STORAGE_LOCAL_DIR` (default: `./uploads`) |
+| `local` | Local development or self-hosted Docker | `STORAGE_LOCAL_DIR` (default: `./uploads`) |
 | `vercel` | Vercel deployments | `BLOB_READ_WRITE_TOKEN`, `VERCEL_BLOB_STORAGE_HOSTNAME` |
 | `s3` | MinIO, AWS S3, Cloudflare R2, Railway Bucket | `S3_ENDPOINT`, `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY`, `S3_SECRET_KEY` |
 
 <Warning>
-  The `local` storage provider writes files to the container's filesystem. In Docker, data persists as long as the container volume exists. Do not use `local` storage on Vercel or other stateless environments — files will be lost on every deploy.
+  The `local` storage provider writes files to the container's filesystem. In Docker, data persists for as long as the container volume exists. Do not use `local` storage on Vercel or other stateless environments. Files are lost on every deploy.
 </Warning>
+
+See [Storage configuration](/configuration/storage) for full per-provider setup.
 
 ## Post-deployment checklist
 
-After your first deploy, complete these steps before accepting real orders:
+After your first deploy, complete these steps before you accept real orders:
 
 - Change the default admin password at `/admin`
 - Set `BETTER_AUTH_SECRET` to a cryptographically random value (not the default)
-- Configure a payment provider (Stripe, PayPal, Square, or Braintree) via environment variables
+- Configure a payment provider (Stripe, PayPal, Square, or Braintree) via environment variables (see [Payment gateways](/guides/payment-integrations))
 - Set `APP_URL` to your store's public domain
 - Verify uploads work by adding a product image in the admin
+- Run [`86d doctor`](/cli/commands#86d-doctor) to confirm every required check passes

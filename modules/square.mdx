@@ -1,0 +1,39 @@
+---
+title: "Square"
+description: "Accept payments with Square in 86d. Square Payments API, HMAC webhook verification, and full or partial refund support."
+---
+
+The Square module implements the `PaymentProvider` interface from `@86d-app/payments` against the Square Payments API. The webhook endpoint verifies HMAC-SHA256 signatures with constant-time comparison and replay protection.
+
+**Source:** [`modules/square`](https://github.com/86d-app/86d/tree/main/modules/square) · **npm:** [`@86d-app/square`](https://www.npmjs.com/package/@86d-app/square)
+
+## Installation
+
+```sh
+86d module add square payments
+```
+
+## Configuration
+
+```ts
+square({
+  accessToken: "...",
+  applicationId: "...",
+  locationId: "...",
+  webhookSignatureKey: "..."
+});
+```
+
+See [Environment variables](/configuration/environment-variables) for the corresponding `SQUARE_*` variables.
+
+## Webhook setup
+
+In the [Square Developer dashboard](https://developer.squareup.com/apps), open your application, go to **Webhooks**, and create a subscription for `payment.created` and `payment.updated` pointing at:
+
+```text
+POST https://your-store.com/api/square/webhook
+```
+
+## Related modules
+
+- [Payments](/modules/payments), [Payment gateways guide](/guides/payment-integrations).

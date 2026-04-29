@@ -1,0 +1,22 @@
+---
+title: "Waitlist"
+description: "Capture interest in upcoming or out-of-stock products in 86d. Notify shoppers when a product is available."
+---
+
+The waitlist module lets shoppers join a waitlist for any product. When the product becomes available (preorder window opens or backorder is replenished), the module fires a `waitlist.notify` event for each subscriber.
+
+**Source:** [`modules/waitlist`](https://github.com/86d-app/86d/tree/main/modules/waitlist) · **npm:** [`@86d-app/waitlist`](https://www.npmjs.com/package/@86d-app/waitlist)
+
+## Installation
+
+```sh
+86d module add waitlist
+```
+
+## Components
+
+- `<WaitlistButton productId={id} />`, `<WaitlistForm productId={id} />`.
+
+## Related modules
+
+- [Preorders](/modules/preorders), [Backorders](/modules/backorders), [Notifications](/modules/notifications).

@@ -1,9 +1,9 @@
 ---
-title: "Storefront API"
+title: "Storefront"
 description: "The storefront is a Next.js app driven by MDX templates. Module components register automatically, so you compose pages like writing markdown."
 ---
 
-The 86d storefront is a Next.js application that renders your store's public-facing pages. Every page is an MDX file from your active template. Module components — `<ProductGrid />`, `<Cart />`, `<NewsletterInline />` — are registered automatically when a module is enabled, so you place them in MDX the same way you place any other element. No import statements, no boilerplate.
+The 86d storefront is a Next.js application that renders your store's public-facing pages. Every page is an MDX file from your active template. Module components such as `<ProductGrid />`, `<Cart />`, and `<NewsletterInline />` are registered automatically when a module is enabled, so you place them in MDX the same way you place any other element. No import statements, no boilerplate.
 
 ## Key pages
 
@@ -16,7 +16,7 @@ The storefront routes map directly to MDX files in your template:
 | `/products/[slug]` | `products/[slug]/layout.mdx` |
 | `/collections` | `collections/layout.mdx` |
 | `/collections/[slug]` | `collections/[slug]/layout.mdx` |
-| `/checkout` | Multi-step Next.js route (info → shipping → payment → review) |
+| `/checkout` | Multi-step Next.js route (info, shipping, payment, review) |
 | `/blog` | `blog/layout.mdx` |
 | `/search` | `search/index.mdx` |
 | `/track` | `track/index.mdx` |
@@ -49,8 +49,8 @@ Props flow from the page's rendering context into the MDX file. Detail pages rec
 
 Customers can shop without creating an account. The storefront distinguishes the two modes transparently:
 
-- **Guest shopping** — The cart is identified by a `guestId` stored client-side. Items persist for up to 7 days (configurable via `moduleOptions` in `config.json`).
-- **Authenticated shopping** — After sign-in, the cart is attached to the customer's `customerId`. Guest carts can be merged into an authenticated cart at sign-in.
+- **Guest shopping**: the cart is identified by a `guestId` stored client-side. Items persist for up to 7 days (configurable via `moduleOptions` in `config.json`).
+- **Authenticated shopping**: after sign-in, the cart is attached to the customer's `customerId`. Guest carts can be merged into an authenticated cart at sign-in.
 
 <Note>
   The storefront never accepts a customer's identity from the request body. Session data determines who the customer is on every authenticated request.
@@ -68,19 +68,19 @@ GET  /api/collections
 POST /api/newsletter/subscribe
 ```
 
-You do not need to configure routes manually — enabling a module in `config.json` and regenerating is all it takes.
+You do not need to configure routes manually. Enabling a module in `config.json` and regenerating is all it takes.
 
 ## Rate limiting
 
 The API enforces rate limits to protect your store from abuse. Limits apply per IP address on public endpoints.
 
 <AccordionGroup>
-  <Accordion title="Public endpoints — 120 req/min per IP">
+  <Accordion title="Public endpoints: 120 requests per minute per IP">
     All standard storefront API calls (product listings, cart operations, collection browsing) are limited to 120 requests per minute per IP address.
   </Accordion>
 
-  <Accordion title="Sensitive endpoints — 10 req / 10 min per IP">
-    Endpoints that could be abused for spam or fraud — including newsletter subscribe and payment intent creation — have a stricter limit of 10 requests per 10 minutes per IP.
+  <Accordion title="Sensitive endpoints: 10 requests per 10 minutes per IP">
+    Endpoints that could be abused for spam or fraud (newsletter subscribe and payment intent creation, among others) are restricted to 10 requests per 10 minutes per IP.
   </Accordion>
 
   <Accordion title="Rate limit response headers">
@@ -93,12 +93,12 @@ The API enforces rate limits to protect your store from abuse. Limits apply per 
 The MDX component registry merges components from multiple sources. When two sources export a component with the same name, the later source wins:
 
 1. UI primitives (base layer)
-2. App components — `<Navbar />`, `<Footer />`, `<Logo />`
-3. Module components — auto-generated from installed modules
+2. App components: `<Navbar />`, `<Footer />`, `<Logo />`
+3. Module components, auto-generated from installed modules
 4. Per-page custom overrides (highest priority)
 
 This means you can override any module component on a specific page by passing a custom component as a prop to the MDX renderer.
 
 <Tip>
-  To see all components available in your current setup, run `bun run generate:docs`. This generates `docs/component-api.md` with the full list of registered components and their props.
+  To see all components available in your current setup, run `86d generate components`. The generator writes `apps/store/component-api.md` with the full list of registered components and their props.
 </Tip>

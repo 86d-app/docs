@@ -1,0 +1,80 @@
+---
+title: "MCP server"
+description: "Connect AI assistants to the 86d documentation through a hosted Model Context Protocol server. Two tools expose semantic search and a read-only filesystem over every docs page."
+---
+
+The 86d Docs MCP server gives AI clients structured access to this documentation: every introduction, concept, module page, CLI reference, configuration page, and guide. It exposes two tools: a semantic search for broad or conceptual questions, and a read-only shell over a virtual filesystem for exact-match lookups, structural exploration, and full-page reads.
+
+## Hosted endpoint
+
+Point any MCP-compatible client at:
+
+```
+https://86d.app/docs/mcp
+```
+
+The server is hosted by 86d, requires no authentication, and serves the same content you see on this site.
+
+<Note>
+  Tooling for managing your own MCP server, or hosting a private mirror that includes your store's modules, is on the roadmap.
+</Note>
+
+## Available tools
+
+### `search_86d`
+
+Semantic search across the entire 86d knowledge base: concepts, modules, CLI commands, configuration, and guides. Use it for broad or conceptual questions such as "how do I add a payment provider", "what is the difference between modules and templates", or "where do I configure storage".
+
+Results return matched sections with titles and links. To pull the full body of a matched page, hand its path to `query_docs_filesystem_86d` and `cat` or `head` the corresponding `.mdx` file.
+
+### `query_docs_filesystem_86d`
+
+Run a read-only, shell-like query against a virtual filesystem rooted at `/` that contains every 86d documentation page as an `.mdx` file. The filesystem is sandboxed in memory; nothing runs on your machine, the server host, or the network. Use it when you need exact keyword matching, regex, structural exploration, or the complete content of a specific page.
+
+**Reading pages.** There is no separate "get page" tool. Pass an `.mdx` path to `head` or `cat`:
+
+- `cat /quickstart.mdx`
+- `head -120 /concepts/modules.mdx`
+- `cat /modules/cart.mdx /modules/checkout.mdx /modules/orders.mdx`
+
+**Searching.** Use `rg` for keyword or regex search across the docs:
+
+- `rg -il "stripe" /` lists every page that mentions Stripe.
+- `rg -C 3 "BETTER_AUTH_SECRET" /` returns matches with three lines of context.
+- `rg "86d (init|generate|template)" /cli/` scopes to the CLI section.
+
+**Exploring structure.** Use `tree` or `ls` to understand the layout:
+
+- `tree / -L 2` prints the top-level structure.
+- `ls /modules/` lists every documented module.
+- `ls /guides/` lists every guide.
+
+**Supported commands.** `rg`, `grep`, `find`, `tree`, `ls`, `cat`, `head`, `tail`, `stat`, `wc`, `sort`, `uniq`, `cut`, `sed`, `awk`, `jq`, plus basic text utilities. No writes, no network, no process control. Append `--help` to any command for usage.
+
+#### Statelessness
+
+Every call is independent. The working directory always resets to `/`, and no shell variables, aliases, or history carry over between calls. To work in a subdirectory, either pass absolute paths or chain commands in a single call:
+
+```sh
+ls /modules/
+# or
+cd /modules && ls && head -40 cart.mdx
+```
+
+Do not assume that `cd` in one call affects the next.
+
+#### Output limits and best practices
+
+Each call's output is truncated to 30 KB. Prefer targeted reads over broad ones:
+
+- Use `rg -C 3 "pattern" /path/file.mdx` to pull only the relevant sections of a long page.
+- Use `head -N` when you only need the top of a file.
+- Batch multiple file reads into one `cat` or `head` call instead of issuing them sequentially.
+
+#### Linking back to the user
+
+When citing pages in a response, convert filesystem paths to URL paths by dropping the `.mdx` extension:
+
+- `/quickstart.mdx` → `/quickstart`
+- `/concepts/modules.mdx` → `/concepts/modules`
+- `/modules/cart.mdx` → `/modules/cart`

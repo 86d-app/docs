@@ -1,0 +1,34 @@
+---
+title: "Tickets"
+description: "Customer support ticket system for 86d. Threaded messages between customer and admin with status tracking and auto-routing."
+---
+
+The tickets module gives every customer a self-service way to open a support ticket. Tickets thread between the customer and admin team, move through `open -> waiting_on_customer -> resolved -> closed`, and can be linked to a specific order.
+
+**Source:** [`modules/tickets`](https://github.com/86d-app/86d/tree/main/modules/tickets) · **npm:** [`@86d-app/tickets`](https://www.npmjs.com/package/@86d-app/tickets)
+
+## Installation
+
+```sh
+86d module add tickets
+```
+
+## Store endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/tickets` | Open a ticket |
+| `GET` | `/tickets/me` | List the customer's tickets |
+| `POST` | `/tickets/me/:id/reply` | Reply |
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/tickets` | Queue with filters |
+| `POST` | `/admin/tickets/:id/respond` | Reply |
+| `POST` | `/admin/tickets/:id/resolve` | Resolve |
+
+## Related modules
+
+- [Order notes](/modules/order-notes), [FAQ](/modules/faq), [Notifications](/modules/notifications).

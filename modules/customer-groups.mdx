@@ -1,0 +1,27 @@
+---
+title: "Customer groups"
+description: "Segment customers in 86d for targeted pricing, promotions, and content. B2B groups, VIPs, employees, and any custom segmentation you need."
+---
+
+The customer-groups module attaches customers to one or more groups (B2B, VIP, employee, beta tester, anything you define). Groups are referenced by `@86d-app/price-lists` for segment-specific pricing, by `@86d-app/discounts` for group-only promo codes, and by your own MDX for group-gated content.
+
+**Source:** [`modules/customer-groups`](https://github.com/86d-app/86d/tree/main/modules/customer-groups) · **npm:** [`@86d-app/customer-groups`](https://www.npmjs.com/package/@86d-app/customer-groups)
+
+## Installation
+
+```sh
+86d module add customer-groups
+```
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/customer-groups` | List groups |
+| `POST` | `/admin/customer-groups` | Create |
+| `POST` | `/admin/customer-groups/:id/members` | Add customers |
+| `DELETE` | `/admin/customer-groups/:id/members/:customerId` | Remove |
+
+## Related modules
+
+- [Customers](/modules/customers), [Price lists](/modules/price-lists), [Discounts](/modules/discounts).

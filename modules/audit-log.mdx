@@ -1,0 +1,25 @@
+---
+title: "Audit log"
+description: "Tamper-evident log of every admin action in 86d. Who did what, when, against which entity."
+---
+
+The audit-log module captures every admin-side mutation: create, update, delete, status change, role change, payment refund. Each entry is hash-chained to the previous entry so tampering is detectable. Useful for compliance, security review, and post-incident forensics.
+
+**Source:** [`modules/audit-log`](https://github.com/86d-app/86d/tree/main/modules/audit-log) · **npm:** [`@86d-app/audit-log`](https://www.npmjs.com/package/@86d-app/audit-log)
+
+## Installation
+
+```sh
+86d module add audit-log
+```
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/audit-log` | Browse and filter entries |
+| `GET` | `/admin/audit-log/verify` | Verify chain integrity |
+
+## Related modules
+
+- [Operations: Security](/operations/security).

@@ -1,9 +1,9 @@
 ---
-title: "Template and Theme Customizations"
-description: "Change your store's name, colors, typography, logo, and page layouts by editing template MDX files and config.json — no framework knowledge required."
+title: "Customize templates and themes"
+description: "Change your store's name, colors, typography, logo, and page layouts by editing template MDX files and config.json. No framework knowledge required."
 ---
 
-A template controls everything your customers see: the global layout, color palette, typography, the content of every page, and the assets in your header and footer. All of this lives in `templates/brisa/` — a plain directory of MDX files and a single `config.json`. You do not need to touch the framework, modify the Next.js app, or run any special tooling. Edit the files, save, and your dev server picks up the change immediately.
+A template controls everything your customers see: the global layout, color palette, typography, the content of every page, and the assets in your header and footer. All of this lives in `templates/brisa/`, a plain directory of MDX files and a single `config.json`. You do not need to touch the framework, modify the Next.js app, or run any special tooling. Edit the files, save, and your dev server picks up the change immediately.
 
 ## What templates contain
 
@@ -16,9 +16,9 @@ A template controls everything your customers see: the global layout, color pale
 | `products/[slug]/layout.mdx` | Individual product pages |
 | `collections/layout.mdx` | Collection listing page |
 | `blog/layout.mdx` | Blog listing page |
-| `about.mdx`, `contact.mdx`, etc. | Static pages |
+| `about.mdx`, `contact.mdx`, ... | Static pages |
 
-## Step 1 — Create a custom template (optional)
+## Step 1: create a custom template (optional)
 
 If you want to start from a copy of the default `brisa` template rather than editing it in place, scaffold a new one:
 
@@ -26,25 +26,25 @@ If you want to start from a copy of the default `brisa` template rather than edi
 86d template create my-store
 ```
 
-This creates `templates/my-store/` with the full Brisa template copied in. You can then edit `config.json` to point to it, or keep using `brisa` and customise it directly.
+This creates `templates/my-store/` with the full Brisa template copied in. You can then activate it with `86d template activate my-store`, or keep using `brisa` and customize it directly.
 
-## Step 2 — Set your store name and colors
+## Step 2: set your store name and colors
 
 Open `templates/brisa/config.json`. The top section sets your store identity:
 
 ```json
 {
-    "theme": "brisa",
-    "name": "My Store",
-    "favicon": "/assets/favicon.svg",
-    "icon": {
-        "light": "/assets/icon/light.svg",
-        "dark": "/assets/icon/dark.svg"
-    },
-    "logo": {
-        "light": "/assets/logo/light.svg",
-        "dark": "/assets/logo/dark.svg"
-    }
+  "theme": "brisa",
+  "name": "My Store",
+  "favicon": "/assets/favicon.svg",
+  "icon": {
+    "light": "/assets/icon/light.svg",
+    "dark": "/assets/icon/dark.svg"
+  },
+  "logo": {
+    "light": "/assets/logo/light.svg",
+    "dark": "/assets/logo/dark.svg"
+  }
 }
 ```
 
@@ -52,31 +52,31 @@ Colors are defined as OKLCH tokens under `variables.light` and `variables.dark`.
 
 ```json
 {
-    "variables": {
-        "light": {
-            "background": "oklch(0.995 0 0)",
-            "foreground": "oklch(0.13 0.005 285)",
-            "primary": "oklch(0.18 0.005 285)",
-            "primary-foreground": "oklch(0.985 0 0)",
-            "secondary": "oklch(0.965 0.002 285)",
-            "accent": "oklch(0.96 0.003 285)",
-            "muted": "oklch(0.965 0.002 285)",
-            "muted-foreground": "oklch(0.5 0.01 285)",
-            "border": "oklch(0.915 0.004 285)"
-        },
-        "dark": {
-            "background": "oklch(0.12 0.005 285)",
-            "foreground": "oklch(0.96 0.005 285)",
-            "primary": "oklch(0.92 0.005 285)",
-            "primary-foreground": "oklch(0.16 0.005 285)"
-        }
+  "variables": {
+    "light": {
+      "background": "oklch(0.995 0 0)",
+      "foreground": "oklch(0.13 0.005 285)",
+      "primary": "oklch(0.18 0.005 285)",
+      "primary-foreground": "oklch(0.985 0 0)",
+      "secondary": "oklch(0.965 0.002 285)",
+      "accent": "oklch(0.96 0.003 285)",
+      "muted": "oklch(0.965 0.002 285)",
+      "muted-foreground": "oklch(0.5 0.01 285)",
+      "border": "oklch(0.915 0.004 285)"
+    },
+    "dark": {
+      "background": "oklch(0.12 0.005 285)",
+      "foreground": "oklch(0.96 0.005 285)",
+      "primary": "oklch(0.92 0.005 285)",
+      "primary-foreground": "oklch(0.16 0.005 285)"
     }
+  }
 }
 ```
 
-OKLCH gives you perceptually uniform lightness, meaning a `primary` at `oklch(0.5 0.2 30)` (a warm orange) will have the same perceived brightness as `oklch(0.5 0.2 250)` (a cool blue). Adjust the first number for lightness (0–1), the second for chroma (saturation), and the third for hue angle (0–360).
+OKLCH gives you perceptually uniform lightness, meaning a `primary` at `oklch(0.5 0.2 30)` (a warm orange) has the same perceived brightness as `oklch(0.5 0.2 250)` (a cool blue). Adjust the first number for lightness (0 to 1), the second for chroma (saturation), and the third for hue angle (0 to 360).
 
-## Step 3 — Edit MDX pages
+## Step 3: edit MDX pages
 
 MDX pages are where you arrange module components and write content. Open `templates/brisa/index.mdx` to see how the default homepage is built:
 
@@ -147,7 +147,7 @@ export function Navbar() {
 }
 ```
 
-Switching to a different design variant is a one-line change in the `.tsx` file. The business logic — data fetching, state management, event handlers — stays completely unchanged.
+Switching to a different design variant is a one-line change in the `.tsx` file. The business logic (data fetching, state management, event handlers) stays completely unchanged.
 
 ## Update your logo and favicon
 
@@ -155,20 +155,20 @@ Replace the SVG files in `templates/brisa/assets/` and update the paths in `conf
 
 ```json
 {
-    "favicon": "/assets/favicon.svg",
-    "icon": {
-        "light": "/assets/icon/light.svg",
-        "dark": "/assets/icon/dark.svg"
-    },
-    "logo": {
-        "light": "/assets/logo/light.svg",
-        "dark": "/assets/logo/dark.svg"
-    }
+  "favicon": "/assets/favicon.svg",
+  "icon": {
+    "light": "/assets/icon/light.svg",
+    "dark": "/assets/icon/dark.svg"
+  },
+  "logo": {
+    "light": "/assets/logo/light.svg",
+    "dark": "/assets/logo/dark.svg"
+  }
 }
 ```
 
-- **`favicon`** — The browser tab icon (typically 32×32).
-- **`icon.light` / `icon.dark`** — A compact icon-only mark used in places like the mobile menu or compact navbar. Use separate light/dark variants so the icon is readable in both themes.
-- **`logo.light` / `logo.dark`** — The full logotype shown in the header and footer.
+- **`favicon`**: the browser tab icon (typically 32 by 32 pixels).
+- **`icon.light` and `icon.dark`**: a compact icon-only mark used in places like the mobile menu or compact navbar. Use separate light / dark variants so the icon is readable in both themes.
+- **`logo.light` and `logo.dark`**: the full logotype shown in the header and footer.
 
-SVG assets use hardcoded fill colors (e.g. `#111` for dark, `#f5f5f5` for light) rather than CSS custom properties, because they may be loaded outside the theme context for things like Open Graph images.
+SVG assets use hardcoded fill colors (for example `#111` for dark, `#f5f5f5` for light) rather than CSS custom properties, because they may be loaded outside the theme context for things like Open Graph images.

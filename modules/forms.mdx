@@ -1,0 +1,36 @@
+---
+title: "Forms"
+description: "Custom form builder for 86d: contact, wholesale, returns intake, anything. Submissions persisted, validated, and notifiable."
+---
+
+The forms module builds custom forms with text, textarea, select, file-upload, and email fields. Submissions are validated server-side, persisted to the database, and can trigger notifications or webhook deliveries.
+
+**Source:** [`modules/forms`](https://github.com/86d-app/86d/tree/main/modules/forms) · **npm:** [`@86d-app/forms`](https://www.npmjs.com/package/@86d-app/forms)
+
+## Installation
+
+```sh
+86d module add forms
+```
+
+## Store endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/forms/:slug` | Get a form's schema |
+| `POST` | `/forms/:slug/submit` | Submit |
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/admin/forms` | Create a form |
+| `GET` | `/admin/forms/:id/submissions` | View submissions |
+
+## Components
+
+- `<Form slug={slug} />`: renders the form by slug.
+
+## Related modules
+
+- [Notifications](/modules/notifications).

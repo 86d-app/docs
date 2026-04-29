@@ -3,7 +3,9 @@ title: "Payments"
 description: "Provider-agnostic payment processing for 86d. Tracks intents, saved payment methods, and refunds locally while delegating processing to a gateway module."
 ---
 
-The payments module provides a `PaymentProvider` abstraction that separates payment intent tracking from the underlying payment gateway. It records all intents, payment methods, and refunds in your store's database, and delegates the actual processing calls to whichever gateway module you configure — Stripe, PayPal, Square, Braintree, or any custom implementation. Without a provider, the module operates in offline mode and handles status transitions locally, which is useful during development and testing.
+The payments module provides a `PaymentProvider` abstraction that separates payment intent tracking from the underlying payment gateway. It records all intents, payment methods, and refunds in your store's database, and delegates the actual processing calls to whichever gateway module you configure: Stripe, PayPal, Square, Braintree, or any custom implementation. Without a provider, the module operates in offline mode and handles status transitions locally, which is useful during development and testing.
+
+**Source:** [`modules/payments`](https://github.com/86d-app/86d/tree/main/modules/payments) · **npm:** [`@86d-app/payments`](https://www.npmjs.com/package/@86d-app/payments)
 
 ## Installation
 
@@ -101,12 +103,12 @@ interface PaymentProvider {
 
 ## Checkout integration
 
-The `CheckoutPayment` component calls `createIntent` automatically when the customer reaches payment step. You do not need to call the payments API directly from your checkout templates — the checkout and payments modules wire together through the runtime context.
+The `CheckoutPayment` component calls `createIntent` automatically when the customer reaches the payment step. You do not need to call the payments API directly from your checkout templates; the checkout and payments modules wire together through the runtime context.
 
 A typical end-to-end flow looks like this:
 
 ```ts
-// 1. Customer reaches checkout payment step — intent is created
+// 1. Customer reaches checkout payment step; intent is created
 const intent = await controller.createIntent({
   amount: 4999,   // $49.99 in cents
   currency: "USD",
@@ -138,7 +140,7 @@ The payments controller enforces these rules regardless of which gateway you use
 | **Cancel guards** | `cancelIntent` only works on `pending` or `processing`. Throws on `succeeded`, `failed`, `refunded`. |
 | **Refund guards** | `createRefund` only works on `succeeded` or `refunded` intents. |
 | **Refund cap** | Cumulative refunds cannot exceed the original intent amount. Each call sums non-failed prior refunds before allowing a new one. |
-| **Webhook deduplication** | `handleWebhookRefund` deduplicates by `providerRefundId` — webhook retries return the existing refund rather than creating a duplicate. |
+| **Webhook deduplication** | `handleWebhookRefund` deduplicates by `providerRefundId`. Webhook retries return the existing refund rather than creating a duplicate. |
 
 ## Webhook verification
 

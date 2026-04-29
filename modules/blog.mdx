@@ -1,0 +1,40 @@
+---
+title: "Blog"
+description: "Blog posts with drafts, scheduling, and Markdown rendering for an 86d storefront. Categories, authors, and SEO meta included."
+---
+
+The blog module powers a content blog on the storefront. Posts have drafts, scheduled publish dates, categories, authors, hero images, and excerpts. The content body is Markdown rendered through the same MDX pipeline as the rest of the storefront, so you can drop module components into post bodies.
+
+**Source:** [`modules/blog`](https://github.com/86d-app/86d/tree/main/modules/blog) · **npm:** [`@86d-app/blog`](https://www.npmjs.com/package/@86d-app/blog)
+
+## Installation
+
+```sh
+86d module add blog
+```
+
+## Store endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/blog/posts` | List published posts (paginated) |
+| `GET` | `/blog/posts/:slug` | Get a post |
+| `GET` | `/blog/categories` | List categories |
+| `GET` | `/blog/feed.rss` | RSS feed |
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/blog` | All posts (drafts, scheduled, published) |
+| `POST` | `/admin/blog` | Create a post |
+| `PUT` | `/admin/blog/:id` | Update |
+| `POST` | `/admin/blog/:id/publish` | Publish (or schedule) |
+
+## Components
+
+- `<BlogList />`, `<BlogPost slug={slug} />`, `<BlogCategoryList />`.
+
+## Related modules
+
+- [SEO](/modules/seo), [Newsletter](/modules/newsletter).

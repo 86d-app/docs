@@ -1,20 +1,108 @@
 ---
-title: "Build a Custom Module"
-description: "Scaffold, implement, and publish a custom 86d module — add storefront components, admin pages, and API endpoints using the same patterns as built-in modules."
+title: "Build a custom module"
+description: "Scaffold, implement, and publish a custom 86d module. Add storefront components, admin pages, and API endpoints using the same patterns as built-in modules."
 ---
 
-Every feature in 86d is a module — including the ones that ship with the platform. You can write your own modules to add custom storefront components, admin pages, and API endpoints that behave identically to any official `@86d-app/*` module. Modules are isolated by design: they can only communicate with each other through declared contracts, never through direct imports.
+Every feature in 86d is a module, including the ones that ship with the platform. You can write your own modules to add custom storefront components, admin pages, and API endpoints that behave identically to any official `@86d-app/*` module. Modules are isolated by design: they can only communicate with each other through declared contracts, never through direct imports.
 
 ## Scaffold a new module
 
 <Steps>
+  <Step title="Run module create">
+    ```bash
+    86d module create my-feature
+    ```
+
+    The CLI creates `modules/my-feature/` with a complete starter structure:
+
+    ```text
+    modules/my-feature/
+    ├── package.json
+    ├── tsconfig.json
+    └── src/
+        ├── index.ts                 Module factory
+        ├── schema.ts                Zod schema
+        ├── mdx.d.ts                 MDX type declarations
+        ├── store/
+        │   ├── components/index.tsx
+        │   └── endpoints/index.ts
+        ├── admin/
+        │   ├── components/index.tsx
+        │   └── endpoints/index.ts
+        └── __tests__/
+            └── index.test.ts
+    ```
+  </Step>
+  <Step title="Implement your schema and endpoints">
+    Define your Zod schema in `src/schema.ts`, then add controllers and endpoints. Store endpoints are public; admin endpoints sit under `/api/admin/...` and require an authenticated admin session.
+
+    ```ts src/schema.ts
+    import { z } from "zod";
+
+    export const schema = z.object({
+      title: z.string().min(1),
+      published: z.boolean().default(false),
+    });
+
+    export type MyFeatureData = z.infer<typeof schema>;
+    ```
+  </Step>
+  <Step title="Enable the module in the active template">
+    ```bash
+    86d module enable my-feature
+    ```
+
+    This adds `@86d-app/my-feature` to `templates/brisa/config.json` (or whichever template is active).
+  </Step>
+  <Step title="Regenerate the wiring">
+    ```bash
+    86d generate
+    ```
+
+    Codegen now imports your module statically, mounts its endpoints under `/api/`, and registers its MDX components.
+  </Step>
+  <Step title="Verify with the test suite">
+    ```bash
+    bun test
+    ```
+
+    The starter test asserts that the module factory returns the expected `id` and `version`. Replace it with real coverage as you build out the module.
+  </Step>
 </Steps>
+
+## Module entry point
+
+The default `src/index.ts` exports a factory that returns a `Module` object:
+
+```ts src/index.ts
+import type { Module } from "@86d-app/core";
+import { schema } from "./schema.js";
+import { storeEndpoints } from "./store/endpoints/index.js";
+import { adminEndpoints } from "./admin/endpoints/index.js";
+
+export default function myFeature(
+  options: Record<string, unknown> = {},
+): Module {
+  return {
+    id: "my-feature",
+    version: "0.0.1",
+    schema,
+    options,
+    endpoints: {
+      store: storeEndpoints,
+      admin: adminEndpoints,
+    },
+  };
+}
+```
+
+The factory pattern lets users pass per-module options through `moduleOptions` in `config.json`.
 
 ## Admin sidebar navigation
 
 Admin pages appear in the store admin sidebar under the group you declare. The available top-level groups are: **Catalog**, **Sales**, **Customers**, **Fulfillment**, **Marketing**, **Content**, **Finance**, **Support**, and **System**.
 
-Each group has collapsible subgroups (for example, Sales → Orders, Cart, Billing). You can assign a subgroup explicitly via the `subgroup` field on an `AdminPage` declaration:
+Each group has collapsible subgroups (for example Sales → Orders, Cart, Billing). You can assign a subgroup explicitly via the `subgroup` field on an `AdminPage` declaration:
 
 ```ts
 admin: {
@@ -22,10 +110,10 @@ admin: {
     {
       path: "/admin/my-feature",
       component: "MyFeatureList",
-      label: "My Feature",
+      label: "My feature",
       icon: "Star",
       group: "Catalog",
-      subgroup: "Products",   // optional — overrides the default mapping
+      subgroup: "Products",   // optional, overrides the default mapping
     },
   ],
 },
@@ -33,7 +121,7 @@ admin: {
 
 ## Cross-module communication
 
-Modules are isolated — you cannot import another module's code directly. Use the `requires` / `exports` contract system instead:
+Modules are isolated; you cannot import another module's code directly. Use the `requires` / `exports` contract system instead:
 
 ```ts
 // Declare what your module exports for others to read
@@ -43,7 +131,7 @@ exports: {
 
 // Declare what your module needs from another module
 requires: {
-  read: ["cartItems"],   // will be available via ctx.contracts.cartItems
+  read: ["cartItems"],   // available via ctx.contracts.cartItems
 },
 ```
 
@@ -51,7 +139,7 @@ The runtime validates contracts at startup and provides the data through `ctx.co
 
 ## Database access
 
-All database access goes through `ModuleDataService`, which the runtime provides as `ctx.data` inside the `init` function. Modules never import `@86d-app/db` or any ORM client directly — this keeps modules portable and testable:
+All database access goes through `ModuleDataService`, which the runtime provides as `ctx.data` inside the `init` function. Modules never import `@86d-app/db` or any ORM client directly. This keeps modules portable and testable:
 
 ```ts
 init: async (ctx: ModuleContext) => {
@@ -62,3 +150,37 @@ init: async (ctx: ModuleContext) => {
 ```
 
 For unit tests, import `@86d-app/core/test-utils`, which provides an in-memory mock data service so you can test your module without a real database connection.
+
+## Publish to npm
+
+Once your module is ready, publish it to npm so other 86d stores can install it:
+
+<Steps>
+  <Step title="Update package.json">
+    Set `"private": false`, choose a stable version, and add a clear `description` and `keywords`. Add `"86d-app"` and the relevant category (for example `"sales"`) to `keywords` so it surfaces in registry search.
+  </Step>
+  <Step title="Build the module">
+    ```bash
+    bun run build
+    ```
+  </Step>
+  <Step title="Publish">
+    ```bash
+    npm publish --access public
+    ```
+
+    The 86d release pipeline uses Changesets and provenance in CI for first-party modules; for community modules, follow your own release process.
+  </Step>
+</Steps>
+
+Once published, anyone can install your module with:
+
+```bash
+86d module add npm:@your-scope/your-module
+```
+
+## Next steps
+
+- [Modules](/concepts/modules) for the conceptual model.
+- [Storefront](/concepts/storefront) for the MDX component registry order.
+- [Admin dashboard](/concepts/admin) for the sidebar group taxonomy.

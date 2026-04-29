@@ -1,0 +1,41 @@
+---
+title: "PayPal"
+description: "Accept payments with PayPal in 86d. PayPal Orders API, webhook signature verification, and full or partial refund support."
+---
+
+The PayPal module implements the `PaymentProvider` interface from `@86d-app/payments` against the PayPal REST Orders API. It includes a webhook endpoint with signature verification, replay protection, and a constant-time comparator.
+
+**Source:** [`modules/paypal`](https://github.com/86d-app/86d/tree/main/modules/paypal) · **npm:** [`@86d-app/paypal`](https://www.npmjs.com/package/@86d-app/paypal)
+
+## Installation
+
+```sh
+86d module add paypal payments
+```
+
+## Configuration
+
+```ts
+paypal({
+  clientId: "...",
+  clientSecret: "...",
+  sandbox: "true",
+  webhookId: "..."
+});
+```
+
+You can also configure via `config.json` and the corresponding `PAYPAL_*` environment variables. See [Environment variables](/configuration/environment-variables).
+
+## Webhook setup
+
+Set the webhook URL in the [PayPal developer dashboard](https://developer.paypal.com/dashboard/) to:
+
+```text
+POST https://your-store.com/api/paypal/webhook
+```
+
+Subscribe to `PAYMENT.CAPTURE.COMPLETED` and `PAYMENT.CAPTURE.DENIED` at minimum.
+
+## Related modules
+
+- [Payments](/modules/payments), [Stripe](/modules/stripe), [Payment gateways guide](/guides/payment-integrations).

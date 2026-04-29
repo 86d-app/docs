@@ -1,0 +1,119 @@
+---
+title: "Testing"
+description: "How to run, write, and extend tests in 86d. Unit tests with Vitest for every module; end-to-end visual tests with Playwright for every screen."
+---
+
+86d uses two test layers. **Unit tests** (Vitest) cover module logic, controllers, and endpoint handlers. **End-to-end tests** (Playwright) cover real user flows in a real browser, with visual snapshots for every screen in light and dark mode at desktop and mobile widths.
+
+## Run all tests
+
+From the repository root:
+
+```bash
+bun run test          # Unit tests across every package and module
+bun run test:e2e      # Playwright end-to-end + visual tests
+bun run typecheck     # TypeScript across the whole workspace
+bun run check         # Biome lint and format check
+bun run build         # Production build of every package
+```
+
+These five commands are the project health gates. All of them must be green before a commit.
+
+## Unit tests (Vitest)
+
+Every module ships unit tests under `modules/<name>/src/__tests__/`. The starter test scaffolded by `86d module create` validates the factory:
+
+```ts
+import { describe, expect, it } from "vitest";
+import myFeature from "../index.js";
+
+describe("my-feature", () => {
+  it("creates a module with correct id", () => {
+    const mod = myFeature();
+    expect(mod.id).toBe("my-feature");
+  });
+
+  it("creates a module with version", () => {
+    const mod = myFeature();
+    expect(mod.version).toBe("0.0.1");
+  });
+});
+```
+
+### What to test
+
+For a typical module, write tests for:
+
+- **Factory and configuration.** The module returns the right `id` and accepts options correctly.
+- **Controllers.** Every business rule (state transitions, guards, calculations) has at least one happy-path test and one failure-path test.
+- **Endpoint handlers.** Input validation, auth checks, and the response shape.
+- **Cross-module contracts.** When your module exports something via `exports.read`, test that the right value is exposed.
+
+For modules that integrate with external APIs (Stripe, Amazon, Shopify), use realistic fixtures matching the real API's JSON shape. Do not mock with arbitrary objects: a passing test against a fake shape masks broken integration code.
+
+### Run a single module's tests
+
+```bash
+bun run --filter @86d-app/cart test
+```
+
+## End-to-end tests (Playwright)
+
+Playwright tests live in `tests/e2e/`. The config defines several projects:
+
+| Project | Viewport | Purpose |
+| --- | --- | --- |
+| `visual-desktop` | 1280 x 720 | Desktop visual snapshots |
+| `visual-tablet` | 768 x 1024 | Tablet visual snapshots |
+| `visual-mobile` | 375 x 667 | Mobile visual snapshots |
+| `store-chromium` | desktop | Smoke tests for the storefront |
+
+```bash
+# Run all Playwright projects
+bun run test:e2e
+
+# Run only the storefront smoke tests
+bun run test:e2e:store
+
+# Run with the Playwright UI
+bun run test:e2e:ui
+```
+
+### Visual snapshots
+
+Visual tests live in `tests/e2e/visual.spec.ts`. They capture screenshots of every public route and admin screen, in both light and dark mode, across desktop, tablet, and mobile viewports.
+
+To update baselines after intentional UI changes:
+
+```bash
+bun run test:e2e -- --update-snapshots
+```
+
+### Test selectors
+
+Always use `data-testid` selectors. CSS class selectors are fragile and break under refactors. Use `await page.waitForLoadState('networkidle')` instead of `waitForTimeout()`; the latter is non-deterministic.
+
+## CI gates
+
+GitHub Actions runs every gate on every pull request. The minimum bar to merge is:
+
+- `bun run typecheck` passes
+- `bun run check` passes (Biome lint + format)
+- `bun run test` passes (Vitest)
+- `bun run test:e2e` passes (Playwright + visual snapshots)
+- `bun run build` succeeds
+
+CI runs in a Linux container with the same locale and time zone everywhere; if you have visual diffs only on your local machine, that is usually a font or anti-aliasing difference, not a bug.
+
+## Writing testable modules
+
+A few patterns make modules easier to test:
+
+- **Inject `ModuleDataService` at construction time.** The runtime hands it to your `init` function via `ctx.data`. Pass it explicitly to your controllers; never reach for a global.
+- **Keep controllers pure where you can.** Anything that does not need I/O should live in a small helper that takes inputs and returns outputs.
+- **Mock at the boundary, not in the middle.** For external HTTP, swap `fetch` itself rather than your wrapper.
+- **Use `@86d-app/core/test-utils`** when you need an in-memory mock data service.
+
+## Coverage
+
+Run `bun run test:coverage` for a coverage report. There is no hard threshold, but the convention for first-party modules is "every endpoint handler and every controller method has at least one happy-path test plus failure-path coverage for each documented error".

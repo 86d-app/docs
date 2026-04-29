@@ -1,0 +1,25 @@
+---
+title: "Settings"
+description: "Store-wide configuration management for 86d. A typed key/value store backing per-module preferences and merchant choices."
+---
+
+The settings module exposes a typed key/value store for store-wide configuration that does not belong in `config.json` (which is template-scoped). Each setting has a key, a typed value, and optional admin metadata so it renders as a form field in the appropriate admin page.
+
+**Source:** [`modules/settings`](https://github.com/86d-app/86d/tree/main/modules/settings) · **npm:** [`@86d-app/settings`](https://www.npmjs.com/package/@86d-app/settings)
+
+## Installation
+
+```sh
+86d module add settings
+```
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/settings/:key` | Read |
+| `PUT` | `/admin/settings/:key` | Write |
+
+## Related modules
+
+- Most modules read user-changeable preferences here.
