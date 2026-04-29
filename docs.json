@@ -9,7 +9,8 @@
   "favicon": "https://icons.duckduckgo.com/ip3/86d.app.ico",
   "logo": {
     "light": "https://media.brand.dev/93cc828f-f7db-4654-bd42-fe2bf73b8d77.png",
-    "dark": "https://media.brand.dev/93cc828f-f7db-4654-bd42-fe2bf73b8d77.png"
+    "dark": "https://media.brand.dev/93cc828f-f7db-4654-bd42-fe2bf73b8d77.png",
+    "href": "https://86d.app"
   },
   "navbar": {
     "primary": {
