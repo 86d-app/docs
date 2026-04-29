@@ -5,16 +5,7 @@ description: "Contribute code, modules, templates, or documentation to 86d. Setu
 
 86d welcomes contributions. The codebase is intentionally shaped so it is easy to make small focused changes, and we try hard to give every contributor a fast review.
 
-## Where to contribute
-
-You can contribute in five places:
-
-| Repo | What goes there |
-| --- | --- |
-| [86d-app/86d](https://github.com/86d-app/86d) | The framework: store app, modules, CLI, packages |
-| Your own GitHub repo | Community modules and templates |
-| [86d-app/86d (docs/)](https://github.com/86d-app/86d/tree/main/docs) | Documentation pages (this site) |
-| Issues and Discussions | Bug reports, design proposals, questions |
+The main repositories you can contribute to are [86d-app/86d](https://github.com/86d-app/86d), which contains the framework (including the store app, modules, CLI, and packages), and [86d-app/docs](https://github.com/86d-app/docs), which hosts the documentation (this site).
 
 ## Setting up the framework repo
 
@@ -97,11 +88,12 @@ If you want to propose your module for inclusion in the official registry, open 
 
 ## Documentation contributions
 
-Docs live under `docs/` in the framework repo. Every page is an `.mdx` file with YAML frontmatter. Run a local Mintlify preview:
+Docs live in their own repo at [`86d-app/docs`](https://github.com/86d-app/docs). Every page is an `.mdx` file with YAML frontmatter. Clone the repo and run a local Mintlify preview:
 
 ```bash
-npm i -g mint
+git clone https://github.com/86d-app/docs
 cd docs
+npm i -g mint
 mint dev
 ```
 
