@@ -5,10 +5,7 @@
   "colors": {
     "primary": "#747474",
     "light": "#b7b7b7",
-    "background": {
-      "light": "#ffffff",
-      "dark": "#09090b"
-    }
+    "dark": "#09090b"
   },
   "favicon": "https://86d.app/icon",
   "logo": {
