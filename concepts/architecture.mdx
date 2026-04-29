@@ -7,38 +7,16 @@ description: "How an 86d store fits together: the monorepo, the runtime, modules
 
 ## Big picture
 
-```text
-┌────────────────────────────────────────────────────────────────────────┐
-│                          Your 86d store                                │
-│                                                                        │
-│   ┌──────────────────┐    ┌──────────────────┐    ┌────────────────┐   │
-│   │   Storefront     │    │       Admin      │    │     Public     │   │
-│   │   (MDX pages)    │    │     (sidebar)    │    │     API        │   │
-│   │                  │    │                  │    │                │   │
-│   │  <ProductGrid /> │    │  /admin/products │    │  /api/products │   │
-│   │  <Cart />        │    │  /admin/orders   │    │  /api/cart     │   │
-│   │  <Checkout />    │    │  /admin/loyalty  │    │  /api/orders   │   │
-│   └──────────────────┘    └──────────────────┘    └────────────────┘   │
-│              ▲                       ▲                     ▲           │
-│              │ MDX components        │ Admin pages         │ Endpoints │
-│              │                       │                     │           │
-│   ┌──────────┴───────────────────────┴─────────────────────┴────────┐  │
-│   │                          Modules layer                          │  │
-│   │   @86d-app/products  @86d-app/cart  @86d-app/checkout  ...      │  │
-│   └─────────────────────────────────────────────────────────────────┘  │
-│              ▲                       ▲                     ▲           │
-│              │ ctx.data              │ contracts           │ ctx.events │
-│   ┌──────────┴───────────────────────┴─────────────────────┴────────┐  │
-│   │                       @86d-app/core runtime                     │  │
-│   │   ModuleDataService · contract registry · event bus · auth      │  │
-│   └─────────────────────────────────────────────────────────────────┘  │
-│              ▲                       ▲                     ▲           │
-│              │ Prisma                │ Better Auth         │ Storage   │
-│   ┌──────────┴────────────┐  ┌───────┴──────────┐  ┌───────┴────────┐  │
-│   │     PostgreSQL        │  │ Sessions/cookies │  │ local/Vercel/S3│  │
-│   └───────────────────────┘  └──────────────────┘  └────────────────┘  │
-└────────────────────────────────────────────────────────────────────────┘
-```
+<img 
+  className="block dark:hidden" 
+  src="architecture-light.png" 
+  alt="86d architecture diagram"
+/>
+<img 
+  className="hidden dark:block" 
+  src="architecture-dark.png" 
+  alt="86d architecture diagram"
+/>
 
 ## The monorepo
 
