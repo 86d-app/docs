@@ -1,0 +1,249 @@
+---
+title: "Config.json"
+description: "Complete reference for config.json — the file that controls your store's name, branding, active modules, and OKLCH color tokens for light and dark mode."
+---
+
+Every 86d store is driven by a `config.json` file that lives inside your template directory at `templates/<template-name>/config.json`. This file is the single place where you set your store's display name, logo assets, which modules are active, per-module options, and the full palette of OKLCH color tokens used to style both light and dark mode. After editing `config.json`, run `bun run 86d generate` to apply your changes.
+
+## Configuration file location
+
+```text
+templates/
+  brisa/
+    config.json   ← your store config lives here
+```
+
+If you are using the default template, your file is at `templates/brisa/config.json`. Custom templates follow the same pattern under their own directory name.
+
+## Top-level fields
+
+<ParamField body="$schema" type="string">
+  Optional URL pointing to the JSON Schema for this config file. Set to `"https://86d.app/docs.json"` to get editor validation and autocomplete in VS Code and other JSON-aware editors.
+</ParamField>
+
+<ParamField body="theme" type="string" required>
+  The template name this config belongs to. Must match the directory name under `templates/`. The default value is `"brisa"`.
+</ParamField>
+
+<ParamField body="name" type="string" required>
+  The display name of your store. Used in the storefront navbar, the admin dashboard header, and email templates.
+</ParamField>
+
+<ParamField body="favicon" type="string" required>
+  Root-relative path to your favicon asset, for example `"/assets/favicon.svg"`. SVG favicons are supported.
+</ParamField>
+
+<ParamField body="icon" type="object" required>
+  Icon-only mark (square, no wordmark) for use in compact UI contexts such as mobile menus. Provide separate assets for light and dark mode.
+
+  <Expandable title="icon properties">
+    <ParamField body="icon.light" type="string" required>
+      Path to the icon used in light mode, e.g. `"/assets/icon/light.svg"`.
+    </ParamField>
+
+    <ParamField body="icon.dark" type="string" required>
+      Path to the icon used in dark mode, e.g. `"/assets/icon/dark.svg"`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="logo" type="object" required>
+  Full-width logo (with wordmark) shown in the navbar and footer. Provide separate assets for light and dark mode.
+
+  <Expandable title="logo properties">
+    <ParamField body="logo.light" type="string" required>
+      Path to the logo used in light mode, e.g. `"/assets/logo/light.svg"`.
+    </ParamField>
+
+    <ParamField body="logo.dark" type="string" required>
+      Path to the logo used in dark mode, e.g. `"/assets/logo/dark.svg"`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="modules" type="string | string[]">
+  Controls which modules are active in your store.
+
+  - Set to `"*"` to enable every module installed in the workspace — the recommended default when getting started.
+  - Set to an array of package names (e.g. `["@86d-app/cart", "@86d-app/products"]`) to enable only specific modules.
+
+  Omitting this field disables all optional modules.
+</ParamField>
+
+<ParamField body="moduleOptions" type="object">
+  Per-module configuration, keyed by module package name. Each value is an options object defined by that module. See the individual module's documentation for available options.
+
+  ```json
+  "moduleOptions": {
+    "@86d-app/cart": {
+      "guestCartExpiration": 604800000,
+      "maxItemsPerCart": 100
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField body="variables" type="object" required>
+  OKLCH color tokens applied as CSS custom properties for light and dark mode. See [Color tokens](#color-tokens) below for the full list of supported keys.
+
+  <Expandable title="variables properties">
+    <ParamField body="variables.light" type="object" required>
+      Token values applied when the user's color scheme is light.
+    </ParamField>
+
+    <ParamField body="variables.dark" type="object" required>
+      Token values applied when the user's color scheme is dark.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Color tokens
+
+86d uses [OKLCH](https://oklch.com/) for all color tokens. OKLCH is a perceptually uniform color space that makes it straightforward to create palettes with consistent brightness and chroma. Each token maps to a CSS custom property (e.g. `--background`, `--primary`) applied on the `:root`.
+
+You define separate values for `variables.light` and `variables.dark`. The tokens available are:
+
+| Token | Description |
+| --- | --- |
+| `radius` | Border radius for cards and inputs (e.g. `"0.5rem"`). Light mode only. |
+| `background` | Page background |
+| `foreground` | Default text color |
+| `card` | Card surface background |
+| `card-foreground` | Text on card surfaces |
+| `popover` | Popover/dropdown background |
+| `popover-foreground` | Text inside popovers |
+| `primary` | Primary action color (buttons, links) |
+| `primary-foreground` | Text on primary backgrounds |
+| `secondary` | Secondary surface color |
+| `secondary-foreground` | Text on secondary surfaces |
+| `muted` | Subtle background for de-emphasized content |
+| `muted-foreground` | Text inside muted areas |
+| `accent` | Hover/highlight accent surface |
+| `accent-foreground` | Text inside accent areas |
+| `destructive` | Destructive action color (delete buttons, error states) |
+| `border` | Default border color |
+| `input` | Input field border/background tint |
+| `ring` | Focus ring color |
+| `chart-1` – `chart-5` | Chart series colors |
+| `sidebar` | Admin sidebar background |
+| `sidebar-foreground` | Text in the sidebar |
+| `sidebar-primary` | Active item highlight in the sidebar |
+| `sidebar-primary-foreground` | Text on active sidebar items |
+| `sidebar-accent` | Hover surface inside the sidebar |
+| `sidebar-accent-foreground` | Text on hovered sidebar items |
+| `sidebar-border` | Sidebar border color |
+| `sidebar-ring` | Focus ring inside the sidebar |
+
+<Tip>
+  Use [oklch.com](https://oklch.com/) to pick colors interactively and copy the OKLCH values directly into your config.
+</Tip>
+
+## Complete example
+
+The following is the full `config.json` used by the default **brisa** template:
+
+```json templates/brisa/config.json
+{
+  "theme": "brisa",
+  "name": "86d Starter Kit",
+  "favicon": "/assets/favicon.svg",
+  "icon": {
+    "light": "/assets/icon/light.svg",
+    "dark": "/assets/icon/dark.svg"
+  },
+  "logo": {
+    "light": "/assets/logo/light.svg",
+    "dark": "/assets/logo/dark.svg"
+  },
+  "modules": "*",
+  "moduleOptions": {
+    "@86d-app/cart": {
+      "guestCartExpiration": 604800000,
+      "maxItemsPerCart": 100
+    }
+  },
+  "variables": {
+    "light": {
+      "radius": "0.5rem",
+      "background": "oklch(0.995 0 0)",
+      "foreground": "oklch(0.13 0.005 285)",
+      "card": "oklch(1 0 0)",
+      "card-foreground": "oklch(0.13 0.005 285)",
+      "popover": "oklch(1 0 0)",
+      "popover-foreground": "oklch(0.13 0.005 285)",
+      "primary": "oklch(0.18 0.005 285)",
+      "primary-foreground": "oklch(0.985 0 0)",
+      "secondary": "oklch(0.965 0.002 285)",
+      "secondary-foreground": "oklch(0.18 0.005 285)",
+      "muted": "oklch(0.965 0.002 285)",
+      "muted-foreground": "oklch(0.5 0.01 285)",
+      "accent": "oklch(0.96 0.003 285)",
+      "accent-foreground": "oklch(0.18 0.005 285)",
+      "destructive": "oklch(0.577 0.245 27.325)",
+      "border": "oklch(0.915 0.004 285)",
+      "input": "oklch(0.915 0.004 285)",
+      "ring": "oklch(0.7 0.01 285)",
+      "chart-1": "oklch(0.646 0.222 41.116)",
+      "chart-2": "oklch(0.6 0.118 184.704)",
+      "chart-3": "oklch(0.398 0.07 227.392)",
+      "chart-4": "oklch(0.828 0.189 84.429)",
+      "chart-5": "oklch(0.769 0.188 70.08)",
+      "sidebar": "oklch(0.985 0 0)",
+      "sidebar-foreground": "oklch(0.13 0.005 285)",
+      "sidebar-primary": "oklch(0.18 0.005 285)",
+      "sidebar-primary-foreground": "oklch(0.985 0 0)",
+      "sidebar-accent": "oklch(0.965 0.002 285)",
+      "sidebar-accent-foreground": "oklch(0.18 0.005 285)",
+      "sidebar-border": "oklch(0.915 0.004 285)",
+      "sidebar-ring": "oklch(0.7 0.01 285)"
+    },
+    "dark": {
+      "background": "oklch(0.12 0.005 285)",
+      "foreground": "oklch(0.96 0.005 285)",
+      "card": "oklch(0.16 0.005 285)",
+      "card-foreground": "oklch(0.96 0.005 285)",
+      "popover": "oklch(0.18 0.005 285)",
+      "popover-foreground": "oklch(0.96 0.005 285)",
+      "primary": "oklch(0.92 0.005 285)",
+      "primary-foreground": "oklch(0.16 0.005 285)",
+      "secondary": "oklch(0.22 0.005 285)",
+      "secondary-foreground": "oklch(0.96 0.005 285)",
+      "muted": "oklch(0.22 0.005 285)",
+      "muted-foreground": "oklch(0.62 0.01 285)",
+      "accent": "oklch(0.28 0.005 285)",
+      "accent-foreground": "oklch(0.96 0.005 285)",
+      "destructive": "oklch(0.704 0.191 22.216)",
+      "border": "oklch(1 0 0 / 8%)",
+      "input": "oklch(1 0 0 / 12%)",
+      "ring": "oklch(0.5 0.01 285)",
+      "chart-1": "oklch(0.488 0.243 264.376)",
+      "chart-2": "oklch(0.696 0.17 162.48)",
+      "chart-3": "oklch(0.769 0.188 70.08)",
+      "chart-4": "oklch(0.627 0.265 303.9)",
+      "chart-5": "oklch(0.645 0.246 16.439)",
+      "sidebar": "oklch(0.16 0.005 285)",
+      "sidebar-foreground": "oklch(0.96 0.005 285)",
+      "sidebar-primary": "oklch(0.488 0.243 264.376)",
+      "sidebar-primary-foreground": "oklch(0.96 0.005 285)",
+      "sidebar-accent": "oklch(0.22 0.005 285)",
+      "sidebar-accent-foreground": "oklch(0.96 0.005 285)",
+      "sidebar-border": "oklch(1 0 0 / 8%)",
+      "sidebar-ring": "oklch(0.4 0.01 285)"
+    }
+  }
+}
+```
+
+## Applying changes
+
+After editing `config.json`, regenerate the module imports and API router so your changes take effect:
+
+```bash
+bun run 86d generate
+```
+
+You do not need to restart the dev server when running in watch mode — `bun run dev` picks up config changes automatically after codegen runs.
+
+<Note>
+  If you set `STORE_ID` in your environment, the store fetches its configuration from the 86d API instead of reading `config.json`. See [Environment variables](/configuration/environment-variables) for details.
+</Note>

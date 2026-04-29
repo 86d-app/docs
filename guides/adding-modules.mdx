@@ -1,0 +1,63 @@
+---
+title: "Add and Configure Modules"
+description: "Install, configure, and use npm modules in your 86d store — add functionality like carts, reviews, and analytics in minutes by editing a single config file."
+---
+
+Modules are the building blocks of a 86d store. Every feature — cart, reviews, blog, newsletter, checkout — ships as an independent module that you opt into by listing it in your store's `config.json`. When you add a module, its components become immediately available in your MDX templates. No manual imports, no boilerplate.
+
+## Find a module
+
+Browse available modules at [npmjs.com](https://www.npmjs.com/search?q=%4086d-app) or list all locally installed modules with the CLI:
+
+```bash
+86d module list
+```
+
+Official 86d modules follow the `@86d-app/<name>` naming convention (e.g. `@86d-app/reviews`, `@86d-app/blog`). You can also use any npm package that exports MDX components.
+
+## Add and configure a module
+
+<Steps>
+</Steps>
+
+## Set per-module options
+
+Many modules accept configuration options that control their behaviour. Pass these via the `moduleOptions` key in `config.json`:
+
+```json
+{
+    "modules": [
+        "@86d-app/cart",
+        "@86d-app/reviews"
+    ],
+    "moduleOptions": {
+        "@86d-app/cart": {
+            "guestCartExpiration": 604800000,
+            "maxItemsPerCart": 100
+        }
+    }
+}
+```
+
+Each module documents its accepted options in its README on npm. The keys inside `moduleOptions` must match the exact npm package name.
+
+## Use external npm packages
+
+You are not limited to `@86d-app/*` modules. Any npm package that exports React or MDX components can be listed:
+
+```json
+{
+    "modules": [
+        "@86d-app/cart",
+        "@some-company/analytics-widget",
+        "react-product-carousel"
+    ]
+}
+```
+
+`86d generate` detects which packages are workspace-local (`@86d-app/*`) and which are public npm packages, installs the public ones automatically, and adds them to `package.json`.
+
+## Remove a module
+
+<Steps>
+</Steps>

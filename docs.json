@@ -1,0 +1,123 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "luma",
+  "name": "86d",
+  "colors": {
+    "primary": "#747474",
+    "light": "#b7b7b7"
+  },
+  "favicon": "https://icons.duckduckgo.com/ip3/86d.app.ico",
+  "logo": {
+    "light": "https://media.brand.dev/93cc828f-f7db-4654-bd42-fe2bf73b8d77.png",
+    "dark": "https://media.brand.dev/93cc828f-f7db-4654-bd42-fe2bf73b8d77.png"
+  },
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/86d-app/86d"
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Introduction",
+            "pages": [
+              "introduction"
+            ]
+          },
+          {
+            "group": "Concepts",
+            "pages": [
+              "concepts/modules",
+              "concepts/templates",
+              "concepts/storefront",
+              "concepts/admin"
+            ]
+          },
+          {
+            "group": "CLI",
+            "pages": [
+              "cli/overview",
+              "cli/commands"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Stores",
+        "pages": [
+          "quickstart",
+          "deployment",
+          {
+            "group": "Configuration",
+            "pages": [
+              "configuration/store-config",
+              "configuration/environment-variables",
+              "configuration/storage",
+              "configuration/authentication"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/adding-modules",
+              "guides/building-a-module",
+              "guides/customizing-templates",
+              "guides/payment-integrations",
+              "guides/channel-integrations"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Modules",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "modules/overview"
+            ]
+          },
+          {
+            "group": "Catalog",
+            "pages": [
+              "modules/products",
+              "modules/collections",
+              "modules/brands",
+              "modules/media"
+            ]
+          },
+          {
+            "group": "Shopping",
+            "pages": [
+              "modules/cart",
+              "modules/checkout",
+              "modules/orders",
+              "modules/discounts",
+              "modules/payments"
+            ]
+          },
+          {
+            "group": "Marketing",
+            "pages": [
+              "modules/loyalty",
+              "modules/reviews",
+              "modules/newsletter",
+              "modules/affiliates"
+            ]
+          },
+          {
+            "group": "Integrations",
+            "pages": [
+              "modules/stripe",
+              "modules/channels"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

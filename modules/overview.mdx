@@ -1,0 +1,191 @@
+---
+title: "Module Catalog"
+description: "Browse all 100+ modules available in the 86d commerce platform, organized by category. Each module is an isolated npm package you install independently."
+---
+
+86d is built around a modular architecture where every feature ships as a standalone package. You install only the modules your store needs, configure them in `config.json`, and they become available as endpoints and MDX components in your storefront. All modules are published to npm under the `@86d-app` scope and share the same version number.
+
+## Installation
+
+Install any module with npm:
+
+```sh
+npm install @86d-app/<module-name>
+```
+
+Then add it to your store's `config.json` under the `modules` array. Once registered, the module's API endpoints and store components are automatically available.
+
+## Module catalog
+
+<AccordionGroup>
+  <Accordion title="Catalog">
+    Core product data — the foundation of every store.
+
+    | Module | Package | Description |
+    | --- | --- | --- |
+    | products | `@86d-app/products` | Product catalog with variants, categories, and collections |
+    | collections | `@86d-app/collections` | Curated product collections for merchandising |
+    | brands | `@86d-app/brands` | Organize products by manufacturer or brand |
+    | media | `@86d-app/media` | Digital asset management with folder organization and tagging |
+    | inventory | `@86d-app/inventory` | Stock tracking, reservations, and low-stock alerts |
+    | product-labels | `@86d-app/product-labels` | Visual badges — "New", "Sale", "Best Seller", etc. |
+    | product-qa | `@86d-app/product-qa` | Product-specific questions and answers |
+    | search | `@86d-app/search` | Full-text search with fuzzy matching and faceted filtering |
+    | seo | `@86d-app/seo` | Per-page meta tags, Open Graph, Twitter Card, and JSON-LD |
+    | import-export | `@86d-app/import-export` | Bulk import and export of catalog data |
+    | redirects | `@86d-app/redirects` | URL redirect management |
+    | sitemap | `@86d-app/sitemap` | Automated sitemap generation |
+  </Accordion>
+
+  <Accordion title="Shopping & Checkout">
+    Everything from browsing to order placement.
+
+    | Module | Package | Description |
+    | --- | --- | --- |
+    | cart | `@86d-app/cart` | Shopping cart for guest and registered customers |
+    | checkout | `@86d-app/checkout` | Cart-to-order conversion flow |
+    | orders | `@86d-app/orders` | Order lifecycle management and status tracking |
+    | payments | `@86d-app/payments` | Payment processing orchestration |
+    | discounts | `@86d-app/discounts` | Promo codes and automatic discount rules |
+    | bulk-pricing | `@86d-app/bulk-pricing` | Quantity-based tiered pricing |
+    | quotes | `@86d-app/quotes` | B2B request-for-quote (RFQ) workflow |
+    | bundles | `@86d-app/bundles` | Discounted product bundles |
+    | preorders | `@86d-app/preorders` | Preorder campaigns for upcoming products |
+    | backorders | `@86d-app/backorders` | Backorder management for out-of-stock items |
+    | flash-sales | `@86d-app/flash-sales` | Time-limited promotional events with countdowns |
+    | auctions | `@86d-app/auctions` | Time-limited product auctions with bidding |
+    | price-lists | `@86d-app/price-lists` | Customer-segment or channel-specific pricing |
+  </Accordion>
+
+  <Accordion title="Customers">
+    Customer accounts, preferences, and engagement tools.
+
+    | Module | Package | Description |
+    | --- | --- | --- |
+    | customers | `@86d-app/customers` | Customer profiles and account management |
+    | customer-groups | `@86d-app/customer-groups` | Segment customers for targeted pricing and promotions |
+    | saved-addresses | `@86d-app/saved-addresses` | Customer address book |
+    | wishlist | `@86d-app/wishlist` | Save and track favorite products |
+    | gift-registry | `@86d-app/gift-registry` | Customer-created registries for weddings, birthdays, etc. |
+    | comparisons | `@86d-app/comparisons` | Side-by-side product comparison |
+    | recently-viewed | `@86d-app/recently-viewed` | Rediscover previously viewed products |
+    | recommendations | `@86d-app/recommendations` | Personalized product recommendations |
+  </Accordion>
+
+  <Accordion title="Fulfillment & Shipping">
+    Order fulfillment, shipping, and returns.
+
+    | Module | Package | Description |
+    | --- | --- | --- |
+    | shipping | `@86d-app/shipping` | Shipping zones, rates, and carrier definitions |
+    | fulfillment | `@86d-app/fulfillment` | Shipment lifecycle with a 5-state tracking machine |
+    | delivery-slots | `@86d-app/delivery-slots` | Scheduled delivery time windows |
+    | store-pickup | `@86d-app/store-pickup` | Buy online, pick up in store (BOPIS) |
+    | store-locator | `@86d-app/store-locator` | Physical store locations with proximity search |
+    | returns | `@86d-app/returns` | Customer return requests and approval workflow |
+    | tracking | `@86d-app/tracking` | Carrier tracking integration |
+  </Accordion>
+
+  <Accordion title="Marketing">
+    Acquire and retain customers with loyalty, reviews, and promotions.
+
+    | Module | Package | Description |
+    | --- | --- | --- |
+    | loyalty | `@86d-app/loyalty` | Points-based loyalty program with tiered rewards |
+    | affiliates | `@86d-app/affiliates` | Affiliate partner tracking and commissions |
+    | referrals | `@86d-app/referrals` | Customer referral program with unique codes |
+    | reviews | `@86d-app/reviews` | Product reviews, ratings, and helpfulness voting |
+    | social-proof | `@86d-app/social-proof` | Purchase counts, viewer counts, and trust badges |
+    | social-sharing | `@86d-app/social-sharing` | Share links across social networks |
+    | product-feeds | `@86d-app/product-feeds` | Generate product feeds for external channels |
+    | gamification | `@86d-app/gamification` | Points, badges, and challenges |
+    | announcements | `@86d-app/announcements` | Site-wide announcement bars and popup notices |
+    | newsletter | `@86d-app/newsletter` | Email subscriber list management |
+    | notifications | `@86d-app/notifications` | In-app and email notification system |
+  </Accordion>
+
+  <Accordion title="Content">
+    CMS and content publishing tools.
+
+    | Module | Package | Description |
+    | --- | --- | --- |
+    | blog | `@86d-app/blog` | Blog posts with drafts, scheduling, and markdown rendering |
+    | pages | `@86d-app/pages` | CMS-style static pages with draft/publish workflow |
+    | faq | `@86d-app/faq` | Self-service knowledge base with search |
+    | forms | `@86d-app/forms` | Custom form builder and submissions |
+  </Accordion>
+
+  <Accordion title="Finance">
+    Revenue, billing, and financial operations.
+
+    | Module | Package | Description |
+    | --- | --- | --- |
+    | invoices | `@86d-app/invoices` | Invoice lifecycle with payment terms and credit notes |
+    | store-credits | `@86d-app/store-credits` | Customer credit accounts debitable at checkout |
+    | giftcards | `@86d-app/giftcards` | Digital gift cards with balance management |
+    | memberships | `@86d-app/memberships` | Paid membership plans with gated products |
+    | subscriptions | `@86d-app/subscriptions` | Recurring billing and subscription lifecycle |
+    | multi-currency | `@86d-app/multi-currency` | Exchange rates and per-product price overrides |
+    | tipping | `@86d-app/tipping` | Add tip options at checkout |
+    | tax | `@86d-app/tax` | Jurisdiction-based tax calculation with nexus management |
+  </Accordion>
+
+  <Accordion title="Payment gateways">
+    Connect your store to payment processors.
+
+    | Module | Package | Description |
+    | --- | --- | --- |
+    | stripe | `@86d-app/stripe` | Stripe payment processing |
+    | paypal | `@86d-app/paypal` | PayPal checkout integration |
+    | square | `@86d-app/square` | Square payments |
+    | braintree | `@86d-app/braintree` | Braintree by PayPal |
+  </Accordion>
+
+  <Accordion title="Sales channels">
+    Sync your catalog with external marketplaces and platforms.
+
+    | Module | Package | Description |
+    | --- | --- | --- |
+    | amazon | `@86d-app/amazon` | Amazon marketplace sync |
+    | ebay | `@86d-app/ebay` | eBay listing management |
+    | tiktok-shop | `@86d-app/tiktok-shop` | TikTok Shop integration |
+    | google-shopping | `@86d-app/google-shopping` | Google Shopping feed |
+    | instagram-shop | `@86d-app/instagram-shop` | Instagram Shopping catalog |
+    | facebook-shop | `@86d-app/facebook-shop` | Facebook Shop integration |
+    | pinterest-shop | `@86d-app/pinterest-shop` | Pinterest Shopping |
+    | walmart | `@86d-app/walmart` | Walmart Marketplace |
+    | etsy | `@86d-app/etsy` | Etsy shop sync |
+    | x-shop | `@86d-app/x-shop` | X (Twitter) Shopping |
+    | wish | `@86d-app/wish` | Wish marketplace |
+    | uber-eats | `@86d-app/uber-eats` | Uber Eats restaurant integration |
+    | doordash | `@86d-app/doordash` | DoorDash delivery integration |
+    | favor | `@86d-app/favor` | Favor delivery integration |
+    | uber-direct | `@86d-app/uber-direct` | Uber Direct on-demand delivery |
+    | toast | `@86d-app/toast` | Toast POS integration |
+  </Accordion>
+
+  <Accordion title="Operations">
+    Back-office tools for running your store.
+
+    | Module | Package | Description |
+    | --- | --- | --- |
+    | audit-log | `@86d-app/audit-log` | Tamper-evident log of all admin actions |
+    | automations | `@86d-app/automations` | Rule-based workflow automation |
+    | analytics | `@86d-app/analytics` | Storefront and conversion analytics |
+    | settings | `@86d-app/settings` | Store-wide configuration management |
+    | notifications | `@86d-app/notifications` | In-app and email notifications |
+    | order-notes | `@86d-app/order-notes` | Threaded notes on orders from customers and admins |
+    | warranties | `@86d-app/warranties` | Product warranty plans and claims |
+    | tickets | `@86d-app/tickets` | Customer support ticket system |
+    | kiosk | `@86d-app/kiosk` | In-store kiosk mode |
+    | photo-booth | `@86d-app/photo-booth` | In-store photo capture |
+    | qr-code | `@86d-app/qr-code` | QR code generation and scanning |
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+- [Products module reference](/modules/products) — the core catalog module
+- [Collections module reference](/modules/collections) — curated product groupings
+- [Brands module reference](/modules/brands) — manufacturer and brand pages
+- [Media module reference](/modules/media) — digital asset management

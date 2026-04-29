@@ -1,0 +1,198 @@
+---
+title: "Checkouts"
+description: "Manage checkout sessions and the cart-to-order conversion flow. Covers session creation, address collection, discount application, and checkout components."
+---
+
+The checkout module manages the session-based flow that converts a shopping cart into a confirmed order. Each checkout session tracks the customer's email, shipping and billing addresses, applied discounts, and totals through a well-defined status lifecycle. The module is customer-facing only — there are no admin endpoints. To process real payments you pair it with a payment gateway module such as `@86d-app/stripe`.
+
+## Installation
+
+```sh
+npm install @86d-app/checkout
+```
+
+## Configuration
+
+```ts
+import checkout from "@86d-app/checkout";
+import { createModuleClient } from "@86d-app/core";
+
+const client = createModuleClient([
+  checkout({
+    sessionTtl: 1800000, // 30 minutes
+    currency: "USD",
+  }),
+]);
+```
+
+<ParamField path="sessionTtl" default="1800000" type="number">
+  Session time-to-live in milliseconds. Sessions that exceed this age without completing transition to `expired`. Defaults to 30 minutes (1 800 000 ms). Pass a per-session `ttl` override to `controller.create()` when you need a different window for a specific session.
+</ParamField>
+
+<ParamField path="currency" default='"USD"' type="string">
+  Default currency code applied to new checkout sessions. Individual sessions can override this by passing `currency` to `POST /checkout/sessions`.
+</ParamField>
+
+## Session status flow
+
+| Status | Description |
+| --- | --- |
+| `pending` | Session created, awaiting customer completion |
+| `processing` | Payment is being processed |
+| `completed` | Order placed successfully |
+| `expired` | Session TTL elapsed before completion |
+| `abandoned` | Customer left without completing |
+
+```text
+pending → processing → completed
+pending → expired
+pending / processing → abandoned
+```
+
+Call `controller.expireStale()` periodically (for example from a cron job) to transition past-TTL `pending` sessions to `expired`.
+
+## Store endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/checkout/sessions` | Create a new checkout session |
+| `GET` | `/checkout/sessions/:id` | Get a session by ID |
+| `PUT` | `/checkout/sessions/:id/update` | Update addresses, shipping amount, or payment method |
+| `POST` | `/checkout/sessions/:id/discount` | Apply a discount code to the session |
+
+<Note>
+  Checkout is customer-facing only. There are no admin endpoints in this module.
+</Note>
+
+## Components
+
+### CheckoutForm
+
+`CheckoutForm` is the multi-step checkout orchestrator. It renders the active step — information, shipping, payment, or review — alongside the `CheckoutSummary` sidebar. A step indicator shows customers how far along they are. If no session ID is set in `checkoutState`, the component falls back to a "Return to cart" message.
+
+```mdx
+<CheckoutForm />
+```
+
+Place this on your checkout page. Before the component renders, set `checkoutState.sessionId` to a valid session ID (typically created server-side from the customer's cart):
+
+```mdx
+{/* templates/brisa/checkout.mdx */}
+<CheckoutForm />
+```
+
+### CheckoutInformation
+
+Step 1 of the checkout flow. Collects the customer's email address and advances to the shipping step on submit.
+
+```mdx
+<CheckoutInformation />
+```
+
+`CheckoutForm` renders this automatically. Use it standalone only if you are building a fully custom checkout layout.
+
+### CheckoutShipping
+
+Step 2. Collects the shipping address: first and last name, address lines, city, state, postal code, country, and phone number. Advances to the payment step on submit.
+
+```mdx
+<CheckoutShipping />
+```
+
+### CheckoutPayment
+
+Step 3. Confirms the checkout session — validating collected fields and reserving inventory — then creates a payment intent. In offline mode (no payments module configured) this step auto-succeeds. With a payment provider such as Stripe, it renders the provider's payment UI (for example the Stripe `PaymentElement`).
+
+```mdx
+<CheckoutPayment />
+```
+
+### CheckoutReview
+
+Step 4. Shows the final order summary: contact information, shipping address, line items, and totals. The "Place order" button calls `complete()` on the session and displays an order confirmation on success.
+
+```mdx
+<CheckoutReview />
+```
+
+### CheckoutSummary
+
+The order summary sidebar. Displays line items, subtotal, shipping, tax, discount, and total. Includes forms for applying and removing promo codes and gift cards. `CheckoutForm` renders this sidebar automatically; you can also use it standalone in a custom layout.
+
+```mdx
+<CheckoutSummary />
+```
+
+## Types
+
+```ts
+type CheckoutStatus =
+  | "pending"
+  | "processing"
+  | "completed"
+  | "expired"
+  | "abandoned";
+
+interface CheckoutSession {
+  id: string;
+  cartId?: string;
+  customerId?: string;
+  guestEmail?: string;
+  status: CheckoutStatus;
+  subtotal: number;
+  taxAmount: number;
+  shippingAmount: number;
+  discountAmount: number;
+  total: number;
+  currency: string;
+  discountCode?: string;
+  shippingAddress?: CheckoutAddress;
+  billingAddress?: CheckoutAddress;
+  paymentMethod?: string;
+  orderId?: string;           // set after controller.complete() is called
+  metadata?: Record<string, unknown>;
+  expiresAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface CheckoutAddress {
+  firstName: string;
+  lastName: string;
+  company?: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  phone?: string;
+}
+
+interface CheckoutLineItem {
+  productId: string;
+  variantId?: string;
+  name: string;
+  sku?: string;
+  price: number;    // in cents
+  quantity: number;
+}
+```
+
+## Completing a session
+
+After your orders module creates an order from the completed checkout, link the two records by calling `complete()`:
+
+```ts
+// Inside your order-creation flow
+const order = await orderController.create({ ... });
+await checkoutController.complete(sessionId, order.id);
+```
+
+This transitions the session from `pending` to `completed` and stores the `orderId` on the session.
+
+## Discount integration
+
+The checkout module integrates with the discounts module automatically when both are enabled. When a customer applies a promo code at checkout, the checkout module validates and applies it via the discounts module — no additional configuration required.
+
+See the [Discounts module reference](/modules/discounts) for the promo code API and the `DiscountController` interface.

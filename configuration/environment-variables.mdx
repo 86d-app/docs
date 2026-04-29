@@ -1,0 +1,157 @@
+---
+title: "Environment Variables"
+description: "Reference for all environment variables that configure your 86d store, including required database and auth settings and optional provider integrations."
+---
+
+86d reads configuration from environment variables at startup. To get started, copy `.env.example` to `.env` in the repository root and fill in the required values. Variables that are commented out in `.env.example` are optional — uncomment and set only the ones you need for the integrations you want to enable.
+
+```bash
+cp .env.example .env
+```
+
+## Required variables
+
+These three variables must be set before your store will start. The application will fail validation on boot if any are missing.
+
+| Variable | Description |
+| --- | --- |
+| `DATABASE_URL` | PostgreSQL connection string used for all runtime queries. Example: `postgresql://postgres:postgres@localhost:5432/86d` |
+| `DATABASE_URL_UNPOOLED` | The same connection string, but without connection pooling. Used for database migrations. Set this to the same value as `DATABASE_URL` unless you are using a pooler such as PgBouncer. |
+| `BETTER_AUTH_SECRET` | Secret key used to sign session tokens and auth cookies. Generate a secure value with `openssl rand -base64 32` and never commit it to source control. |
+
+<Warning>
+  Change `BETTER_AUTH_SECRET` before going to production. Any value other than the placeholder in `.env.example` is fine for local development, but you must use a cryptographically random string in production.
+</Warning>
+
+## Application URLs
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `APP_URL` | `http://localhost:3000` | The public URL of your store. Used to build absolute URLs in emails, webhooks, and redirects. Set this to your domain in production. |
+| `BETTER_AUTH_URL` | `http://localhost:3000` | The base URL Better Auth uses when constructing auth callback URLs. Should match `APP_URL`. |
+| `NODE_ENV` | `development` | Set to `production` when deploying. Affects logging verbosity, error handling, and build optimizations. |
+
+## Store identity and API
+
+| Variable | Description |
+| --- | --- |
+| `STORE_ID` | UUID identifying this store. Populated automatically when you run `86d init`. When set, the store fetches its configuration from the 86d API instead of reading `templates/<template>/config.json`. |
+| `86D_API_URL` | Base URL for the 86d hosted API. Defaults to `https://api.86d.app`. Only relevant when `STORE_ID` is set. |
+| `86D_API_KEY` | API key for the 86d hosted API. When set, enables 86d.app SSO for admin authentication. See [Authentication](/configuration/authentication) for details. |
+
+## Email
+
+| Variable | Description |
+| --- | --- |
+| `RESEND_API_KEY` | API key for [Resend](https://resend.com). When set, the store sends transactional emails (order confirmations, password resets, etc.) using Resend. If not set, email sending is disabled. |
+
+## Auth providers
+
+Enable social login by setting the corresponding variables. Any provider whose credentials are absent is automatically disabled. See [Authentication](/configuration/authentication) for setup details.
+
+| Provider | Variables |
+| --- | --- |
+| Google | `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `NEXT_PUBLIC_AUTH_GOOGLE_ID` |
+| Twitter / X | `AUTH_TWITTER_ID`, `AUTH_TWITTER_SECRET` |
+| Slack | `AUTH_SLACK_ID`, `AUTH_SLACK_SECRET` |
+| Shopify | `AUTH_SHOPIFY_ID`, `AUTH_SHOPIFY_SECRET` |
+| Apple | `AUTH_APPLE_ID`, `AUTH_APPLE_SECRET`, `AUTH_APPLE_BUNDLE_IDENTIFIER` |
+| Facebook | `AUTH_FACEBOOK_ID`, `AUTH_FACEBOOK_SECRET` |
+
+## Payment providers
+
+The first configured payment provider is automatically wired to the payments module. Priority order when multiple providers are configured: **Stripe → PayPal → Square → Braintree**.
+
+<AccordionGroup>
+  <Accordion title="Stripe">
+    | Variable | Description |
+    | --- | --- |
+    | `STRIPE_SECRET_KEY` | Stripe secret API key (starts with `sk_`). |
+    | `STRIPE_WEBHOOK_SECRET` | Webhook signing secret for verifying Stripe events (starts with `whsec_`). |
+    | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Publishable key used in the browser to initialize Stripe Elements. |
+    | `STRIPE_ACCOUNT_ID` | Optional connected account ID for Stripe Connect. |
+  </Accordion>
+
+  <Accordion title="PayPal">
+    | Variable | Description |
+    | --- | --- |
+    | `PAYPAL_CLIENT_ID` | PayPal app client ID. |
+    | `PAYPAL_CLIENT_SECRET` | PayPal app client secret. |
+    | `PAYPAL_WEBHOOK_ID` | Webhook ID from your PayPal app configuration. |
+    | `PAYPAL_SANDBOX` | Set to `"true"` to use the PayPal sandbox environment. |
+  </Accordion>
+
+  <Accordion title="Square">
+    | Variable | Description |
+    | --- | --- |
+    | `SQUARE_ACCESS_TOKEN` | Square access token. |
+    | `NEXT_PUBLIC_SQUARE_APPLICATION_ID` | Square application ID (client-side). |
+    | `NEXT_PUBLIC_SQUARE_LOCATION_ID` | Square location ID (client-side). |
+    | `SQUARE_WEBHOOK_SIGNATURE_KEY` | Signature key for verifying Square webhook events. |
+    | `SQUARE_WEBHOOK_NOTIFICATION_URL` | Publicly reachable URL Square sends webhook events to. |
+  </Accordion>
+
+  <Accordion title="Braintree">
+    | Variable | Description |
+    | --- | --- |
+    | `BRAINTREE_MERCHANT_ID` | Braintree merchant ID. |
+    | `BRAINTREE_PUBLIC_KEY` | Braintree public key. |
+    | `BRAINTREE_PRIVATE_KEY` | Braintree private key. |
+    | `BRAINTREE_SANDBOX` | Set to `"true"` to use the Braintree sandbox environment. |
+  </Accordion>
+</AccordionGroup>
+
+## Storage
+
+Control where uploaded files are stored. See [Storage configuration](/configuration/storage) for the full setup guide.
+
+| Variable | Description |
+| --- | --- |
+| `STORAGE_PROVIDER` | Storage backend: `local` (default), `vercel`, or `s3`. |
+| `STORAGE_PUBLIC_URL_MODE` | How upload URLs are returned: `direct` (raw bucket URL) or `proxy` (same-origin `/uploads/...` path). |
+| `STORAGE_LOCAL_DIR` | Directory for local file storage. Defaults to `./uploads`. |
+| `S3_ENDPOINT` | S3-compatible endpoint URL (MinIO, Cloudflare R2, Railway Bucket, AWS S3). |
+| `S3_BUCKET` | S3 bucket name. |
+| `S3_REGION` | S3 region. Defaults to `us-east-1`. |
+| `S3_ACCESS_KEY` | S3 access key ID. |
+| `S3_SECRET_KEY` | S3 secret access key. |
+| `S3_VIRTUAL_HOSTED_STYLE` | Set to `"true"` when using Railway object storage or any provider that requires virtual-hosted-style URLs. |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob read/write token. Set automatically by Vercel when you add a Blob store to your project. |
+
+## SMS
+
+| Variable | Description |
+| --- | --- |
+| `TWILIO_ACCOUNT_SID` | Twilio account SID for SMS notifications. |
+| `TWILIO_AUTH_TOKEN` | Twilio auth token. |
+| `TWILIO_SERVICE_SID` | Twilio Messaging Service SID. |
+| `TWILIO_PHONE_NUMBER` | Twilio phone number to send SMS from. |
+
+## AI and LLM
+
+| Variable | Description |
+| --- | --- |
+| `OPENAI_API_KEY` | OpenAI API key for AI-powered features (product descriptions, search, etc.). |
+| `GEMINI_API_KEY` | Google Gemini API key. |
+| `OPENROUTER_API_KEY` | OpenRouter API key for routing to multiple LLM providers. |
+
+## Maps
+
+| Variable | Description |
+| --- | --- |
+| `GOOGLE_MAPS_API_KEY` | Google Maps API key, used for address autocomplete and delivery zones. |
+
+## Analytics and monitoring
+
+| Variable | Description |
+| --- | --- |
+| `NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID` | Google Tag Manager container ID (e.g. `GTM-XXXXXXX`). |
+| `SENTRY_DSN` | Sentry DSN for error tracking and performance monitoring. |
+
+## Point of sale
+
+| Variable | Description |
+| --- | --- |
+| `TOAST_API_KEY` | Toast POS API key. |
+| `TOAST_RESTAURANT_GUID` | Toast restaurant GUID. |
+| `TOAST_SANDBOX` | Set to `"true"` to use the Toast sandbox environment. |

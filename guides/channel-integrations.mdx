@@ -1,0 +1,100 @@
+---
+title: "Marketplaces and Channels"
+description: "Sync your 86d product catalog to Amazon, eBay, TikTok Shop, Google Shopping, Instagram, and more — each channel is a drop-in module you enable in config.json."
+---
+
+86d includes a dedicated module for every major sales channel. Each module handles credential management, catalog sync, order ingestion, and channel-specific data mapping — all accessible from the admin sidebar once enabled. You use the same product catalog you already manage in 86d; the channel module handles translation to each marketplace's API format.
+
+## Available channel modules
+
+<CardGroup cols={3}>
+  <Card title="Amazon" icon="amazon" href="https://www.npmjs.com/package/@86d-app/amazon">
+    `@86d-app/amazon`
+
+    Sync products to Amazon Marketplace, manage ASIN mappings, and ingest Amazon orders back into 86d.
+  </Card>
+
+  <Card title="eBay" icon="tag" href="https://www.npmjs.com/package/@86d-app/ebay">
+    `@86d-app/ebay`
+
+    List products on eBay, manage active listings, and sync sold orders to your 86d order queue.
+  </Card>
+
+  <Card title="TikTok Shop" icon="video" href="https://www.npmjs.com/package/@86d-app/tiktok-shop">
+    `@86d-app/tiktok-shop`
+
+    Connect your TikTok Shop account to sync your catalog and manage in-app purchases from the admin.
+  </Card>
+
+  <Card title="Google Shopping" icon="google" href="https://www.npmjs.com/package/@86d-app/google-shopping">
+    `@86d-app/google-shopping`
+
+    Push your product feed to Google Merchant Center for Shopping ads and free listings.
+  </Card>
+
+  <Card title="Instagram Shop" icon="instagram" href="https://www.npmjs.com/package/@86d-app/instagram-shop">
+    `@86d-app/instagram-shop`
+
+    Tag products in Instagram posts and stories; sync your catalog to your Instagram Shop.
+  </Card>
+
+  <Card title="Facebook Shop" icon="facebook" href="https://www.npmjs.com/package/@86d-app/facebook-shop">
+    `@86d-app/facebook-shop`
+
+    Publish your product catalog to Facebook Shops and manage commerce from the admin sidebar.
+  </Card>
+
+  <Card title="Pinterest" icon="pinterest" href="https://www.npmjs.com/package/@86d-app/pinterest-shop">
+    `@86d-app/pinterest-shop`
+
+    Sync your catalog to Pinterest as Product Pins so shoppers can discover and buy directly.
+  </Card>
+
+  <Card title="Walmart" icon="store" href="https://www.npmjs.com/package/@86d-app/walmart">
+    `@86d-app/walmart`
+
+    List products on Walmart Marketplace and sync orders back into 86d for unified fulfillment.
+  </Card>
+
+  <Card title="Etsy" icon="shop" href="https://www.npmjs.com/package/@86d-app/etsy">
+    `@86d-app/etsy`
+
+    Push listings to your Etsy shop, manage variations, and pull Etsy orders into 86d.
+  </Card>
+
+  <Card title="X Shop" icon="x-twitter" href="https://www.npmjs.com/package/@86d-app/x-shop">
+    `@86d-app/x-shop`
+
+    Connect X (formerly Twitter) Shopping to surface products in posts and your storefront profile.
+  </Card>
+
+  <Card title="Wish" icon="sparkles" href="https://www.npmjs.com/package/@86d-app/wish">
+    `@86d-app/wish`
+
+    List products on the Wish marketplace and sync orders back to 86d for processing.
+  </Card>
+</CardGroup>
+
+## General setup pattern
+
+Every channel module follows the same four steps:
+
+<Steps>
+</Steps>
+
+## Module-specific setup
+
+Each channel has its own authentication method, required scopes, and webhook configuration. Read the README for the specific module you are installing for exact instructions:
+
+```bash
+# View the README for any installed module
+npm info @86d-app/amazon readme
+```
+
+Or visit the module's page on npm — all READMEs are linked in the cards above.
+
+## Notes on catalog sync
+
+- Channel modules read your product catalog through the module contract system — they do not import the products module directly. You must have `@86d-app/products` enabled for catalog sync to work.
+- Inventory levels, prices, and product status changes made in your 86d admin are pushed to connected channels on a configurable schedule or can be triggered manually from the admin.
+- Orders imported from channels appear in your 86d orders queue alongside direct-store orders, with a `channel` field indicating their origin.

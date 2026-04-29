@@ -1,0 +1,216 @@
+---
+title: "Payments"
+description: "Provider-agnostic payment processing for 86d. Tracks intents, saved payment methods, and refunds locally while delegating processing to a gateway module."
+---
+
+The payments module provides a `PaymentProvider` abstraction that separates payment intent tracking from the underlying payment gateway. It records all intents, payment methods, and refunds in your store's database, and delegates the actual processing calls to whichever gateway module you configure — Stripe, PayPal, Square, Braintree, or any custom implementation. Without a provider, the module operates in offline mode and handles status transitions locally, which is useful during development and testing.
+
+## Installation
+
+Install the payments module alongside your chosen gateway module:
+
+```sh
+npm install @86d-app/payments @86d-app/stripe
+```
+
+## Configuration
+
+```ts
+import payments from "@86d-app/payments";
+import stripe, { StripePaymentProvider } from "@86d-app/stripe";
+import { createModuleClient } from "@86d-app/core";
+
+const stripeProvider = new StripePaymentProvider("sk_live_...");
+
+const client = createModuleClient([
+  stripe({
+    apiKey: "sk_live_...",
+    webhookSecret: "whsec_...",
+  }),
+  payments({
+    provider: stripeProvider,
+    currency: "USD",
+  }),
+]);
+```
+
+<ParamField path="provider" default="undefined" type="PaymentProvider">
+  A payment gateway implementation. When omitted the module runs in offline mode: intents are stored locally with `pending` status and status transitions are handled in-memory. Pass a gateway provider (for example `StripePaymentProvider`) to connect to a real processor.
+</ParamField>
+
+<ParamField path="currency" default='"USD"' type="string">
+  Default currency code for new payment intents. Individual intents can override this by passing `currency` to `controller.createIntent()`.
+</ParamField>
+
+## `PaymentProvider` interface
+
+To connect any payment processor, implement this interface and pass an instance to the `provider` option:
+
+```ts
+interface PaymentProvider {
+  createIntent(params: {
+    amount: number;      // positive integer, smallest currency unit (e.g. cents)
+    currency: string;
+    metadata?: Record<string, unknown>;
+  }): Promise<ProviderIntentResult>;
+
+  confirmIntent(providerIntentId: string): Promise<ProviderIntentResult>;
+
+  cancelIntent(providerIntentId: string): Promise<ProviderIntentResult>;
+
+  createRefund(params: {
+    providerIntentId: string;
+    amount?: number;     // partial refund in cents; omit for full refund
+    reason?: string;
+  }): Promise<ProviderRefundResult>;
+}
+```
+
+**`ProviderIntentResult`** contains `providerIntentId`, `status`, and an optional `providerMetadata` bag. For Stripe, `providerMetadata.clientSecret` holds the value you pass to the frontend `PaymentElement`.
+
+## Store endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/payments/intents` | Create a payment intent |
+| `GET` | `/payments/intents/:id` | Get an intent by ID |
+| `POST` | `/payments/intents/:id/confirm` | Confirm payment |
+| `POST` | `/payments/intents/:id/cancel` | Cancel payment |
+| `GET` | `/payments/methods` | List the customer's saved payment methods |
+| `DELETE` | `/payments/methods/:id` | Delete a saved payment method |
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/payments` | List all intents (filter by `customerId`, `status`, `orderId`) |
+| `GET` | `/admin/payments/:id` | Get intent detail |
+| `POST` | `/admin/payments/:id/refund` | Issue a refund |
+| `GET` | `/admin/payments/:id/refunds` | List refunds for an intent |
+
+## Payment intent statuses
+
+| Status | Description |
+| --- | --- |
+| `pending` | Intent created, payment not yet initiated |
+| `processing` | Payment is being processed |
+| `succeeded` | Payment completed successfully |
+| `failed` | Payment failed |
+| `cancelled` | Intent was cancelled |
+| `refunded` | Payment has been partially or fully refunded |
+
+## Checkout integration
+
+The `CheckoutPayment` component calls `createIntent` automatically when the customer reaches payment step. You do not need to call the payments API directly from your checkout templates — the checkout and payments modules wire together through the runtime context.
+
+A typical end-to-end flow looks like this:
+
+```ts
+// 1. Customer reaches checkout payment step — intent is created
+const intent = await controller.createIntent({
+  amount: 4999,   // $49.99 in cents
+  currency: "USD",
+  customerId: "cust_123",
+  orderId: "ord_456",
+});
+// With Stripe: intent.providerMetadata.clientSecret → send to frontend PaymentElement
+
+// 2. Customer completes payment on the frontend → confirm server-side
+const confirmed = await controller.confirmIntent(intent.id);
+// confirmed.status === "succeeded"
+
+// 3. Issue a refund when needed
+const refund = await controller.createRefund({
+  intentId: intent.id,
+  amount: 1000,           // $10.00 partial refund; omit for full refund
+  reason: "customer request",
+});
+```
+
+## Financial safety guards
+
+The payments controller enforces these rules regardless of which gateway you use:
+
+| Rule | Detail |
+| --- | --- |
+| **Amount validation** | `createIntent` rejects zero, negative, and fractional amounts. Amount must be a positive integer in the smallest currency unit. |
+| **Confirm guards** | `confirmIntent` only transitions from `pending` or `processing`. Throws on terminal states (`cancelled`, `failed`, `refunded`). |
+| **Cancel guards** | `cancelIntent` only works on `pending` or `processing`. Throws on `succeeded`, `failed`, `refunded`. |
+| **Refund guards** | `createRefund` only works on `succeeded` or `refunded` intents. |
+| **Refund cap** | Cumulative refunds cannot exceed the original intent amount. Each call sums non-failed prior refunds before allowing a new one. |
+| **Webhook deduplication** | `handleWebhookRefund` deduplicates by `providerRefundId` — webhook retries return the existing refund rather than creating a duplicate. |
+
+## Webhook verification
+
+All gateway modules implement HMAC signature verification on their webhook endpoint. For Stripe:
+
+```text
+POST /stripe/webhook
+```
+
+- Verifies the `Stripe-Signature` header using HMAC-SHA256 with a 5-minute timestamp replay window
+- Uses constant-time comparison to prevent timing attacks
+- Returns `401` on invalid or expired signatures
+- Without `webhookSecret` configured, all requests are accepted (useful for local development)
+
+Other gateway modules follow the same pattern using their respective signing schemes.
+
+## Supported gateways
+
+| Gateway | Package |
+| --- | --- |
+| Stripe | `@86d-app/stripe` |
+
+Additional gateway modules (PayPal, Square, Braintree) are on the roadmap. You can also implement the `PaymentProvider` interface directly to connect any processor not yet covered by a first-party module.
+
+## Types
+
+```ts
+type PaymentIntentStatus =
+  | "pending" | "processing" | "succeeded"
+  | "failed" | "cancelled" | "refunded";
+
+type RefundStatus = "pending" | "succeeded" | "failed";
+
+interface PaymentIntent {
+  id: string;
+  providerIntentId?: string;     // e.g. Stripe's pi_xxx
+  customerId?: string;
+  email?: string;
+  amount: number;                // in cents
+  currency: string;
+  status: PaymentIntentStatus;
+  paymentMethodId?: string;
+  orderId?: string;
+  checkoutSessionId?: string;
+  metadata: Record<string, unknown>;
+  providerMetadata: Record<string, unknown>;  // gateway-specific data
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface PaymentMethod {
+  id: string;
+  customerId: string;
+  providerMethodId: string;      // e.g. Stripe's pm_xxx
+  type: string;                  // "card" | "bank_transfer" | "wallet"
+  last4?: string;
+  brand?: string;                // "visa" | "mastercard" | etc.
+  expiryMonth?: number;
+  expiryYear?: number;
+  isDefault: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface Refund {
+  id: string;
+  paymentIntentId: string;
+  providerRefundId: string;
+  amount: number;                // in cents
+  reason?: string;
+  status: RefundStatus;
+  createdAt: Date;
+  updatedAt: Date;
+}
+```

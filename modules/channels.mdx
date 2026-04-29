@@ -1,0 +1,127 @@
+---
+title: "Sales channel modules"
+description: "Sync your catalog and manage orders across Amazon, eBay, TikTok Shop, Google Shopping, and a dozen more sales channels from a single 86d store."
+---
+
+Sales channel modules let you list products, sync inventory, and manage orders on external marketplaces and social commerce platforms — all from your 86d admin. Each channel is an independent module you install and configure separately.
+
+## General setup pattern
+
+Every channel module follows the same four-step setup:
+
+<Steps>
+  <Step title="Install the package">
+    ```sh
+    npm install @86d-app/<channel-name>
+    ```
+  </Step>
+  <Step title="Add to config.json">
+    ```json
+    {
+      "modules": ["@86d-app/<channel-name>"]
+    }
+    ```
+  </Step>
+  <Step title="Regenerate module bindings">
+    ```sh
+    86d generate
+    ```
+  </Step>
+  <Step title="Configure credentials in the admin dashboard">
+    Open **Admin → Settings → \[Channel Name\]** and enter the API credentials for that channel. Each module documents the required credentials in its README on npm.
+  </Step>
+</Steps>
+
+## Available channel modules
+
+| Channel | Package | Description |
+| --- | --- | --- |
+| Amazon | `@86d-app/amazon` | Sync listings to Amazon Marketplace (FBA and FBM) |
+| eBay | `@86d-app/ebay` | Sync listings and manage orders on eBay |
+| TikTok Shop | `@86d-app/tiktok-shop` | Sell on TikTok Shop |
+| Google Shopping | `@86d-app/google-shopping` | Generate product feeds for Google Shopping |
+| Instagram Shop | `@86d-app/instagram-shop` | Sync your catalog to Instagram Shopping |
+| Facebook Shop | `@86d-app/facebook-shop` | Sync your catalog to Facebook Shop |
+| Pinterest Shop | `@86d-app/pinterest-shop` | Sync listings to Pinterest |
+| Walmart | `@86d-app/walmart` | Sell on Walmart Marketplace |
+| Etsy | `@86d-app/etsy` | Sync listings to Etsy |
+| X Shop | `@86d-app/x-shop` | Sell on X (Twitter) |
+| Wish | `@86d-app/wish` | Sync listings to Wish |
+| Uber Eats | `@86d-app/uber-eats` | Integration for food and delivery merchants |
+| DoorDash | `@86d-app/doordash` | DoorDash delivery integration |
+| Favor | `@86d-app/favor` | Favor delivery integration |
+| Uber Direct | `@86d-app/uber-direct` | Uber Direct local delivery integration |
+
+## Amazon module
+
+The Amazon module is the most fully featured channel integration. It supports both FBA (Fulfilled by Amazon) and FBM (Fulfilled by Merchant) channels with listing management, order fulfillment, and inventory synchronization.
+
+### Installation
+
+```sh
+npm install @86d-app/amazon
+```
+
+```ts
+import amazon from "@86d-app/amazon";
+
+const module = amazon({
+  sellerId: "A1B2C3D4E5F6G7",
+  mwsAuthToken: "amzn.mws.xxx",
+  marketplaceId: "ATVPDKIKX0DER",
+  region: "NA",
+});
+```
+
+### Configuration
+
+<ParamField path="sellerId" type="string" required>
+  Your Amazon Seller ID, found in Seller Central under **Account Info**.
+</ParamField>
+
+<ParamField path="mwsAuthToken" type="string" required>
+  MWS Auth Token for API access.
+</ParamField>
+
+<ParamField path="marketplaceId" type="string" required>
+  Amazon Marketplace ID (e.g., `ATVPDKIKX0DER` for the US marketplace).
+</ParamField>
+
+<ParamField path="region" default='"NA"' type="string">
+  Amazon region. One of `NA` (North America), `EU` (Europe), or `FE` (Far East).
+</ParamField>
+
+### Store endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/amazon/webhooks` | Receive Amazon webhook notifications |
+
+### Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/amazon/listings` | List all listings |
+| `POST` | `/admin/amazon/listings/create` | Create a new listing |
+| `GET` | `/admin/amazon/listings/:id` | Get a listing by ID |
+| `POST` | `/admin/amazon/listings/:id/update` | Update a listing |
+| `POST` | `/admin/amazon/listings/:id/delete` | Delete a listing |
+| `GET` | `/admin/amazon/orders` | List all Amazon orders |
+| `POST` | `/admin/amazon/orders/:id/ship` | Mark an order as shipped |
+| `POST` | `/admin/amazon/orders/:id/cancel` | Cancel an order |
+| `POST` | `/admin/amazon/inventory/sync` | Trigger an inventory sync |
+| `GET` | `/admin/amazon/inventory/health` | Get an inventory health report |
+| `GET` | `/admin/amazon/stats` | Get channel statistics |
+
+## Finding credentials for other channels
+
+Each channel module's README on npm documents the exact credentials required. To find them:
+
+1. Run `npm show @86d-app/<channel-name>` to check availability and version.
+2. Visit the package page at `https://www.npmjs.com/package/@86d-app/<channel-name>` for the full README.
+
+Most channel modules follow the same credential pattern:
+
+- A platform-issued **API key** or **access token**
+- A **store ID**, **seller ID**, or **shop ID** to identify your account on the platform
+- An optional **webhook secret** for receiving real-time order and inventory updates

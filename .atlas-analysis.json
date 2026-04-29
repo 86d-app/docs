@@ -1,0 +1,138 @@
+{
+  "projectType": "framework",
+  "projectName": "86d",
+  "projectDescription": "Modular open-source commerce platform built from isolated, interchangeable modules that can be composed to create fully customizable online stores.",
+  "theme": "luma",
+  "primaryColor": "#747474",
+  "lightColor": "#b7b7b7",
+  "darkColor": null,
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "deployment"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/modules",
+              "concepts/templates",
+              "concepts/storefront",
+              "concepts/admin"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "pages": [
+              "configuration/store-config",
+              "configuration/environment-variables",
+              "configuration/storage",
+              "configuration/authentication"
+            ]
+          },
+          {
+            "group": "CLI",
+            "pages": [
+              "cli/overview",
+              "cli/commands"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/adding-modules",
+              "guides/building-a-module",
+              "guides/customizing-templates",
+              "guides/payment-integrations",
+              "guides/channel-integrations"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Modules",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "modules/overview"
+            ]
+          },
+          {
+            "group": "Catalog",
+            "pages": [
+              "modules/products",
+              "modules/collections",
+              "modules/brands",
+              "modules/media"
+            ]
+          },
+          {
+            "group": "Shopping",
+            "pages": [
+              "modules/cart",
+              "modules/checkout",
+              "modules/orders",
+              "modules/discounts",
+              "modules/payments"
+            ]
+          },
+          {
+            "group": "Marketing",
+            "pages": [
+              "modules/loyalty",
+              "modules/reviews",
+              "modules/newsletter",
+              "modules/affiliates"
+            ]
+          },
+          {
+            "group": "Integrations",
+            "pages": [
+              "modules/stripe",
+              "modules/channels"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "99+ composable commerce modules installable via npm",
+    "MDX-based storefront templates for full design flexibility",
+    "Per-store isolated environments with full data ownership",
+    "Two-level admin dashboard with modular management UI",
+    "CLI tooling for scaffolding modules and templates",
+    "Multi-provider payment support (Stripe, PayPal, Square, Braintree)",
+    "Multi-channel selling (Amazon, eBay, TikTok Shop, Google Shopping)",
+    "Self-hosted via Docker or managed via Railway/Vercel",
+    "OKLCH color token theming system with light/dark mode",
+    "Open source under Apache-2.0"
+  ],
+  "publicApiSurface": [
+    "GET /products — list active products",
+    "GET /products/:slug — get product by slug",
+    "GET /products/search — full-text product search",
+    "GET /cart/get — retrieve cart with items and totals",
+    "POST /cart — add item to cart",
+    "POST /checkout/sessions — create checkout session",
+    "POST /discounts/validate — validate promo code",
+    "GET /orders/me — list customer orders",
+    "GET /api/health — health check",
+    "POST /api/upload — file upload (admin)",
+    "ALL /api/[...path] — module endpoints",
+    "86d dev — start development server",
+    "86d init — configure local store",
+    "86d module create <name> — scaffold module",
+    "86d module enable <name> — enable a module",
+    "86d template create <name> — scaffold template",
+    "86d generate — regenerate module imports"
+  ]
+}

@@ -1,0 +1,138 @@
+---
+title: "Deployment and Hosting"
+description: "Deploy 86d to Railway, Vercel, or a self-hosted Docker server. Each option takes minutes to set up and requires only a few environment variables."
+---
+
+86d ships a production-ready `Dockerfile` and `docker-compose.yml`, and supports one-click deploys to Railway and Vercel. Choose the path that matches your infrastructure preferences — all three run the same codebase.
+
+<Tabs>
+  <Tab title="Docker Compose (self-hosted)">
+    Docker Compose is the simplest self-hosted path. A single command starts PostgreSQL 16, MinIO object storage, and the store app. Migrations and demo data seeding run automatically on first boot.
+
+    **Start the stack:**
+
+    ```bash
+    docker compose up
+    ```
+
+    On first boot, the store:
+
+    1. Waits for PostgreSQL to be healthy
+    2. Runs all database migrations
+    3. Seeds demo data and creates the admin user (`admin@example.com` / `password123`)
+    4. Starts the Next.js server on port 3000
+
+    **Services started:**
+
+    | Service | Default port |
+    | --- | --- |
+    | Store app | 3000 |
+    | PostgreSQL | 5432 |
+    | MinIO API | 9000 |
+    | MinIO Console | 9001 |
+
+    **Required environment variable for production:**
+
+    ```bash
+    BETTER_AUTH_SECRET="$(openssl rand -base64 32)"
+    ```
+
+    Set this in a `.env` file alongside your `docker-compose.yml` before running. The default value in the Compose file is for development only.
+
+    **Storage:** Docker Compose uses MinIO (an S3-compatible object store) by default. File uploads are stored in the `86d-uploads` bucket and served at same-origin `/uploads/...` URLs.
+
+    To override default ports if they conflict with existing services:
+
+    ```bash
+    POSTGRES_PUBLISH_PORT=5433 STORE_PUBLISH_PORT=3001 MINIO_API_PUBLISH_PORT=9002 MINIO_CONSOLE_PUBLISH_PORT=9003 docker compose up
+    ```
+  </Tab>
+  <Tab title="Railway">
+    Railway provides managed PostgreSQL and runs the store as a containerized service. Click the button below to deploy directly from the 86d GitHub repository:
+
+    **Required environment variables on Railway:**
+
+    | Variable | Description |
+    | --- | --- |
+    | `DATABASE_URL` | Populated automatically by Railway's PostgreSQL add-on |
+    | `BETTER_AUTH_SECRET` | Generate with `openssl rand -base64 32` |
+    | `STORE_ID` | UUID that identifies your store (from seed output) |
+    | `86D_API_KEY` | Your 86d platform API key (enables SSO and platform features) |
+
+    Railway populates `DATABASE_URL` automatically when you attach a PostgreSQL service. Set `BETTER_AUTH_SECRET` in the Railway dashboard under **Variables** before your first deploy.
+
+    **Storage on Railway:** Use a Railway Object Storage bucket (S3-compatible). Set these additional variables:
+
+    ```bash
+    STORAGE_PROVIDER=s3
+    S3_ENDPOINT=<your-railway-bucket-endpoint>
+    S3_BUCKET=<your-bucket-name>
+    S3_ACCESS_KEY=<access-key>
+    S3_SECRET_KEY=<secret-key>
+    S3_VIRTUAL_HOSTED_STYLE=true
+    ```
+
+    <Tip>
+      Railway automatically sets `RAILWAY_PUBLIC_DOMAIN` at runtime. Use `APP_URL=https://$RAILWAY_PUBLIC_DOMAIN` to configure the store's public URL.
+    </Tip>
+  </Tab>
+  <Tab title="Vercel + Neon">
+    Vercel hosts the Next.js store app and Neon provides a serverless PostgreSQL database. Click the button below to clone the repository and deploy:
+
+    **Required environment variables on Vercel:**
+
+    | Variable | Description |
+    | --- | --- |
+    | `DATABASE_URL` | Neon PostgreSQL connection string (pooled) |
+    | `DATABASE_URL_UNPOOLED` | Neon PostgreSQL connection string (direct, used for migrations) |
+    | `BETTER_AUTH_SECRET` | Generate with `openssl rand -base64 32` |
+    | `STORE_ID` | UUID that identifies your store |
+    | `86D_API_KEY` | Your 86d platform API key |
+    | `STORAGE_PROVIDER` | Set to `vercel` |
+    | `BLOB_READ_WRITE_TOKEN` | From your Vercel Blob store |
+
+    **Storage on Vercel:** Set `STORAGE_PROVIDER=vercel` and connect a Vercel Blob store in the Vercel dashboard. The store uses Vercel Blob for all file uploads. Set `VERCEL_BLOB_STORAGE_HOSTNAME` to your blob store's public hostname.
+
+    <Note>
+      Neon provides both a pooled connection string (for the app) and a direct connection string (for migrations). Set both `DATABASE_URL` and `DATABASE_URL_UNPOOLED` to the appropriate Neon URLs from your project dashboard.
+    </Note>
+  </Tab>
+</Tabs>
+
+## Environment variables reference
+
+The table below covers the variables you are most likely to configure. For the full list, see `.env.example` in the repository.
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `DATABASE_URL_UNPOOLED` | Yes | Same connection string, used for migrations |
+| `BETTER_AUTH_SECRET` | Yes | Auth signing key — generate with `openssl rand -base64 32` |
+| `STORE_ID` | Recommended | UUID identifying this store. Required for 86d API integration |
+| `STORAGE_PROVIDER` | No | Storage backend: `local`, `vercel`, or `s3` (default: `local`) |
+| `86D_API_KEY` | No | Enables 86d platform API and admin SSO |
+| `APP_URL` | No | Public URL of your store (e.g. `https://mystore.com`) |
+
+## Storage providers
+
+Set `STORAGE_PROVIDER` to choose where uploaded files (product images, PDFs, etc.) are stored.
+
+| Value | Use case | Additional variables required |
+| --- | --- | --- |
+| `local` | Local development or Docker self-hosted | `STORAGE_LOCAL_DIR` (default: `./uploads`) |
+| `vercel` | Vercel deployments | `BLOB_READ_WRITE_TOKEN`, `VERCEL_BLOB_STORAGE_HOSTNAME` |
+| `s3` | MinIO, AWS S3, Cloudflare R2, Railway Bucket | `S3_ENDPOINT`, `S3_BUCKET`, `S3_REGION`, `S3_ACCESS_KEY`, `S3_SECRET_KEY` |
+
+<Warning>
+  The `local` storage provider writes files to the container's filesystem. In Docker, data persists as long as the container volume exists. Do not use `local` storage on Vercel or other stateless environments — files will be lost on every deploy.
+</Warning>
+
+## Post-deployment checklist
+
+After your first deploy, complete these steps before accepting real orders:
+
+- Change the default admin password at `/admin`
+- Set `BETTER_AUTH_SECRET` to a cryptographically random value (not the default)
+- Configure a payment provider (Stripe, PayPal, Square, or Braintree) via environment variables
+- Set `APP_URL` to your store's public domain
+- Verify uploads work by adding a product image in the admin

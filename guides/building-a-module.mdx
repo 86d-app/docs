@@ -1,0 +1,64 @@
+---
+title: "Build a Custom Module"
+description: "Scaffold, implement, and publish a custom 86d module — add storefront components, admin pages, and API endpoints using the same patterns as built-in modules."
+---
+
+Every feature in 86d is a module — including the ones that ship with the platform. You can write your own modules to add custom storefront components, admin pages, and API endpoints that behave identically to any official `@86d-app/*` module. Modules are isolated by design: they can only communicate with each other through declared contracts, never through direct imports.
+
+## Scaffold a new module
+
+<Steps>
+</Steps>
+
+## Admin sidebar navigation
+
+Admin pages appear in the store admin sidebar under the group you declare. The available top-level groups are: **Catalog**, **Sales**, **Customers**, **Fulfillment**, **Marketing**, **Content**, **Finance**, **Support**, and **System**.
+
+Each group has collapsible subgroups (for example, Sales → Orders, Cart, Billing). You can assign a subgroup explicitly via the `subgroup` field on an `AdminPage` declaration:
+
+```ts
+admin: {
+  pages: [
+    {
+      path: "/admin/my-feature",
+      component: "MyFeatureList",
+      label: "My Feature",
+      icon: "Star",
+      group: "Catalog",
+      subgroup: "Products",   // optional — overrides the default mapping
+    },
+  ],
+},
+```
+
+## Cross-module communication
+
+Modules are isolated — you cannot import another module's code directly. Use the `requires` / `exports` contract system instead:
+
+```ts
+// Declare what your module exports for others to read
+exports: {
+  read: ["myFeatureItems", "myFeatureCount"],
+},
+
+// Declare what your module needs from another module
+requires: {
+  read: ["cartItems"],   // will be available via ctx.contracts.cartItems
+},
+```
+
+The runtime validates contracts at startup and provides the data through `ctx.contracts` in your handlers.
+
+## Database access
+
+All database access goes through `ModuleDataService`, which the runtime provides as `ctx.data` inside the `init` function. Modules never import `@86d-app/db` or any ORM client directly — this keeps modules portable and testable:
+
+```ts
+init: async (ctx: ModuleContext) => {
+  // ctx.data is a ModuleDataService scoped to this module's schema
+  const controllers = createControllers(ctx.data);
+  return { controllers };
+},
+```
+
+For unit tests, import `@86d-app/core/test-utils`, which provides an in-memory mock data service so you can test your module without a real database connection.

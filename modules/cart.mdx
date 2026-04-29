@@ -1,0 +1,152 @@
+---
+title: "Carts"
+description: "Add shopping cart functionality to your 86d store. Supports guest and authenticated customers with configurable expiration, item limits, and a cart drawer."
+---
+
+The cart module handles the full shopping cart lifecycle for both guest visitors and authenticated customers. It exposes store endpoints for adding, updating, and removing items, ships a ready-to-use cart drawer component, and keeps prices snapshotted at the moment each item is added so totals stay accurate even when catalog prices change later.
+
+## Installation
+
+```sh
+npm install @86d-app/cart
+```
+
+## Configuration
+
+Initialize the module by passing it to your module client. Both options have sensible defaults and can be omitted entirely.
+
+```ts
+import cart from "@86d-app/cart";
+import { createModuleClient } from "@86d-app/core";
+
+const client = createModuleClient([
+  cart({
+    guestCartExpiration: 604800000, // 7 days in ms
+    maxItemsPerCart: 100,
+  }),
+]);
+```
+
+<ParamField path="guestCartExpiration" default="604800000" type="number">
+  Guest cart time-to-live in milliseconds. After this window elapses the cart is considered expired. Defaults to 7 days (604 800 000 ms).
+</ParamField>
+
+<ParamField path="maxItemsPerCart" default="100" type="number">
+  Maximum number of distinct line items a single cart may hold. Adding a new product beyond this limit returns an error. Updating the quantity of an existing item is not affected.
+</ParamField>
+
+## Store endpoints
+
+All store endpoints return a consistent response shape:
+
+```ts
+{
+  cart: Cart;
+  items: CartItem[];
+  itemCount: number;
+  subtotal: number;  // in cents
+}
+```
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/cart` | Add an item to the cart |
+| `GET` | `/cart/get` | Get the current cart with items and totals |
+| `PATCH` | `/cart/items/:id/update` | Update the quantity of a cart item |
+| `DELETE` | `/cart/items/:id/remove` | Remove a single item from the cart |
+| `POST` | `/cart/clear` | Remove all items from the cart |
+
+<Note>
+  `POST /cart/clear` removes all items but preserves the cart entity itself. The cart ID and customer/guest association remain intact.
+</Note>
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/carts` | List all carts (paginated) |
+| `GET` | `/admin/carts/:id` | Get a cart with its items |
+| `DELETE` | `/admin/carts/:id/delete` | Delete a cart |
+
+## Components
+
+### Cart
+
+The `Cart` component renders a slide-in drawer from the right side of the screen. It displays the customer's current cart items, subtotal, and a link to proceed to checkout. The component fetches all cart data on its own — no props are required.
+
+```mdx
+<Cart />
+```
+
+Place `Cart` in your main layout so it is available on every page:
+
+```mdx
+{/* templates/brisa/layout.mdx */}
+<Cart />
+<StoreNavbar actions={<CartButton />} ... />
+```
+
+### CartButton
+
+`CartButton` opens the cart drawer when clicked and shows a badge with the current item count when the cart is non-empty.
+
+```mdx
+<CartButton />
+```
+
+Typically added to the navbar actions slot:
+
+```mdx
+<StoreNavbar actions={<CartButton />} logo="..." />
+```
+
+### CartDrawerInner
+
+The inner content area of the cart drawer. Use this when you want to embed the cart contents directly on a page rather than inside a slide-out panel.
+
+```mdx
+<CartDrawerInner />
+```
+
+### CartFloatingPill
+
+A compact floating pill button that appears at the bottom of the viewport. Shows item count and opens the cart drawer on click. Useful as an alternative to `CartButton` on mobile-first layouts.
+
+```mdx
+<CartFloatingPill />
+```
+
+## Types
+
+```ts
+interface Cart {
+  id: string;
+  customerId?: string;    // set for authenticated customers
+  guestId?: string;       // set for guest sessions
+  status: "active" | "abandoned" | "converted";
+  expiresAt: Date;
+  metadata?: Record<string, unknown>;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface CartItem {
+  id: string;             // deterministic: `${cartId}_${productId}[_${variantId}]`
+  cartId: string;
+  productId: string;
+  variantId?: string;
+  quantity: number;
+  price: number;          // price snapshot at add-to-cart time, in cents
+  metadata?: Record<string, unknown>;
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+## Notes
+
+**Guest vs. authenticated carts.** Guest carts are identified by a `guestId` UUID. When a customer signs in, their guest cart can coexist alongside their authenticated cart — both carts reference different IDs. Your checkout flow is responsible for merging them if needed.
+
+**Deterministic item IDs.** Cart item IDs follow the pattern `${cartId}_${productId}[_${variantId}]`. This means adding the same product (or product \+ variant) twice merges the quantity into the existing line item rather than creating a duplicate. Different variants of the same product are always treated as separate line items.
+
+**Swappable storage.** The module ships with an in-memory adapter by default. You can swap in any persistence layer by replacing the adapter in your module configuration.

@@ -1,0 +1,147 @@
+---
+title: "Getting Started"
+description: "Set up a local 86d store using the CLI and Bun, or skip all configuration with a single Docker Compose command that starts the full stack."
+---
+
+The fastest way to get an 86d store running is `docker compose up` — it starts PostgreSQL, MinIO object storage, and the store app with zero configuration. If you prefer a local development setup with hot reloading and direct access to the codebase, use the CLI path below.
+
+<Steps>
+  <Step title="Check prerequisites">
+    Before you start, make sure you have the following installed:
+
+    | Tool | Minimum version |
+    | --- | --- |
+    | [Bun](https://bun.sh) | v1.3.6\+ |
+    | [Node.js](https://nodejs.org) | v23\+ |
+    | [PostgreSQL](https://www.postgresql.org) | v15\+ |
+
+    If you'd rather not install PostgreSQL locally, use the Docker Compose path at the bottom of this page — it handles the database for you.
+  </Step>
+  <Step title="Clone the repository and install dependencies">
+    Clone the 86d monorepo and install all workspace dependencies with Bun:
+
+    ```bash
+    git clone https://github.com/86d-app/86d
+    cd 86d
+    bun install
+    ```
+
+    The monorepo contains the store app (`apps/store/`), all modules (`modules/`), and supporting packages including the CLI.
+  </Step>
+  <Step title="Initialize your local store">
+    Run `86d init` to configure your environment, run database migrations, and seed demo data:
+
+    ```bash
+    bun run 86d init
+    ```
+
+    The `init` command:
+
+    - Creates a `.env` file from `.env.example` if one doesn't exist
+    - Prompts you to run database migrations against your `DATABASE_URL`
+    - Optionally seeds the database with demo products, categories, and an admin user
+    - Runs code generation to wire up module imports
+
+    <Tip>
+      To skip all interactive prompts (useful in scripts or CI), run `bun run 86d init --yes`.
+    </Tip>
+
+    After initialization, the seed output prints your default admin credentials:
+
+    ```text
+    Admin credentials:
+      Email:    admin@example.com
+      Password: password123
+    ```
+
+    <Warning>
+      Change the admin password immediately in any environment that is accessible from the internet.
+    </Warning>
+  </Step>
+  <Step title="Start the development server">
+    Start the store with hot reloading:
+
+    ```bash
+    bun run dev
+    ```
+
+    Once running, open:
+
+    - **Storefront** — [http://localhost:3000](http://localhost:3000)
+    - **Admin dashboard** — [http://localhost:3000/admin](http://localhost:3000/admin)
+
+    Sign in with `admin@example.com` / `password123`.
+  </Step>
+  <Step title="Add your first module">
+    Modules are enabled by listing them in `templates/brisa/config.json`. Open that file and add a module package name to the `modules` array:
+
+    ```json templates/brisa/config.json
+    {
+      "name": "My Store",
+      "modules": [
+        "@86d-app/cart",
+        "@86d-app/products",
+        "@86d-app/checkout",
+        "@86d-app/loyalty"
+      ]
+    }
+    ```
+
+    After saving, regenerate the module imports and API router:
+
+    ```bash
+    bun run 86d generate
+    ```
+
+    The module's components are now available in your MDX storefront templates, and its admin pages appear automatically in the sidebar at [http://localhost:3000/admin](http://localhost:3000/admin).
+
+    To scaffold a brand-new custom module from scratch:
+
+    ```bash
+    bun run 86d module create my-feature
+    ```
+
+    This creates `modules/my-feature/` with the full module structure — entry point, schema, store and admin endpoints, and component stubs.
+  </Step>
+</Steps>
+
+## Docker Compose alternative
+
+If you want a zero-configuration setup — no local PostgreSQL, no manual `.env` — use Docker Compose. A single command starts PostgreSQL, MinIO object storage, and the store app, and automatically runs migrations and seeds demo data on first boot:
+
+```bash
+docker compose up
+```
+
+Once the containers are healthy, the following services are available:
+
+| Service | URL |
+| --- | --- |
+| Store | [http://localhost:3000](http://localhost:3000) |
+| Admin | [http://localhost:3000/admin](http://localhost:3000/admin) |
+| MinIO API | [http://localhost:9000](http://localhost:9000) |
+| MinIO Console | [http://localhost:9001](http://localhost:9001) |
+
+Default admin credentials are `admin@example.com` / `password123`.
+
+<Note>
+  In the Docker Compose setup, file uploads are stored in MinIO and served at same-origin `/uploads/...` URLs. You do not need to expose the raw MinIO bucket URL to your users.
+</Note>
+
+If any default ports conflict with services already running on your machine, override them:
+
+```bash
+POSTGRES_PUBLISH_PORT=5433 STORE_PUBLISH_PORT=3001 docker compose up
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Deploy to production" icon="rocket" href="/deployment">
+    Push your store to Railway, Vercel, or a self-hosted Docker server.
+  </Card>
+
+  <Card title="Browse the module catalog" icon="grid" href="/modules/overview">
+    Explore the 99\+ modules you can enable in your store.
+  </Card>
+</CardGroup>

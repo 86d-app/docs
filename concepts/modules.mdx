@@ -1,0 +1,175 @@
+---
+title: "Modules"
+description: "Modules are isolated npm packages that add API endpoints, admin UI, and storefront components to your store. Compose exactly the features you need."
+---
+
+Modules are the building blocks of an 86d store. Each module is a self-contained npm package under the `@86d-app` scope that ships three things together: API endpoints your storefront calls, admin UI pages that appear in the dashboard, and React components you can drop directly into your MDX templates. You add or remove features by editing a single list in `config.json` — there are no plugins to configure, no monolithic bundles to untangle.
+
+## What a module provides
+
+Every module in the `@86d-app` scope is structured the same way:
+
+- **Store endpoints** — public API routes mounted at `/api/[module-path]/...`
+- **Admin endpoints** — protected routes accessible only to authenticated admin users
+- **Store components** — React components (e.g. `<Cart />`, `<ProductGrid />`) registered automatically in the MDX component registry
+- **Admin components** — management UI pages that appear in the relevant group in the sidebar
+
+Modules depend only on `@86d-app/core` and communicate with each other through declared contracts, not direct imports. This keeps every module independently replaceable.
+
+## Enabling modules in config.json
+
+The `modules` field in `templates/brisa/config.json` controls which modules are active. After editing it, run `bun run generate:modules` to wire everything in.
+
+```json config.json
+{
+  "modules": [
+    "@86d-app/cart",
+    "@86d-app/products",
+    "@86d-app/checkout",
+    "@86d-app/reviews"
+  ]
+}
+```
+
+<Steps>
+  <Step title="Edit config.json">
+    Add the module package name to the `modules` array in `templates/brisa/config.json`.
+  </Step>
+  <Step title="Regenerate module imports">
+    ```bash
+    bun run generate:modules
+    ```
+
+    This installs any missing packages, updates `package.json`, and regenerates `modules.ts` with static imports from every enabled module.
+  </Step>
+  <Step title="Use the components in MDX">
+    Components from newly enabled modules are immediately available in any MDX template file — no import statements needed.
+  </Step>
+</Steps>
+
+<Note>
+  Setting `"modules": "*"` in `config.json` enables all installed modules. This is the default for the brisa starter template.
+</Note>
+
+## Using module components in MDX
+
+Once a module is enabled, its components are auto-registered in the MDX component registry. You use them like any other JSX element inside your `.mdx` files:
+
+```mdx index.mdx
+<FeaturedProducts limit={4} title="Staff Picks" />
+
+<CollectionGrid featured />
+
+<Reviews productId={id} />
+
+<Cart />
+```
+
+No import statements are required — the code generator handles that automatically.
+
+## Module categories
+
+86d ships more than 99 modules. Here is a breakdown by category:
+
+<AccordionGroup>
+  <Accordion title="Catalog">
+    Core product data and discovery.
+
+    | Module | Package |
+    | --- | --- |
+    | Products | `@86d-app/products` |
+    | Collections | `@86d-app/collections` |
+    | Brands | `@86d-app/brands` |
+    | Bundles | `@86d-app/bundles` |
+    | Inventory | `@86d-app/inventory` |
+    | Search | `@86d-app/search` |
+    | Product Q&A | `@86d-app/product-qa` |
+    | Reviews | `@86d-app/reviews` |
+    | Comparisons | `@86d-app/comparisons` |
+    | Recently Viewed | `@86d-app/recently-viewed` |
+    | Recommendations | `@86d-app/recommendations` |
+  </Accordion>
+
+  <Accordion title="Shopping">
+    Cart, checkout, and purchase flow.
+
+    | Module | Package |
+    | --- | --- |
+    | Cart | `@86d-app/cart` |
+    | Checkout | `@86d-app/checkout` |
+    | Discounts | `@86d-app/discounts` |
+    | Giftcards | `@86d-app/giftcards` |
+    | Wishlist | `@86d-app/wishlist` |
+    | Bulk Pricing | `@86d-app/bulk-pricing` |
+    | Flash Sales | `@86d-app/flash-sales` |
+    | Auctions | `@86d-app/auctions` |
+    | Subscriptions | `@86d-app/subscriptions` |
+    | Preorders | `@86d-app/preorders` |
+    | Backorders | `@86d-app/backorders` |
+  </Accordion>
+
+  <Accordion title="Marketing">
+    Growth, retention, and content.
+
+    | Module | Package |
+    | --- | --- |
+    | Newsletter | `@86d-app/newsletter` |
+    | Blog | `@86d-app/blog` |
+    | Affiliates | `@86d-app/affiliates` |
+    | Loyalty | `@86d-app/loyalty` |
+    | Referrals | `@86d-app/referrals` |
+    | Gamification | `@86d-app/gamification` |
+    | Announcements | `@86d-app/announcements` |
+    | Social Proof | `@86d-app/social-proof` |
+    | SEO | `@86d-app/seo` |
+  </Accordion>
+
+  <Accordion title="Fulfillment">
+    Shipping, delivery, and post-purchase.
+
+    | Module | Package |
+    | --- | --- |
+    | Orders | `@86d-app/orders` |
+    | Fulfillment | `@86d-app/fulfillment` |
+    | Shipping | `@86d-app/shipping` |
+    | Returns | `@86d-app/returns` |
+    | Digital Downloads | `@86d-app/digital-downloads` |
+    | Store Pickup | `@86d-app/store-pickup` |
+    | Delivery Slots | `@86d-app/delivery-slots` |
+    | DoorDash | `@86d-app/doordash` |
+    | Uber Direct | `@86d-app/uber-direct` |
+  </Accordion>
+
+  <Accordion title="Channels">
+    Sell on external platforms.
+
+    | Module | Package |
+    | --- | --- |
+    | Amazon | `@86d-app/amazon` |
+    | eBay | `@86d-app/ebay` |
+    | Etsy | `@86d-app/etsy` |
+    | Google Shopping | `@86d-app/google-shopping` |
+    | Facebook Shop | `@86d-app/facebook-shop` |
+    | Instagram Shop | `@86d-app/instagram-shop` |
+    | TikTok Shop | `@86d-app/tiktok-shop` |
+    | Walmart | `@86d-app/walmart` |
+  </Accordion>
+</AccordionGroup>
+
+## Installing community modules from npm
+
+Modules do not have to come from the `@86d-app` scope. Any npm package that follows the 86d module contract works the same way. Add the package name to `config.json` and run `bun run generate:modules` — the generator detects that it is not a workspace package and installs it from npm automatically.
+
+```json config.json
+{
+  "modules": [
+    "@86d-app/cart",
+    "@86d-app/products",
+    "@some-company/analytics-widget"
+  ]
+}
+```
+
+<Tip>
+  You can enable and disable modules between environments by keeping separate `config.json` files — for example, including a `@86d-app/debug-tools` module in development but omitting it from production.
+</Tip>

@@ -1,0 +1,258 @@
+---
+title: "Payment Gateways"
+description: "Connect a payment gateway to your 86d store — install the payment module, set your API keys, and configure webhooks for real-time order status updates."
+---
+
+86d separates payment logic into two layers: the `@86d-app/payments` module manages the intent lifecycle (create, confirm, cancel, refund), and a provider module (Stripe, PayPal, Square, or Braintree) handles the actual API communication. This lets you swap payment providers without touching your checkout flow. All provider modules implement HMAC webhook verification using the Web Crypto API directly — no extra crypto dependencies required. Webhooks return `401` on invalid or expired signatures.
+
+<Tabs>
+  <Tab title="Stripe">
+    ## Install
+
+    ```bash
+    npm install @86d-app/stripe @86d-app/payments
+    ```
+
+    ## Add to config.json
+
+    ```json
+    {
+        "modules": [
+            "@86d-app/payments",
+            "@86d-app/stripe"
+        ],
+        "moduleOptions": {
+            "@86d-app/stripe": {
+                "apiKey": "sk_live_...",
+                "webhookSecret": "whsec_..."
+            }
+        }
+    }
+    ```
+
+    Then run:
+
+    ```bash
+    86d generate
+    ```
+
+    ## Set environment variables
+
+    Set these in your deployment environment (`.env.local` for local dev):
+
+    | Variable | Description |
+    | --- | --- |
+    | `STRIPE_SECRET_KEY` | Your Stripe secret key — `sk_live_...` for production, `sk_test_...` for testing |
+    | `STRIPE_WEBHOOK_SECRET` | Signing secret from your Stripe webhook endpoint — `whsec_...` |
+
+    ## Configure a Stripe webhook
+
+    In the [Stripe dashboard](https://dashboard.stripe.com/webhooks), create a webhook endpoint pointing to:
+
+    ```text
+    POST https://your-store.com/api/stripe/webhook
+    ```
+
+    Select at minimum these events:
+
+    - `payment_intent.succeeded`
+    - `payment_intent.payment_failed`
+    - `payment_intent.canceled`
+    - `charge.refunded`
+
+    Copy the signing secret (`whsec_...`) and set it as `STRIPE_WEBHOOK_SECRET`.
+
+    ## How the payment flow works
+
+    1. **Create intent** — At checkout, the server calls `provider.createIntent({ amount, currency })` against the Stripe API. This returns a `clientSecret` in `providerMetadata`.
+    2. **Confirm on the client** — Your checkout UI uses Stripe.js to call `confirmCardPayment(clientSecret)` with the customer's card details. No raw card data ever touches your server.
+    3. **Webhook confirms** — Stripe sends a `payment_intent.succeeded` event to `/api/stripe/webhook`. The module verifies the HMAC-SHA256 signature using a timing-safe comparison, then emits a `payment.completed` domain event that the `payments` module uses to finalize the order.
+
+    ## Webhook security
+
+    The Stripe module verifies each incoming webhook using the Stripe signing scheme:
+
+    ```text
+    signed_payload = <timestamp> + "." + <raw_body>
+    expected_sig   = HMAC-SHA256(webhook_secret, signed_payload)
+    ```
+
+    Signatures are compared with constant-time comparison to prevent timing attacks. Webhooks with timestamps older than 5 minutes are rejected with `401` to protect against replay attacks. Without `webhookSecret` set, all requests are accepted — useful for local development with the Stripe CLI.
+
+    ## Status mapping
+
+    | Stripe status | 86d status |
+    | --- | --- |
+    | `succeeded` | `succeeded` |
+    | `canceled` | `cancelled` |
+    | `processing`, `requires_capture` | `processing` |
+    | `requires_payment_method`, `requires_confirmation`, `requires_action` | `pending` |
+  </Tab>
+  <Tab title="PayPal">
+    ## Install
+
+    ```bash
+    npm install @86d-app/paypal @86d-app/payments
+    ```
+
+    ## Add to config.json
+
+    ```json
+    {
+        "modules": [
+            "@86d-app/payments",
+            "@86d-app/paypal"
+        ],
+        "moduleOptions": {
+            "@86d-app/paypal": {
+                "clientId": "...",
+                "clientSecret": "..."
+            }
+        }
+    }
+    ```
+
+    Then run:
+
+    ```bash
+    86d generate
+    ```
+
+    ## Set environment variables
+
+    | Variable | Description |
+    | --- | --- |
+    | `PAYPAL_CLIENT_ID` | Your PayPal REST API client ID |
+    | `PAYPAL_CLIENT_SECRET` | Your PayPal REST API client secret |
+
+    ## Configure a PayPal webhook
+
+    In the [PayPal developer dashboard](https://developer.paypal.com/dashboard/), create a webhook pointing to:
+
+    ```text
+    POST https://your-store.com/api/paypal/webhook
+    ```
+
+    Subscribe to `PAYMENT.CAPTURE.COMPLETED` and `PAYMENT.CAPTURE.DENIED` at minimum.
+
+    ## How the payment flow works
+
+    1. The server creates a PayPal order via the PayPal Orders API and returns the order ID to the client.
+    2. Your checkout UI renders the PayPal button SDK, which handles the buyer authentication flow.
+    3. On approval, the client notifies the server, which captures the order.
+    4. PayPal sends a webhook to confirm the capture; the module verifies the signature and emits `payment.completed`.
+  </Tab>
+  <Tab title="Square">
+    ## Install
+
+    ```bash
+    npm install @86d-app/square @86d-app/payments
+    ```
+
+    ## Add to config.json
+
+    ```json
+    {
+        "modules": [
+            "@86d-app/payments",
+            "@86d-app/square"
+        ],
+        "moduleOptions": {
+            "@86d-app/square": {
+                "accessToken": "...",
+                "webhookSignatureKey": "..."
+            }
+        }
+    }
+    ```
+
+    Then run:
+
+    ```bash
+    86d generate
+    ```
+
+    ## Set environment variables
+
+    | Variable | Description |
+    | --- | --- |
+    | `SQUARE_ACCESS_TOKEN` | Your Square access token (sandbox or production) |
+    | `SQUARE_WEBHOOK_SIGNATURE_KEY` | The signature key from your Square webhook subscription |
+
+    ## Configure a Square webhook
+
+    In the [Square Developer dashboard](https://developer.squareup.com/apps), open your application, go to **Webhooks**, and create a subscription pointing to:
+
+    ```text
+    POST https://your-store.com/api/square/webhook
+    ```
+
+    Subscribe to `payment.created` and `payment.updated` events. Copy the signature key and set it as `SQUARE_WEBHOOK_SIGNATURE_KEY`.
+
+    ## How the payment flow works
+
+    1. The server creates a Square payment using the Payments API with a nonce generated by Square Web Payments SDK on the client.
+    2. On success, Square sends a `payment.created` webhook to confirm capture.
+    3. The module verifies the HMAC-SHA256 signature and emits `payment.completed`.
+  </Tab>
+  <Tab title="Braintree">
+    ## Install
+
+    ```bash
+    npm install @86d-app/braintree @86d-app/payments
+    ```
+
+    ## Add to config.json
+
+    ```json
+    {
+        "modules": [
+            "@86d-app/payments",
+            "@86d-app/braintree"
+        ],
+        "moduleOptions": {
+            "@86d-app/braintree": {
+                "merchantId": "...",
+                "publicKey": "...",
+                "privateKey": "..."
+            }
+        }
+    }
+    ```
+
+    Then run:
+
+    ```bash
+    86d generate
+    ```
+
+    ## Set environment variables
+
+    | Variable | Description |
+    | --- | --- |
+    | `BRAINTREE_MERCHANT_ID` | Your Braintree merchant ID |
+    | `BRAINTREE_PUBLIC_KEY` | Your Braintree public key |
+    | `BRAINTREE_PRIVATE_KEY` | Your Braintree private key |
+
+    ## Configure a Braintree webhook
+
+    In the [Braintree Control Panel](https://www.braintreegateway.com/login), navigate to **Settings → Webhooks** and create a webhook pointing to:
+
+    ```text
+    POST https://your-store.com/api/braintree/webhook
+    ```
+
+    Subscribe to `transaction_settled` and `transaction_settlement_declined` notifications.
+
+    ## How the payment flow works
+
+    1. The server generates a client token using the Braintree SDK and returns it to the checkout UI.
+    2. Braintree.js uses the token to render the Drop-in UI or Card Fields; the customer submits payment.
+    3. The client sends the resulting payment nonce to the server, which submits the transaction to Braintree.
+    4. Braintree sends a webhook to confirm settlement; the module verifies the signature and emits `payment.completed`.
+  </Tab>
+</Tabs>
+
+## Webhook security across all providers
+
+All four payment modules implement the same security model: webhook secrets are captured in a closure at module init time; each incoming request reads the raw body before any JSON parsing (required for HMAC integrity); signatures are verified with timing-safe comparison; and replay attacks are blocked by timestamp tolerance. No external crypto library is used — verification runs on the Web Crypto API built into the runtime, keeping every payment module publishable as a standalone npm package.

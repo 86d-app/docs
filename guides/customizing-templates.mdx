@@ -1,0 +1,174 @@
+---
+title: "Template and Theme Customizations"
+description: "Change your store's name, colors, typography, logo, and page layouts by editing template MDX files and config.json — no framework knowledge required."
+---
+
+A template controls everything your customers see: the global layout, color palette, typography, the content of every page, and the assets in your header and footer. All of this lives in `templates/brisa/` — a plain directory of MDX files and a single `config.json`. You do not need to touch the framework, modify the Next.js app, or run any special tooling. Edit the files, save, and your dev server picks up the change immediately.
+
+## What templates contain
+
+| File | Controls |
+| --- | --- |
+| `config.json` | Store name, color tokens, logo and favicon paths, enabled modules |
+| `layout.mdx` | Global page wrapper (navbar, main content area, footer) |
+| `index.mdx` | Homepage content |
+| `products/layout.mdx` | Product listing page |
+| `products/[slug]/layout.mdx` | Individual product pages |
+| `collections/layout.mdx` | Collection listing page |
+| `blog/layout.mdx` | Blog listing page |
+| `about.mdx`, `contact.mdx`, etc. | Static pages |
+
+## Step 1 — Create a custom template (optional)
+
+If you want to start from a copy of the default `brisa` template rather than editing it in place, scaffold a new one:
+
+```bash
+86d template create my-store
+```
+
+This creates `templates/my-store/` with the full Brisa template copied in. You can then edit `config.json` to point to it, or keep using `brisa` and customise it directly.
+
+## Step 2 — Set your store name and colors
+
+Open `templates/brisa/config.json`. The top section sets your store identity:
+
+```json
+{
+    "theme": "brisa",
+    "name": "My Store",
+    "favicon": "/assets/favicon.svg",
+    "icon": {
+        "light": "/assets/icon/light.svg",
+        "dark": "/assets/icon/dark.svg"
+    },
+    "logo": {
+        "light": "/assets/logo/light.svg",
+        "dark": "/assets/logo/dark.svg"
+    }
+}
+```
+
+Colors are defined as OKLCH tokens under `variables.light` and `variables.dark`. Every token maps to a CSS custom property applied at runtime. Change the `primary` token to update your main brand color across all buttons and interactive elements:
+
+```json
+{
+    "variables": {
+        "light": {
+            "background": "oklch(0.995 0 0)",
+            "foreground": "oklch(0.13 0.005 285)",
+            "primary": "oklch(0.18 0.005 285)",
+            "primary-foreground": "oklch(0.985 0 0)",
+            "secondary": "oklch(0.965 0.002 285)",
+            "accent": "oklch(0.96 0.003 285)",
+            "muted": "oklch(0.965 0.002 285)",
+            "muted-foreground": "oklch(0.5 0.01 285)",
+            "border": "oklch(0.915 0.004 285)"
+        },
+        "dark": {
+            "background": "oklch(0.12 0.005 285)",
+            "foreground": "oklch(0.96 0.005 285)",
+            "primary": "oklch(0.92 0.005 285)",
+            "primary-foreground": "oklch(0.16 0.005 285)"
+        }
+    }
+}
+```
+
+OKLCH gives you perceptually uniform lightness, meaning a `primary` at `oklch(0.5 0.2 30)` (a warm orange) will have the same perceived brightness as `oklch(0.5 0.2 250)` (a cool blue). Adjust the first number for lightness (0–1), the second for chroma (saturation), and the third for hue angle (0–360).
+
+## Step 3 — Edit MDX pages
+
+MDX pages are where you arrange module components and write content. Open `templates/brisa/index.mdx` to see how the default homepage is built:
+
+```mdx
+import Link from "next/link";
+
+{/* Hero section */}
+<section className="mx-auto max-w-7xl px-4 pt-20 pb-16">
+  <div className="text-center">
+    <h1 className="font-display text-5xl font-bold tracking-tight">
+      Welcome to my store
+    </h1>
+    <p className="mt-4 text-muted-foreground">
+      Thoughtfully selected products for everyday life.
+    </p>
+    <Link href="/products" className="mt-8 inline-flex rounded-full bg-foreground px-6 py-2.5 text-sm text-background">
+      Shop now
+    </Link>
+  </div>
+</section>
+
+{/* Featured products from the @86d-app/products module */}
+<section className="mx-auto max-w-7xl px-4 pt-16">
+  <FeaturedProducts limit={4} title="Featured" />
+</section>
+
+{/* Collections from the @86d-app/collections module */}
+<section className="mx-auto max-w-7xl px-4 pt-16">
+  <FeaturedCollections />
+</section>
+
+{/* Newsletter from the @86d-app/newsletter module */}
+<section className="mx-auto max-w-7xl px-4 pt-16 pb-24">
+  <NewsletterInline
+    title="Stay in the loop"
+    description="New arrivals, exclusive offers, and store updates."
+    source="homepage"
+  />
+</section>
+```
+
+Every component you see (`FeaturedProducts`, `FeaturedCollections`, `NewsletterInline`) comes from its corresponding module. Components are available in MDX automatically once their module is listed in `config.json` and you have run `86d generate`. Standard HTML, JSX, and Tailwind utility classes work anywhere in MDX files.
+
+### Page-specific MDX and detail pages
+
+Layout files for dynamic routes receive props from the framework. For example, `products/[slug]/layout.mdx` receives `props.slug` automatically:
+
+```mdx
+{/* templates/brisa/products/[slug]/layout.mdx */}
+<div className="mx-auto max-w-7xl px-4 py-12">
+  <ProductDetail slug={props.slug} />
+  <ProductReviews />
+  <ProductRecommendations productId={props.slug} />
+</div>
+```
+
+## Numbered MDX variants
+
+Components can have multiple design variants stored as numbered MDX files (`1.mdx`, `2.mdx`, `3.mdx`). The `.tsx` logic file imports the numbered variant it wants:
+
+```tsx
+// The Navbar component imports its presentation variant
+import One from "./1.mdx";
+
+export function Navbar() {
+  const [isOpen, setIsOpen] = useState(false);
+  return <One items={navItems} isOpen={isOpen} setIsOpen={setIsOpen} />;
+}
+```
+
+Switching to a different design variant is a one-line change in the `.tsx` file. The business logic — data fetching, state management, event handlers — stays completely unchanged.
+
+## Update your logo and favicon
+
+Replace the SVG files in `templates/brisa/assets/` and update the paths in `config.json` if they change:
+
+```json
+{
+    "favicon": "/assets/favicon.svg",
+    "icon": {
+        "light": "/assets/icon/light.svg",
+        "dark": "/assets/icon/dark.svg"
+    },
+    "logo": {
+        "light": "/assets/logo/light.svg",
+        "dark": "/assets/logo/dark.svg"
+    }
+}
+```
+
+- **`favicon`** — The browser tab icon (typically 32×32).
+- **`icon.light` / `icon.dark`** — A compact icon-only mark used in places like the mobile menu or compact navbar. Use separate light/dark variants so the icon is readable in both themes.
+- **`logo.light` / `logo.dark`** — The full logotype shown in the header and footer.
+
+SVG assets use hardcoded fill colors (e.g. `#111` for dark, `#f5f5f5` for light) rather than CSS custom properties, because they may be loaded outside the theme context for things like Open Graph images.

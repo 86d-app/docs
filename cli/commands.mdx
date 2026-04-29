@@ -1,0 +1,197 @@
+---
+title: "Flags and Usage Reference"
+description: "Complete reference for every 86d CLI command — flags, arguments, and examples for dev, init, status, module, template, and generate."
+---
+
+This page documents every command available in the `86d` CLI. For a high-level overview and a typical workflow, see [CLI overview](/cli/overview).
+
+---
+
+## `86d dev`
+
+Starts the Next.js store development server.
+
+```sh
+86d dev
+```
+
+**Flags**
+
+| Flag | Description |
+| --- | --- |
+| `--port N` | Listen on port `N` instead of the default |
+
+**Example**
+
+```sh
+86d dev --port 3001
+```
+
+---
+
+## `86d init`
+
+Configures your local store. This command:
+
+- Sets up your `.env` file
+- Installs dependencies
+- Runs database migrations (if `DATABASE_URL` is set and reachable)
+- Seeds demo data (if `DATABASE_URL` is set and reachable)
+
+When run interactively, `86d init` prompts you before running migrations and before seeding. On success it prints your admin credentials.
+
+In a non-TTY environment (CI pipelines, shell scripts, pipes), database setup is skipped automatically because there is no interactive stdin.
+
+**Flags**
+
+| Flag | Description |
+| --- | --- |
+| `--yes`, `-y` | Skip all interactive prompts and auto-confirm migrate and seed |
+
+<CodeGroup>
+
+```sh Interactive
+86d init
+```
+
+```sh Non-interactive (CI)
+86d init --yes
+```
+
+</CodeGroup>
+
+---
+
+## `86d status`
+
+Shows the health of your project: database connectivity, the currently active template, and which modules are enabled.
+
+```sh
+86d status
+```
+
+Run this after `86d init` to verify your setup is correct before starting development.
+
+---
+
+## `86d module create <name>`
+
+Scaffolds a new module at `modules/<name>/` with a complete structure: entry point, schema, store and admin endpoints, and component stubs.
+
+```sh
+86d module create loyalty-points
+```
+
+After creating a module, wire it into your store:
+
+1. Add `"@86d-app/<name>"` to your active template's `config.json`
+2. Run `86d generate` to regenerate module imports and the API router
+
+---
+
+## `86d module list`
+
+Lists all modules available in your project.
+
+```sh
+86d module list
+```
+
+---
+
+## `86d module info <name>`
+
+Shows details about a specific module: version, enabled status, and exported endpoints.
+
+```sh
+86d module info loyalty-points
+```
+
+---
+
+## `86d module enable <name>`
+
+Enables a module in your active template's `config.json` and regenerates the necessary imports.
+
+```sh
+86d module enable loyalty-points
+```
+
+This is equivalent to manually adding the module to `config.json` and running `86d generate`.
+
+---
+
+## `86d module disable <name>`
+
+Disables a module in your active template's `config.json` and regenerates imports.
+
+```sh
+86d module disable loyalty-points
+```
+
+This is equivalent to manually removing the module from `config.json` and running `86d generate`.
+
+---
+
+## `86d template create <name>`
+
+Copies the default `brisa` template to `templates/<name>/`. Use this as the starting point for a custom store design.
+
+```sh
+86d template create minimal
+```
+
+After creating a template, customize its MDX files, color tokens, and layout to build your design.
+
+---
+
+## `86d template list`
+
+Lists all templates in your project.
+
+```sh
+86d template list
+```
+
+---
+
+## `86d template activate <name>`
+
+Switches the store to use a different template.
+
+```sh
+86d template activate minimal
+```
+
+---
+
+## `86d generate`
+
+Runs all code generation: module imports, the API router, and component documentation. Run this after editing `config.json` to add or remove modules.
+
+```sh
+86d generate
+```
+
+**Sub-commands**
+
+| Command | Description |
+| --- | --- |
+| `86d generate modules` | Regenerate module imports and the API router only |
+| `86d generate components` | Regenerate component documentation only |
+
+<CodeGroup>
+
+```sh All generators
+86d generate
+```
+
+```sh Module imports only
+86d generate modules
+```
+
+```sh Component docs only
+86d generate components
+```
+
+</CodeGroup>

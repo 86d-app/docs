@@ -1,0 +1,185 @@
+---
+title: "MDX Templates"
+description: "Templates bundle MDX pages, a config.json, and OKLCH color tokens to define your store's look and content. Swap designs without touching business logic."
+---
+
+A template is a folder that contains everything visual about your store: the MDX files that compose each page, a `config.json` that lists which modules are active and what colors to use, and any global CSS overrides. When you change a template, the store's look changes completely — but the underlying module logic, API routes, and data stay exactly the same.
+
+The default template is **brisa**, located at `templates/brisa/`. It is the starting point for every new store.
+
+## Template file structure
+
+```text
+templates/brisa/
+├── config.json          # Modules list, theme name, color tokens, asset paths
+├── layout.mdx           # Global page wrapper (Navbar + main content + Footer)
+├── index.mdx            # Homepage content
+├── about.mdx
+├── contact.mdx
+├── terms.mdx
+├── privacy.mdx
+├── products/
+│   ├── layout.mdx       # Product listing page
+│   └── [slug]/
+│       └── layout.mdx   # Product detail page (receives props.slug)
+├── collections/
+│   ├── layout.mdx
+│   └── [slug]/layout.mdx
+├── blog/
+│   ├── layout.mdx
+│   └── [slug]/layout.mdx
+├── track/index.mdx      # Order tracking
+├── search/index.mdx     # Search results
+└── assets/              # Favicon, logos (light + dark variants)
+```
+
+## config.json
+
+`config.json` is the single source of truth for your store's configuration. It controls which modules are active, what the store is named, and how every color is rendered — in both light and dark mode.
+
+```json config.json
+{
+  "theme": "brisa",
+  "name": "86d Starter Kit",
+  "favicon": "/assets/favicon.svg",
+  "icon": {
+    "light": "/assets/icon/light.svg",
+    "dark": "/assets/icon/dark.svg"
+  },
+  "logo": {
+    "light": "/assets/logo/light.svg",
+    "dark": "/assets/logo/dark.svg"
+  },
+  "modules": "*",
+  "moduleOptions": {
+    "@86d-app/cart": {
+      "guestCartExpiration": 604800000,
+      "maxItemsPerCart": 100
+    }
+  },
+  "variables": {
+    "light": {
+      "background": "oklch(0.995 0 0)",
+      "foreground": "oklch(0.13 0.005 285)",
+      "primary": "oklch(0.18 0.005 285)",
+      "primary-foreground": "oklch(0.985 0 0)"
+    },
+    "dark": {
+      "background": "oklch(0.12 0.005 285)",
+      "foreground": "oklch(0.96 0.005 285)",
+      "primary": "oklch(0.92 0.005 285)",
+      "primary-foreground": "oklch(0.16 0.005 285)"
+    }
+  }
+}
+```
+
+### Key config fields
+
+| Field | Description |
+| --- | --- |
+| `theme` | The template name. Must match the folder name under `templates/`. |
+| `name` | Your store's display name, shown in the navbar and browser tab. |
+| `modules` | `"*"` to enable all installed modules, or an explicit array of package names. |
+| `moduleOptions` | Per-module configuration passed to the module's `init` function at startup. |
+| `variables.light` | OKLCH color tokens applied as CSS custom properties in light mode. |
+| `variables.dark` | OKLCH color tokens applied as CSS custom properties in dark mode. |
+
+## OKLCH color customization
+
+Colors are defined as [OKLCH](https://oklch.com/) values — a perceptually uniform color space that makes it easy to control lightness and chroma consistently across a palette. Every token in `variables.light` and `variables.dark` maps directly to a CSS custom property used by Tailwind.
+
+<CodeGroup>
+
+```json Light mode (excerpt)
+"variables": {
+  "light": {
+    "radius": "0.5rem",
+    "background": "oklch(0.995 0 0)",
+    "foreground": "oklch(0.13 0.005 285)",
+    "primary": "oklch(0.18 0.005 285)",
+    "primary-foreground": "oklch(0.985 0 0)",
+    "secondary": "oklch(0.965 0.002 285)",
+    "muted": "oklch(0.965 0.002 285)",
+    "muted-foreground": "oklch(0.5 0.01 285)",
+    "border": "oklch(0.915 0.004 285)",
+    "destructive": "oklch(0.577 0.245 27.325)"
+  }
+}
+```
+
+```json Dark mode (excerpt)
+"variables": {
+  "dark": {
+    "background": "oklch(0.12 0.005 285)",
+    "foreground": "oklch(0.96 0.005 285)",
+    "primary": "oklch(0.92 0.005 285)",
+    "primary-foreground": "oklch(0.16 0.005 285)",
+    "secondary": "oklch(0.22 0.005 285)",
+    "muted": "oklch(0.22 0.005 285)",
+    "muted-foreground": "oklch(0.62 0.01 285)",
+    "border": "oklch(1 0 0 / 8%)"
+  }
+}
+```
+
+</CodeGroup>
+
+<Tip>
+  OKLCH values follow the format `oklch(lightness chroma hue)`. To shift your brand color, adjust the hue value (0–360) on `primary` and keep lightness/chroma consistent across the palette for a harmonious result.
+</Tip>
+
+## The two-file component pattern
+
+Every visual component in a template follows a strict two-file convention:
+
+- **`.tsx`** — business logic only: state, data fetching, event handlers, and configuration
+- **`.mdx`** — presentation only: pure render template that receives all data as props
+
+```tsx navbar/index.tsx
+import One from "./1.mdx";
+
+export function Navbar() {
+  const [isOpen, setIsOpen] = useState(false);
+  return <One items={items} isOpen={isOpen} setIsOpen={setIsOpen} />;
+}
+```
+
+```mdx navbar/1.mdx
+<nav>
+  {props.items.map(item => (
+    <a href={item.href}>{item.label}</a>
+  ))}
+</nav>
+```
+
+Numbered MDX files (`1.mdx`, `2.mdx`, `3.mdx`) are **design variants** of the same component. Switching themes means swapping which numbered file the `.tsx` imports — the business logic is untouched.
+
+## Creating a new template
+
+<Steps>
+  <Step title="Scaffold from brisa">
+    ```bash
+    bun run 86d template create my-theme
+    ```
+
+    This copies the brisa template into `templates/my-theme/` as a starting point.
+  </Step>
+  <Step title="Update config.json">
+    Change the `theme` field to your new template name and adjust the `name`, colors, and module list.
+  </Step>
+  <Step title="Edit your MDX pages">
+    Modify `layout.mdx`, `index.mdx`, and any page-level MDX files to match your design. Module components are available by name — no imports needed.
+  </Step>
+  <Step title="Restart the dev server">
+    ```bash
+    bun run dev
+    ```
+
+    Changes to `config.json` take effect on restart. MDX edits hot-reload automatically.
+  </Step>
+</Steps>
+
+<Warning>
+  If you rename your template folder, make sure the `theme` field in your `config.json` matches the new folder name exactly, or the build will fail.
+</Warning>

@@ -1,0 +1,83 @@
+---
+title: "What is 86d?"
+description: "86d is an open-source commerce platform of 99+ independent modules. Compose your exact feature set, own your data, and deploy anywhere without vendor lock-in."
+---
+
+86d is a modular, open-source commerce platform where every feature ships as an independent npm package. Instead of a monolithic system where you take everything or nothing, 86d lets you compose precisely the commerce capabilities your store needs — products, cart, checkout, subscriptions, loyalty, multi-channel selling, and 99\+ more — then deploy it to infrastructure you control.
+
+## The module system
+
+Every piece of functionality in 86d is a module: an isolated npm package that contributes API endpoints, admin UI, and storefront components. Modules depend only on `@86d-app/core` and cannot import each other directly — cross-module communication happens through declared contracts (`requires` / `exports`). This isolation means you can add, remove, or replace any module without touching the rest of your store.
+
+You control which modules your store loads by editing `templates/brisa/config.json`:
+
+```json templates/brisa/config.json
+{
+  "name": "My Store",
+  "modules": [
+    "@86d-app/cart",
+    "@86d-app/products",
+    "@86d-app/checkout",
+    "@86d-app/orders"
+  ]
+}
+```
+
+After updating `config.json`, run `bun run 86d generate` to regenerate the module imports and API router. Module components become immediately available in your MDX storefront templates.
+
+Each module follows a consistent structure:
+
+```text
+modules/<name>/src/
+  index.ts              Factory, types, and admin navigation
+  schema.ts             Zod schemas
+  controllers.ts        Business logic
+  store/endpoints/      Public API endpoints
+  store/components/     Customer-facing MDX components
+  admin/endpoints/      Protected admin endpoints
+  admin/components/     Admin UI components
+```
+
+## Deployment modes
+
+86d supports two deployment paths depending on whether you want to run the full platform yourself or use managed infrastructure.
+
+<CardGroup cols={2}>
+  <Card title="Self-hosted with Docker" icon="docker">
+    Run `docker compose up` to spin up PostgreSQL, MinIO object storage, and the store app on your own server. You own every byte of data. Set `BETTER_AUTH_SECRET` to a secure random string for production.
+  </Card>
+
+  <Card title="Managed (Railway or Vercel)" icon="cloud">
+    Deploy to Railway or Vercel with a one-click button. Use a Neon PostgreSQL database and Vercel Blob or Railway object storage. Set `STORE_ID` and `86D_API_KEY` to connect to the 86d platform API.
+  </Card>
+</CardGroup>
+
+Both modes run the same codebase — the deployment target determines which storage provider and database you wire up via environment variables.
+
+## Key value props
+
+**Full data ownership.** Your store runs on your PostgreSQL database. No shared infrastructure, no usage-based pricing surprises, and no vendor lock-in. You can export, migrate, or self-host at any time.
+
+**Composable architecture.** Enable exactly the modules your store needs. A minimal store might run products, cart, and checkout. A full-featured store might add loyalty, subscriptions, multi-currency, helpdesk, and multi-channel selling — all as independent packages that can be upgraded or swapped individually.
+
+**Open source.** 86d is Apache-2.0 licensed. You can fork it, extend it, contribute back, or audit every line of code that runs your store.
+
+<Note>
+  86d is under active development and not yet recommended for production use. Proceed with caution.
+</Note>
+
+## Start building
+
+<CardGroup cols={3}>
+  <Card title="Quickstart" icon="bolt" href="/quickstart">
+    Get a local store running in minutes with the CLI or Docker.
+  </Card>
+
+  <Card title="Module catalog" icon="grid" href="/modules/overview">
+    Browse the 99\+ modules available for your store.
+  </Card>
+
+  <Card title="CLI reference" icon="terminal" href="/cli/overview">
+    Scaffold modules, manage templates, and run code generation.
+  </Card>
+</CardGroup>

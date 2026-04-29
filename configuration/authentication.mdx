@@ -1,0 +1,123 @@
+---
+title: "Authentication"
+description: "Configure Better Auth session management, social login providers, and admin access for your 86d store, including SSO and the default admin credentials."
+---
+
+86d uses [Better Auth](https://better-auth.com/) for all authentication — customer sign-in, admin sessions, and social OAuth flows. The auth system handles session cookies, role-based access control, and (when `86D_API_KEY` is set) SSO with the 86d.app platform. Setting up authentication correctly is one of the first things to do before going to production.
+
+## Required setup
+
+Before your store can authenticate anyone, set `BETTER_AUTH_SECRET` to a cryptographically random string. This secret signs all session tokens and auth cookies.
+
+```bash
+openssl rand -base64 32
+```
+
+Copy the output and add it to your `.env`:
+
+```bash .env
+BETTER_AUTH_SECRET=<paste the output here>
+```
+
+<Warning>
+  Never use the placeholder value from `.env.example` in production. Any store with a predictable `BETTER_AUTH_SECRET` is trivially exploitable.
+</Warning>
+
+You should also set `BETTER_AUTH_URL` to your store's public URL so that OAuth callbacks resolve correctly:
+
+```bash .env
+BETTER_AUTH_URL=https://your-store.com
+```
+
+## Auth endpoints
+
+Better Auth handles all requests under `/api/auth/[...all]`. You do not need to configure these routes manually — they are wired up automatically.
+
+| Endpoint | Description |
+| --- | --- |
+| `POST /api/auth/sign-in/email` | Sign in with email and password |
+| `POST /api/auth/sign-up/email` | Register a new customer account |
+| `GET/POST /api/auth/[...all]` | OAuth callbacks, session management, SSO |
+
+## Guest shoppers
+
+Guest shoppers do not need an account. Guest carts are tracked using a `guestId` cookie set automatically on first visit. When a guest completes checkout, their order is recorded against the guest ID. If they later create an account, their order history can be associated with their new account.
+
+## Social login providers
+
+Enable social login by adding credentials for one or more OAuth providers to your `.env`. Any provider whose variables are absent is automatically disabled — you do not need to remove anything from your config.
+
+| Provider | Required variables |
+| --- | --- |
+| Google | `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `NEXT_PUBLIC_AUTH_GOOGLE_ID` |
+| Twitter / X | `AUTH_TWITTER_ID`, `AUTH_TWITTER_SECRET` |
+| Slack | `AUTH_SLACK_ID`, `AUTH_SLACK_SECRET` |
+| Shopify | `AUTH_SHOPIFY_ID`, `AUTH_SHOPIFY_SECRET` |
+| Apple | `AUTH_APPLE_ID`, `AUTH_APPLE_SECRET`, `AUTH_APPLE_BUNDLE_IDENTIFIER` |
+| Facebook | `AUTH_FACEBOOK_ID`, `AUTH_FACEBOOK_SECRET` |
+
+<Note>
+  Google requires `NEXT_PUBLIC_AUTH_GOOGLE_ID` in addition to the server-side credentials. This public variable is used to initialize the Google One Tap widget in the browser.
+</Note>
+
+### Setting up Google
+
+<Steps>
+  <Step title="Create a Google OAuth app">
+    Open the [Google Cloud Console](https://console.cloud.google.com/), create a new project (or select an existing one), and navigate to **APIs & Services → Credentials**. Create an OAuth 2.0 Client ID of type **Web application**.
+  </Step>
+  <Step title="Add your redirect URI">
+    Add `https://your-store.com/api/auth/callback/google` to the list of authorized redirect URIs.
+  </Step>
+  <Step title="Set the environment variables">
+    ```bash .env
+    AUTH_GOOGLE_ID=123456789-abc.apps.googleusercontent.com
+    AUTH_GOOGLE_SECRET=GOCSPX-...
+    NEXT_PUBLIC_AUTH_GOOGLE_ID=123456789-abc.apps.googleusercontent.com
+    ```
+  </Step>
+</Steps>
+
+Other providers follow the same pattern — create an OAuth app on the provider's developer platform, set the redirect URI to `https://your-store.com/api/auth/callback/<provider>`, and copy the client ID and secret into your `.env`.
+
+## Admin access
+
+Admin users have the `admin` role. Only admin users can access the `/admin` dashboard, manage products and orders, and upload files.
+
+### Default admin account
+
+When you run `86d init` or `docker compose up` (which seeds automatically), a default admin account is created:
+
+| Field | Value |
+| --- | --- |
+| Email | `admin@example.com` |
+| Password | `password123` |
+
+<Warning>
+  Change the default admin password immediately after setup. In production, use a strong unique password or disable email/password login in favor of SSO.
+</Warning>
+
+You can create additional admin users from the admin dashboard under **System → Users**, or by promoting an existing user to the `admin` role directly in the database.
+
+### 86d SSO
+
+When `86D_API_KEY` is set, 86d.app SSO is enabled for admin authentication. This allows you to sign in to your store's admin using your 86d.app account credentials — no separate admin password required.
+
+```bash .env
+86D_API_KEY=your-api-key
+STORE_ID=your-store-uuid
+```
+
+With SSO enabled, admin sessions are issued via the 86d.app identity provider. Team members with access to your store in the 86d.app dashboard can sign in directly without needing a local account.
+
+## Email \+ password auth
+
+Email and password login is enabled by default. Customers and admins can register and sign in using their email address and a password. Passwords are hashed using bcrypt and never stored in plaintext.
+
+To send password-reset and verification emails, set `RESEND_API_KEY`:
+
+```bash .env
+RESEND_API_KEY=re_...
+```
+
+Without a Resend key, email delivery is disabled and password-reset flows will not work. You may still use social login or SSO for authentication.

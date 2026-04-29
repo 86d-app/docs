@@ -1,0 +1,235 @@
+---
+title: "Loyalty"
+description: "Add a points-based rewards program to your store with tiered membership, configurable earning rules, and automatic point accrual on every order."
+---
+
+The loyalty module gives your customers a points-based rewards program with four built-in tiers (bronze, silver, gold, platinum), configurable earning rules, and automatic point accrual whenever an order is placed. Accounts are provisioned automatically on a customer's first interaction — no manual setup required.
+
+## Installation
+
+```sh
+npm install @86d-app/loyalty
+```
+
+Add the module to your store configuration:
+
+```ts
+import loyalty from "@86d-app/loyalty";
+import { createModuleClient } from "@86d-app/core";
+
+const client = createModuleClient([
+  loyalty({
+    pointsPerDollar: "1",
+    minRedemption: "100",
+    redemptionRate: "100", // 100 points = $1
+  }),
+]);
+```
+
+<Note>
+  The loyalty module requires the `customers` module to be enabled.
+</Note>
+
+## Configuration
+
+<ParamField path="pointsPerDollar" default="1" type="string">
+  Number of points a customer earns per dollar spent. Applied to the order amount at the time the `order.placed` event fires.
+</ParamField>
+
+<ParamField path="minRedemption" type="string">
+  Minimum point balance required before a customer can redeem. Customers with fewer points than this threshold cannot use the `/loyalty/redeem` endpoint.
+</ParamField>
+
+<ParamField path="redemptionRate" type="string">
+  Points-to-currency conversion rate. A value of `"100"` means 100 points = \$1.
+</ParamField>
+
+<Note>
+  All configuration values are strings for module config system compatibility, even though they represent numbers.
+</Note>
+
+## Store endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/loyalty/balance` | Get the authenticated customer's current point balance |
+| `GET` | `/loyalty/transactions` | List the customer's point transaction history |
+| `GET` | `/loyalty/tiers` | List all loyalty tiers |
+| `GET` | `/loyalty/calculate` | Calculate how many points an order amount would earn |
+| `POST` | `/loyalty/redeem` | Redeem points against an order |
+| `GET` | `/loyalty/store-search` | Search loyalty data (store search integration) |
+
+### Redeem points (`POST /loyalty/redeem`)
+
+```json
+{
+  "points": 500,
+  "orderId": "ord_abc123"
+}
+```
+
+Returns the resulting `LoyaltyTransaction` on success, or `400` if the customer has insufficient points or the amount is below `minRedemption`.
+
+### Calculate points (`GET /loyalty/calculate`)
+
+Pass `amount` as a query parameter (in dollars):
+
+```text
+GET /loyalty/calculate?amount=49.99
+```
+
+Returns `{ "points": 49 }` based on active earning rules.
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/loyalty/accounts` | List loyalty accounts (filter by `tier`, `status`) |
+| `GET` | `/admin/loyalty/accounts/:customerId` | Get a single customer's loyalty account |
+| `POST` | `/admin/loyalty/accounts/:customerId/adjust` | Manually add or deduct points |
+| `POST` | `/admin/loyalty/accounts/:customerId/suspend` | Suspend a loyalty account |
+| `POST` | `/admin/loyalty/accounts/:customerId/reactivate` | Reactivate a suspended account |
+| `GET` | `/admin/loyalty/summary` | Get program-wide statistics |
+| `GET` | `/admin/loyalty/rules` | List earning rules |
+| `POST` | `/admin/loyalty/rules/create` | Create an earning rule |
+| `PUT` | `/admin/loyalty/rules/:id/update` | Update an earning rule |
+| `DELETE` | `/admin/loyalty/rules/:id/delete` | Delete an earning rule |
+| `GET` | `/admin/loyalty/tiers` | List tiers |
+| `POST` | `/admin/loyalty/tiers/create` | Create a tier |
+| `PUT` | `/admin/loyalty/tiers/:id/update` | Update a tier |
+| `DELETE` | `/admin/loyalty/tiers/:id/delete` | Delete a tier |
+
+## Store components
+
+Use these components in your MDX template files.
+
+### `PointsBalance`
+
+Displays the customer's current point balance with a tier badge and lifetime earn/redeem stats.
+
+<ParamField path="customerId" type="string">
+  The customer's ID. If omitted, the component shows a sign-in prompt.
+</ParamField>
+
+```mdx
+<PointsBalance customerId={session.customerId} />
+```
+
+**States:** signed out (sign-in prompt) → loading (skeleton) → loaded (balance, tier badge, lifetime stats).
+
+---
+
+### `TierProgress`
+
+Shows the customer's current tier and a visual progress bar toward the next tier. Displays a multiplier badge when the current tier has a points multiplier greater than 1×.
+
+<ParamField path="customerId" type="string">
+  The customer's ID. If omitted, the component shows a sign-in prompt.
+</ParamField>
+
+```mdx
+<TierProgress customerId={session.customerId} />
+```
+
+**States:** signed out → loading (skeleton) → loaded (progress bar, percentage to next tier, tier step indicators with checkmarks).
+
+---
+
+### `PointsHistory`
+
+A filterable table of the customer's point transactions (earn, redeem, adjust, expire).
+
+<ParamField path="customerId" type="string">
+  The customer's ID. If omitted, the component shows a sign-in prompt.
+</ParamField>
+
+<ParamField path="limit" default="10" type="number">
+  Maximum number of transactions to display.
+</ParamField>
+
+```mdx
+<PointsHistory customerId={session.customerId} limit={20} />
+```
+
+**States:** signed out → loading (skeleton rows) → loaded (filter bar \+ transaction table) → empty ("No transactions found").
+
+---
+
+### `LoyaltyPage`
+
+A full-page loyalty dashboard that composes `PointsBalance`, `TierProgress`, and `PointsHistory` into a single view with a two-column layout.
+
+<ParamField path="customerId" type="string">
+  The customer's ID. If omitted, the component shows a sign-in prompt.
+</ParamField>
+
+```mdx
+<LoyaltyPage customerId={session.customerId} />
+```
+
+## Types
+
+```ts
+type LoyaltyTierSlug = "bronze" | "silver" | "gold" | "platinum";
+type TransactionType = "earn" | "redeem" | "adjust" | "expire";
+type AccountStatus = "active" | "suspended" | "closed";
+
+interface LoyaltyAccount {
+  id: string;
+  customerId: string;
+  balance: number;
+  lifetimeEarned: number;
+  lifetimeRedeemed: number;
+  tier: LoyaltyTierSlug;
+  status: AccountStatus;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface LoyaltyTransaction {
+  id: string;
+  accountId: string;
+  type: TransactionType;
+  points: number;
+  description: string;
+  orderId?: string;
+  metadata?: Record<string, unknown>;
+  createdAt: Date;
+}
+
+interface LoyaltyRule {
+  id: string;
+  name: string;
+  type: "per_dollar" | "fixed_bonus" | "multiplier" | "signup";
+  points: number;
+  minOrderAmount?: number;
+  active: boolean;
+  createdAt: Date;
+}
+
+interface LoyaltyTier {
+  id: string;
+  name: string;
+  slug: string;
+  minPoints: number;
+  multiplier: number;
+  perks?: Record<string, unknown>;
+  sortOrder: number;
+}
+
+interface LoyaltySummary {
+  totalAccounts: number;
+  totalPointsOutstanding: number;
+  totalLifetimeEarned: number;
+  tierBreakdown: Array<{ tier: LoyaltyTierSlug; count: number }>;
+}
+```
+
+### Rule types
+
+| Type | Description |
+| --- | --- |
+| `per_dollar` | Award a fixed number of points per dollar spent |
+| `fixed_bonus` | Award a flat point bonus when the order meets a minimum amount |
+| `multiplier` | Multiply the base points earned by a factor |
+| `signup` | One-time bonus awarded on a customer's first interaction |
