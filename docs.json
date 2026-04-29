@@ -93,7 +93,7 @@
               "resources/versioning",
               "resources/contributing",
               "resources/changelog",
-              "mcp"
+              "resources/mcp"
             ]
           }
         ]
@@ -213,7 +213,8 @@
               "modules/subscriptions",
               "modules/multi-currency",
               "modules/tax",
-              "modules/tipping"
+              "modules/tipping",
+              "modules/revenue"
             ]
           },
           {

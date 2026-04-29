@@ -5,12 +5,12 @@ description: "Templates bundle MDX pages, a config.json, and OKLCH color tokens 
 
 A template is a folder that contains everything visual about your store: the MDX files that compose each page, a `config.json` that lists which modules are active and what colors to use, and any global CSS overrides. When you change a template, the store's look changes completely, but the underlying module logic, API routes, and data stay exactly the same.
 
-The default template is **brisa**, located at `templates/brisa/`. It is the starting point for every new store.
+The default starter template ships under `templates/`. It is the starting point for every new store; copy it to make your own theme.
 
 ## Template file structure
 
 ```text
-templates/brisa/
+templates/<theme>/
 ├── config.json          # Modules list, theme name, color tokens, asset paths
 ├── layout.mdx           # Global page wrapper (Navbar + main content + Footer)
 ├── index.mdx            # Homepage content
@@ -165,7 +165,7 @@ Numbered MDX files (`1.mdx`, `2.mdx`, `3.mdx`) are **design variants** of the sa
     86d template create my-theme
     ```
 
-    This copies the brisa template into `templates/my-theme/` as a starting point and updates `theme` and `name` in the new `config.json`.
+    This copies the default template into `templates/my-theme/` as a starting point and updates `theme` and `name` in the new `config.json`.
   </Step>
   <Step title="Edit your MDX pages">
     Modify `layout.mdx`, `index.mdx`, and any page-level MDX files to match your design. Module components are available by name without any imports.

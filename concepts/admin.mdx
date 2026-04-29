@@ -38,9 +38,9 @@ The sidebar uses a two-level collapsible structure. The top level has nine fixed
 
 When you enable a module, it declares which group and subgroup it belongs to. The admin sidebar reflects this automatically; you never need to touch a navigation config file.
 
-<Note>
+<Info>
   Both the group and subgroup collapse states persist in `localStorage` under the key `86d-admin-sidebar-collapsed`. Your sidebar state survives page reloads and browser restarts.
-</Note>
+</Info>
 
 ## How modules register admin pages
 
@@ -76,9 +76,9 @@ POST /api/upload
   </Accordion>
 </AccordionGroup>
 
-<Note>
+<Warning>
   The upload endpoint is admin-only. Unauthenticated requests are rejected. File deletion (`DELETE /api/upload`) is also admin-only and includes store-isolation checks to prevent cross-store deletion.
-</Note>
+</Warning>
 
 ## Admin API rate limit
 

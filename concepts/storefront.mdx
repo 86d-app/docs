@@ -52,9 +52,9 @@ Customers can shop without creating an account. The storefront distinguishes the
 - **Guest shopping**: the cart is identified by a `guestId` stored client-side. Items persist for up to 7 days (configurable via `moduleOptions` in `config.json`).
 - **Authenticated shopping**: after sign-in, the cart is attached to the customer's `customerId`. Guest carts can be merged into an authenticated cart at sign-in.
 
-<Note>
+<Warning>
   The storefront never accepts a customer's identity from the request body. Session data determines who the customer is on every authenticated request.
-</Note>
+</Warning>
 
 ## Store API
 

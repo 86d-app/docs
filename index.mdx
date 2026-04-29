@@ -1,10 +1,14 @@
 ---
 title: "86d"
-description: "86d is an open-source dynamic commerce platform. Compose your store from 99 isolated modules, own every byte of data, and deploy anywhere."
+description: "86d is an open-source dynamic commerce platform. Compose your store from isolated modules, own every byte of data, and deploy anywhere."
 sidebarTitle: "Home"
 ---
 
-86d is an open-source dynamic commerce platform built from isolated, interchangeable modules. Every feature ships as its own npm package: products, cart, checkout, loyalty, subscriptions, multi-channel selling, and 90 more. You compose the exact stack you need, customize every component, and deploy on infrastructure you control.
+<Warning>
+  86d is under active development and is not yet recommended for production use. Proceed with caution.
+</Warning>
+
+86d is an open-source dynamic commerce platform built from isolated, interchangeable modules. Every feature ships as its own npm package, from products and cart to loyalty and multi-channel selling. You compose the exact stack you need, customize every component, and deploy on infrastructure you control.
 
 <CardGroup cols={2}>
   <Card title="Quickstart" icon="bolt" href="/quickstart">
@@ -14,7 +18,7 @@ sidebarTitle: "Home"
     Ship to Railway, Vercel + Neon, or self-host with Docker.
   </Card>
   <Card title="Module catalog" icon="grid" href="/modules/overview">
-    Browse all 99 modules and pick what your store needs.
+    Browse the full module catalog and pick what your store needs.
   </Card>
   <Card title="CLI reference" icon="terminal" href="/cli/overview">
     Scaffold modules, switch templates, and run codegen with the `86d` CLI.
@@ -23,14 +27,14 @@ sidebarTitle: "Home"
 
 ## How 86d works
 
-A store is a Bun + Next.js monorepo of composable modules. Each module is an isolated npm package that contributes API endpoints, admin UI, and storefront components. You enable the modules your store needs in `templates/<theme>/config.json`, run codegen, and the components are wired into your MDX templates and admin sidebar automatically.
+A store is a Bun + Next.js monorepo of composable modules. Each module is an isolated npm package that contributes API endpoints, admin UI, and storefront components. You enable the modules your store needs in your active template's `config.json`, run codegen, and the components are wired into your MDX templates and admin sidebar automatically.
 
 <Steps>
   <Step title="Install and initialize">
     Install the `86d` CLI, then run `86d init` to set up your environment, run database migrations, and seed demo data.
   </Step>
   <Step title="Choose your modules">
-    Edit `templates/brisa/config.json`. Every `@86d-app/*` module on npm is available, and so is any third-party module that follows the same contract.
+    Edit your active template's `config.json`. Every `@86d-app/*` module on npm is available, and so is any third-party module that follows the same contract.
   </Step>
   <Step title="Run codegen">
     `86d generate` regenerates module imports and the API router. Module components become available immediately in MDX templates.
@@ -43,7 +47,7 @@ A store is a Bun + Next.js monorepo of composable modules. Each module is an iso
 ## Why 86d
 
 <CardGroup cols={2}>
-  <Card title="99 commerce modules" icon="boxes-stacked" href="/modules/overview">
+  <Card title="A module for every feature" icon="boxes-stacked" href="/modules/overview">
     Products, cart, checkout, subscriptions, loyalty, multi-currency, and more. Each one is an independent package.
   </Card>
   <Card title="MDX storefront templates" icon="palette" href="/concepts/templates">
@@ -63,6 +67,6 @@ A store is a Bun + Next.js monorepo of composable modules. Each module is an iso
   </Card>
 </CardGroup>
 
-<Note>
-  86d is under active development and is not yet recommended for production use. Proceed with caution.
-</Note>
+<Tip>
+  Working with an AI assistant? Point it at the [86d docs MCP server](/resources/mcp) for structured access to every page in this site.
+</Tip>

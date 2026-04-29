@@ -3,7 +3,15 @@ title: "Quickstart"
 description: "Set up a local 86d store with the CLI and Bun, or skip configuration entirely with one Docker Compose command that starts the full stack."
 ---
 
+<Warning>
+  86d is under active development and is not yet recommended for production use. Use the steps below for development and evaluation.
+</Warning>
+
 The fastest way to get an 86d store running is `docker compose up`. It starts PostgreSQL, MinIO object storage, and the store app with zero configuration. If you prefer a local dev setup with hot reload and direct access to the codebase, follow the CLI path below.
+
+<Tip>
+  Want to skip the prerequisites entirely? Jump straight to the [Docker Compose alternative](#docker-compose-alternative) section.
+</Tip>
 
 <Steps>
   <Step title="Check prerequisites">
@@ -75,9 +83,9 @@ The fastest way to get an 86d store running is `docker compose up`. It starts Po
     Sign in with `admin@example.com` / `password123`.
   </Step>
   <Step title="Add your first module">
-    Modules are enabled by listing them in `templates/brisa/config.json`. Open that file and add a module package name to the `modules` array:
+    Modules are enabled by listing them in your active template's `config.json`. Open that file and add a module package name to the `modules` array:
 
-    ```json templates/brisa/config.json
+    ```json templates/<theme>/config.json
     {
       "name": "My Store",
       "modules": [
@@ -144,6 +152,6 @@ POSTGRES_PUBLISH_PORT=5433 STORE_PUBLISH_PORT=3001 docker compose up
   </Card>
 
   <Card title="Browse the module catalog" icon="grid" href="/modules/overview">
-    Explore the 99 modules you can enable in your store.
+    Explore every module you can enable in your store.
   </Card>
 </CardGroup>

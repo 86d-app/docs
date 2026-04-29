@@ -13,7 +13,7 @@ templates/
     config.json   ← your store config lives here
 ```
 
-If you are using the default template, your file is at `templates/brisa/config.json`. Custom templates follow the same pattern under their own directory name.
+If you are using the default starter template, your file is at `templates/<theme>/config.json`. Custom templates follow the same pattern under their own directory name.
 
 ## Top-level fields
 
@@ -140,9 +140,9 @@ You define separate values for `variables.light` and `variables.dark`. The suppo
 
 ## Complete example
 
-The following is the full `config.json` used by the default **brisa** template:
+The following is the full `config.json` used by the default starter template:
 
-```json templates/brisa/config.json
+```json templates/<theme>/config.json
 {
   "theme": "brisa",
   "name": "86d Starter Kit",
@@ -244,6 +244,6 @@ After editing `config.json`, regenerate the module imports and API router so you
 
 You do not need to restart the dev server when running in watch mode. `bun run dev` picks up config changes automatically after codegen runs.
 
-<Note>
+<Info>
   If you set `STORE_ID` in your environment, the store fetches its configuration from the 86d API instead of reading `config.json`. See [Environment variables](/configuration/environment-variables) for details.
-</Note>
+</Info>

@@ -1,0 +1,28 @@
+---
+title: "Revenue"
+description: "Revenue and transaction reporting for 86d. Aggregate orders, refunds, and payouts into a queryable dashboard."
+---
+
+The revenue module aggregates payments, refunds, and payouts across the store's history into a single reporting layer. It exposes per-period metrics (gross, net, refunded, payable), per-channel breakdowns, and a queryable transaction ledger that the admin renders as charts and tables.
+
+**Source:** [`modules/revenue`](https://github.com/86d-app/86d/tree/main/modules/revenue) · **npm:** [`@86d-app/revenue`](https://www.npmjs.com/package/@86d-app/revenue)
+
+## Installation
+
+```sh
+86d module add revenue
+```
+
+## Admin endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/admin/revenue/summary` | Headline metrics for a date range |
+| `GET` | `/admin/revenue/by-channel` | Revenue split by sales channel |
+| `GET` | `/admin/revenue/by-product` | Top products by revenue |
+| `GET` | `/admin/revenue/transactions` | Paginated transaction ledger |
+| `GET` | `/admin/revenue/export` | CSV export of any view |
+
+## Related modules
+
+- [Orders](/modules/orders), [Payments](/modules/payments), [Analytics](/modules/analytics), [Audit log](/modules/audit-log).

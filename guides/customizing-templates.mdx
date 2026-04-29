@@ -3,7 +3,7 @@ title: "Customize templates and themes"
 description: "Change your store's name, colors, typography, logo, and page layouts by editing template MDX files and config.json. No framework knowledge required."
 ---
 
-A template controls everything your customers see: the global layout, color palette, typography, the content of every page, and the assets in your header and footer. All of this lives in `templates/brisa/`, a plain directory of MDX files and a single `config.json`. You do not need to touch the framework, modify the Next.js app, or run any special tooling. Edit the files, save, and your dev server picks up the change immediately.
+A template controls everything your customers see: the global layout, color palette, typography, the content of every page, and the assets in your header and footer. All of this lives under `templates/<theme>/`, a plain directory of MDX files and a single `config.json`. You do not need to touch the framework, modify the Next.js app, or run any special tooling. Edit the files, save, and your dev server picks up the change immediately.
 
 ## What templates contain
 
@@ -30,7 +30,7 @@ This creates `templates/my-store/` with the full Brisa template copied in. You c
 
 ## Step 2: set your store name and colors
 
-Open `templates/brisa/config.json`. The top section sets your store identity:
+Open your active template's `config.json`. The top section sets your store identity:
 
 ```json
 {
@@ -78,7 +78,7 @@ OKLCH gives you perceptually uniform lightness, meaning a `primary` at `oklch(0.
 
 ## Step 3: edit MDX pages
 
-MDX pages are where you arrange module components and write content. Open `templates/brisa/index.mdx` to see how the default homepage is built:
+MDX pages are where you arrange module components and write content. Open your active template's `index.mdx` to see how the default homepage is built:
 
 ```mdx
 import Link from "next/link";
@@ -125,7 +125,7 @@ Every component you see (`FeaturedProducts`, `FeaturedCollections`, `NewsletterI
 Layout files for dynamic routes receive props from the framework. For example, `products/[slug]/layout.mdx` receives `props.slug` automatically:
 
 ```mdx
-{/* templates/brisa/products/[slug]/layout.mdx */}
+{/* templates/<theme>/products/[slug]/layout.mdx */}
 <div className="mx-auto max-w-7xl px-4 py-12">
   <ProductDetail slug={props.slug} />
   <ProductReviews />
@@ -151,7 +151,7 @@ Switching to a different design variant is a one-line change in the `.tsx` file.
 
 ## Update your logo and favicon
 
-Replace the SVG files in `templates/brisa/assets/` and update the paths in `config.json` if they change:
+Replace the SVG files in your template's `assets/` directory and update the paths in `config.json` if they change:
 
 ```json
 {

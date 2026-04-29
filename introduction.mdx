@@ -1,9 +1,13 @@
 ---
 title: "What is 86d?"
-description: "86d is an open-source dynamic commerce platform of 99 independent modules. Compose your stack, own your data, and deploy anywhere."
+description: "86d is an open-source dynamic commerce platform built from independent modules. Compose your stack, own your data, and deploy anywhere."
 ---
 
-86d is a modular, open-source commerce platform where every feature ships as an independent npm package. Instead of a monolithic system where you take everything or nothing, 86d lets you compose precisely the commerce capabilities your store needs (products, cart, checkout, subscriptions, loyalty, multi-channel selling, and 90 more), then deploy on infrastructure you control.
+<Warning>
+  86d is under active development and is not yet recommended for production use. Proceed with caution.
+</Warning>
+
+86d is a modular, open-source commerce platform where every feature ships as an independent npm package. Instead of a monolithic system where you take everything or nothing, 86d lets you compose precisely the commerce capabilities your store needs (products, cart, checkout, subscriptions, loyalty, multi-channel selling, and many more), then deploy on infrastructure you control.
 
 The platform is designed to be **agentic-friendly**: each module is small, isolated, and scoped to a single concern, which makes it tractable for AI-assisted code generation, automated reviews, and bulk migrations.
 
@@ -17,9 +21,9 @@ Every piece of functionality in 86d is a module: an isolated npm package that sh
 
 Modules depend only on `@86d-app/core` and never import each other directly. Cross-module communication happens through declared contracts (`requires` / `exports`), so you can add, remove, or replace any module without touching the rest of your store.
 
-You control which modules your store loads by editing `templates/brisa/config.json`:
+You control which modules your store loads by editing your active template's `config.json`:
 
-```json templates/brisa/config.json
+```json templates/<theme>/config.json
 {
   "name": "My Store",
   "modules": [
@@ -72,10 +76,6 @@ See [Deployment and hosting](/deployment) for the full setup for each path.
 
 **Open source.** 86d is Apache 2.0 licensed. You can fork it, extend it, contribute back, or audit every line of code that runs your store. The repository is at [github.com/86d-app/86d](https://github.com/86d-app/86d).
 
-<Note>
-  86d is under active development and is not yet recommended for production use. Proceed with caution.
-</Note>
-
 ## Start building
 
 <CardGroup cols={3}>
@@ -84,7 +84,7 @@ See [Deployment and hosting](/deployment) for the full setup for each path.
   </Card>
 
   <Card title="Module catalog" icon="grid" href="/modules/overview">
-    Browse the 99 modules available for your store.
+    Browse the full module catalog and pick what your store needs.
   </Card>
 
   <Card title="CLI reference" icon="terminal" href="/cli/overview">

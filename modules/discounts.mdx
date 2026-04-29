@@ -72,9 +72,9 @@ Validates a promo code and calculates the discount amount without applying it or
 | `POST` | `/admin/discounts/:id/codes` | Add a promo code to a discount |
 | `DELETE` | `/admin/discounts/codes/:id/delete` | Delete a single promo code |
 
-<Note>
+<Warning>
   Deleting a discount cascades: all promo codes attached to that discount are removed first, then the discount record is deleted.
-</Note>
+</Warning>
 
 ## Components
 

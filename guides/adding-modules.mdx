@@ -52,9 +52,9 @@ You can also add modules manually by listing them in the active template's `conf
 
 <Steps>
   <Step title="Edit config.json">
-    Open `templates/brisa/config.json` and append the package name to the `modules` array:
+    Open your active template's `config.json` and append the package name to the `modules` array:
 
-    ```json templates/brisa/config.json
+    ```json templates/<theme>/config.json
     {
       "modules": [
         "@86d-app/cart",
@@ -148,5 +148,5 @@ You are not limited to `@86d-app/*` modules. Any npm package that exports React 
 ## Next steps
 
 - [Build a custom module](/guides/building-a-module) to add bespoke functionality.
-- [Module catalog](/modules/overview) for the full list of 99 modules.
+- [Module catalog](/modules/overview) for the full list of available modules.
 - [`config.json` reference](/configuration/store-config) for every supported field.

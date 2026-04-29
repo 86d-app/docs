@@ -18,9 +18,9 @@ Modules depend only on `@86d-app/core` and communicate with each other through d
 
 ## Enabling modules in `config.json`
 
-The `modules` field in `templates/brisa/config.json` controls which modules are active. After editing it, run `86d generate` to wire everything in.
+The `modules` field in your active template's `config.json` controls which modules are active. After editing it, run `86d generate` to wire everything in.
 
-```json templates/brisa/config.json
+```json templates/<theme>/config.json
 {
   "modules": [
     "@86d-app/cart",
@@ -33,7 +33,7 @@ The `modules` field in `templates/brisa/config.json` controls which modules are 
 
 <Steps>
   <Step title="Edit config.json">
-    Add the module package name to the `modules` array in `templates/brisa/config.json`.
+    Add the module package name to the `modules` array in your active template's `config.json`.
   </Step>
   <Step title="Regenerate module imports">
     ```bash
@@ -47,9 +47,9 @@ The `modules` field in `templates/brisa/config.json` controls which modules are 
   </Step>
 </Steps>
 
-<Note>
-  Setting `"modules": "*"` in `config.json` enables every module installed in the workspace. This is the default for the brisa starter template.
-</Note>
+<Info>
+  Setting `"modules": "*"` in `config.json` enables every module installed in the workspace. This is the default for the starter template.
+</Info>
 
 ## Using module components in MDX
 
@@ -69,7 +69,7 @@ No import statements are required. The code generator handles them for you.
 
 ## Module categories
 
-86d ships 99 modules. Here is a breakdown by category. For the full list with descriptions, see the [Module catalog](/modules/overview).
+86d ships a deep set of first-party modules across the categories below. For the full list with descriptions, see the [Module catalog](/modules/overview).
 
 <AccordionGroup>
   <Accordion title="Catalog">
@@ -180,5 +180,5 @@ You can also pull a module straight from a GitHub repository or any npm registry
 See [`86d module add`](/cli/commands#86d-module-add) for the full specifier grammar.
 
 <Tip>
-  You can keep separate `config.json` files per environment. Include a `@86d-app/debug-tools` module in development, for example, but omit it from production.
+  Keep separate `config.json` files per environment. Include a `@86d-app/debug-tools` module in development, for example, but omit it from production.
 </Tip>

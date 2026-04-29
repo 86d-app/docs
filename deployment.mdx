@@ -3,7 +3,11 @@ title: "Deployment and hosting"
 description: "Deploy 86d to Railway, Vercel + Neon, or a self-hosted Docker server. Each option takes minutes to set up and needs only a few environment variables."
 ---
 
-86d ships with a production-ready `Dockerfile` and `docker-compose.yml`, and supports one-click deploys to Railway and Vercel. Pick the path that matches your infrastructure preferences. All three run the same codebase.
+<Warning>
+  86d is under active development and is not yet recommended for production use. Use these flows for staging, internal stores, and evaluation.
+</Warning>
+
+86d ships with a `Dockerfile` and `docker-compose.yml`, and supports one-click deploys to Railway and Vercel. Pick the path that matches your infrastructure preferences. All three run the same codebase.
 
 <Tabs>
   <Tab title="Docker Compose (self-hosted)">
@@ -99,9 +103,9 @@ description: "Deploy 86d to Railway, Vercel + Neon, or a self-hosted Docker serv
 
     **Storage on Vercel:** set `STORAGE_PROVIDER=vercel` and connect a Vercel Blob store in the Vercel dashboard. The store uses Vercel Blob for all file uploads. Set `VERCEL_BLOB_STORAGE_HOSTNAME` to your blob store's public hostname.
 
-    <Note>
+    <Info>
       Neon provides both a pooled connection string (for the app) and a direct connection string (for migrations). Set both `DATABASE_URL` and `DATABASE_URL_UNPOOLED` to the appropriate Neon URLs from your project dashboard.
-    </Note>
+    </Info>
   </Tab>
 </Tabs>
 

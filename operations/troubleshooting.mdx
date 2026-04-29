@@ -3,11 +3,13 @@ title: "Troubleshooting"
 description: "Diagnose common 86d issues. Database errors, codegen failures, missing components, broken webhooks, and what each one points at."
 ---
 
-When something goes wrong, run `86d doctor` first. It reports on Node, Bun, dependencies, the active template, module integrity, environment variables, database connectivity, codegen scripts, and TypeScript config, with a `Fix:` line for every issue.
+<Tip>
+  When something goes wrong, run `86d doctor` first. It reports on Node, Bun, dependencies, the active template, module integrity, environment variables, database connectivity, codegen scripts, and TypeScript config, with a `Fix:` line for every issue.
 
-```bash
-86d doctor
-```
+  ```bash
+  86d doctor
+  ```
+</Tip>
 
 If `doctor` is green and you still have a problem, the rest of this page covers the symptoms we see most often.
 
