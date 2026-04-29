@@ -6,10 +6,10 @@
     "primary": "#747474",
     "light": "#b7b7b7"
   },
-  "favicon": "https://icons.duckduckgo.com/ip3/86d.app.ico",
+  "favicon": "https://86d.app/icon",
   "logo": {
-    "light": "https://media.brand.dev/93cc828f-f7db-4654-bd42-fe2bf73b8d77.png",
-    "dark": "https://media.brand.dev/93cc828f-f7db-4654-bd42-fe2bf73b8d77.png",
+    "light": "https://86d.app/logo/light",
+    "dark": "https://86d.app/logo/dark",
     "href": "https://86d.app"
   },
   "navbar": {
