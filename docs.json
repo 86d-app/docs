@@ -7,10 +7,10 @@
     "light": "#b7b7b7",
     "dark": "#09090b"
   },
-  "favicon": "https://86d.app/icon",
+  "favicon": "https://86d.app/icon.png",
   "logo": {
-    "light": "https://86d.app/logo/light",
-    "dark": "https://86d.app/logo/dark",
+    "light": "https://86d.app/logo-light.png",
+    "dark": "https://86d.app/logo-dark.png",
     "href": "https://86d.app"
   },
   "navbar": {
