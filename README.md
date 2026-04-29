@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  Dynamic commerce infrastructure built from modular components
+  Dynamic Commerce
 </p>
 
 <p align="center">
@@ -17,3 +17,4 @@
 > [!WARNING]
 > This project is under active development and is not ready for production use. Please proceed with caution. Use at your own risk. 
 
+Modular open-source commerce platform.
