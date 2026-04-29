@@ -1,6 +1,0 @@
-@import "@mintlify/components/styles.css";
-@import "tailwindcss";
-
-@theme {
-  --color-background-dark: lab(2.51107% .242703 -.886115);
-}
